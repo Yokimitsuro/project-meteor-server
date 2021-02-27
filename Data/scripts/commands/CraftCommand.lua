@@ -413,7 +413,6 @@ function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
         local qltyDiff = math.random(0,2);
 
         if progress >= 100 then
-        
             player:SendGameMessage(GetWorldMaster(), 40111, 0x20, player, itemId, 3, 8);  -- "You create <#3 quantity> <#1 item> <#2 quality>."
             callClientFunction(player, "delegateCommand", craftJudge, "closeCraftProgressWidget", commandactor);
             
@@ -467,5 +466,5 @@ function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
         end
     end
 
-    return -1; 
+    return -1;
 end

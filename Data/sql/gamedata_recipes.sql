@@ -17,7 +17,10 @@ CREATE DATABASE IF NOT EXISTS `ffxiv_server` /*!40100 DEFAULT CHARACTER SET lati
 USE `ffxiv_server`;
 
 -- Dumping structure for table ffxiv_server.gamedata_recipes
+<<<<<<< HEAD
 DROP TABLE IF EXISTS `gamedata_recipes`;
+=======
+>>>>>>> develop
 CREATE TABLE IF NOT EXISTS `gamedata_recipes` (
   `id` int(4) NOT NULL AUTO_INCREMENT,
   `craftedItem` int(11) NOT NULL,
@@ -46,6 +49,7 @@ CREATE TABLE IF NOT EXISTS `gamedata_recipes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
+<<<<<<< HEAD
 -- Dumping data for table ffxiv_server.gamedata_recipes: ~5,410 rows (approximately)
 /*!40000 ALTER TABLE `gamedata_recipes` DISABLE KEYS */;
 INSERT INTO `gamedata_recipes` (`id`, `craftedItem`, `craftedQuantity`, `job`, `level`, `dated`, `kind`, `crystal0ID`, `crystal0Quantity`, `crystal1ID`, `crystal1Quantity`, `facilities`, `material0`, `material1`, `material2`, `material3`, `material4`, `material5`, `material6`, `material7`, `subSkill0Job`, `subSkill0Level`, `subSkill1Job`, `subSkill1Level`) VALUES
@@ -5435,6 +5439,9 @@ INSERT INTO `gamedata_recipes` (`id`, `craftedItem`, `craftedQuantity`, `job`, `
 	(5384, 3010023, 2, 'H', 6, 0, 'CC', 1000009, 2, 0, 0, NULL, 3011012, 3011016, 3011501, 3010018, 3011515, 3011517, 0, 0, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `gamedata_recipes` ENABLE KEYS */;
 
+=======
+-- Data exporting was unselected.
+>>>>>>> develop
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

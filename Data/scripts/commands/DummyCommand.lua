@@ -125,8 +125,6 @@ function onEventStarted(player, commandActor, triggerName, arg1, arg2, arg3, arg
     --callClientFunction(player, "delegateCommand", harvestJudge, "turnToTarget", commandActor, harvestType, nodeGrade);
 
     player:ChangeState(50);
-	
-    
     
     if harvestType == commandMine then
         player:SendGameMessage(harvestJudge, 26, MESSAGE_TYPE_SYSTEM, 1, nodeGrade);
@@ -154,8 +152,7 @@ function onEventStarted(player, commandActor, triggerName, arg1, arg2, arg3, arg
                     -- "Strike" 0 = Empty, 100 = Filled.   Mooglebox sweespots are 1=10, 2=30, 3=70, 4=100 for Mining
                     chosenCommand, currentPower = callClientFunction(player, "delegateCommand", harvestJudge, "askInputWidget", commandActor, harvestType, 2, showTutorial, false, false, nil, false); -- Strike
     
-                    if debugMsg then player:SendMessage(0x20, "", tostring(chosenCommand).." Power: "..tostring(currentPower)); end
-                    
+                    if debugMsg then player:SendMessage(0x20, "", tostring(chosenCommand).." Power: "..tostring(currentPower)); end                    
                     
                     if chosenCommand == 22702 then      -- Cancel.
                         harvestAttempts = harvestAttempts - 1;
@@ -170,14 +167,11 @@ function onEventStarted(player, commandActor, triggerName, arg1, arg2, arg3, arg
                         break;
                     elseif chosenCommand == 22703 then  -- Strike.
                     
-                        player:PlayAnimation(minerAnim[math.random(1,3)]);
-                    
+                        player:PlayAnimation(minerAnim[math.random(1,3)]);                   
                         nodeRemainder = nodeRemainder - 20;
                         if nodeRemainder < 0 then 
                             nodeRemainder = 0;  
-                        end
-                        
-                       
+                        end         
 
                         --player:SendGameMessage(harvestJudge, 25, MESSAGE_TYPE_SYSTEM, item, 4, 1);
                         callClientFunction(player, "delegateCommand", harvestJudge, "orderInputWidget", commandActor, nodeRemainder, false, harvestType);
@@ -199,7 +193,6 @@ function onEventStarted(player, commandActor, triggerName, arg1, arg2, arg3, arg
                             wait(2);
                             break;
                         end
-                    
                     elseif chosenCommand == 22710 then -- "Strike" Tutorial.                    
                         SendTutorial(player, harvestJudge, 2);
                     end
@@ -246,5 +239,4 @@ function SendTutorial(player, harvestJudge, id)
         wait(3);
         player:SendGameMessage(harvestJudge, 16, MESSAGE_TYPE_SYSTEM);  
     end
-
 end
