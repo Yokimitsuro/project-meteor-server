@@ -42,10 +42,10 @@ namespace Meteor.Map
     class Database
     {
 
-        public static uint GetUserIdFromSession(String sessionId)
+        public static uint GetUserIdFromSession(string sessionId)
         {
             uint id = 0;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -74,7 +74,7 @@ namespace Meteor.Map
 
         public static Dictionary<uint, ItemData> GetItemGamedata()
         {
-            using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (var conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 Dictionary<uint, ItemData> gamedataItems = new Dictionary<uint, ItemData>();
 
@@ -131,7 +131,7 @@ namespace Meteor.Map
 
         public static Dictionary<uint, GuildleveData> GetGuildleveGamedata()
         {
-            using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (var conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 Dictionary<uint, GuildleveData> gamedataGuildleves = new Dictionary<uint, GuildleveData>();
 
@@ -151,7 +151,6 @@ namespace Meteor.Map
                     {
                         while (reader.Read())
                         {
-                            uint id = reader.GetUInt32("id");
                             GuildleveData guildleve = new GuildleveData(reader);
                             gamedataGuildleves.Add(guildleve.id, guildleve);
                         }
@@ -170,9 +169,49 @@ namespace Meteor.Map
             }
         }
 
+        public static Dictionary<uint, PassiveGuildleveData> GetPassiveGuildleveGamedata()
+        {
+            using (var conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                Dictionary<uint, PassiveGuildleveData> gamedataPassiveGuildleves = new Dictionary<uint, PassiveGuildleveData>();
+
+                try
+                {
+                    conn.Open();
+
+                    string query = @"
+                                SELECT
+                                *                                
+                                FROM gamedata_passivegl_craft
+                                ";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            PassiveGuildleveData passiveGL = new PassiveGuildleveData(reader);
+                            gamedataPassiveGuildleves.Add(passiveGL.id, passiveGL);
+                        }
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+
+                return gamedataPassiveGuildleves;
+            }
+        }
+
         public static bool GetRecipeGamedata(Dictionary<uint, Recipe> recipeList, Dictionary<string, List<Recipe>> matToRecipe)
         {
-            using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (var conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -227,10 +266,6 @@ namespace Meteor.Map
                             mats[6] = reader.GetUInt32("material6");
                             mats[7] = reader.GetUInt32("material7");
 
-                            Array.Sort(mats);
-
-                            Recipe recipe = new Recipe(craftedItem, craftedQuantity, new byte[] { }, 1);
-
                             //Hash for the Mat -> Recipe Dictionary                            
                             byte[] result = new byte[8 * sizeof(int)];
                             Buffer.BlockCopy(mats, 0, result, 0, result.Length);
@@ -243,9 +278,12 @@ namespace Meteor.Map
                             if (!matToRecipe.ContainsKey(hash))
                                 matToRecipe.Add(hash, new List<Recipe>());
 
+                            //Create obj
+                            Recipe recipe = new Recipe(recipeID, craftedItem, craftedQuantity, mats, crystal0ID, crystal0Quantity, crystal1ID, crystal1Quantity, new byte[] { }, 1);
+
                             //Add to both Dictionaries
-                            recipeList.Add(recipeID, new Recipe(craftedItem, craftedQuantity, new byte[] { }, 1));
-                            matToRecipe[hash].Add(new Recipe(craftedItem, craftedQuantity, new byte[] { }, 1));
+                            recipeList.Add(recipeID, recipe);
+                            matToRecipe[hash].Add(recipe);
                         }
                     }
                 }
@@ -268,7 +306,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -326,7 +364,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -362,7 +400,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -412,7 +450,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -446,7 +484,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -494,7 +532,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -513,9 +551,13 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@charaId", player.actorId);
                     cmd.Parameters.AddWithValue("@slot", slot);
                     cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.actorId);
-                    cmd.Parameters.AddWithValue("@phase", quest.GetPhase());
                     cmd.Parameters.AddWithValue("@questData", quest.GetSerializedQuestData());
-                    cmd.Parameters.AddWithValue("@questFlags", quest.GetQuestFlags());
+
+                    if (quest.IsScenario())
+                    {
+                        cmd.Parameters.AddWithValue("@phase", (quest as Scenario).GetPhase());
+                        cmd.Parameters.AddWithValue("@questFlags", (quest as Scenario).GetQuestFlags());
+                    }
 
                     cmd.ExecuteNonQuery();
                 }
@@ -535,7 +577,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -571,7 +613,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -611,7 +653,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -644,7 +686,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -677,7 +719,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -711,7 +753,7 @@ namespace Meteor.Map
         public static bool IsQuestCompleted(Player player, uint questId)
         {
             bool isCompleted = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -738,7 +780,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1156,27 +1198,10 @@ namespace Meteor.Map
                     {
                         while (reader.Read())
                         {
-                            int index = reader.GetUInt16(0);
-                            player.playerWork.questScenario[index] = 0xA0F00000 | reader.GetUInt32(1);
-                            string questData = null;
-                            uint questFlags = 0;
-                            uint currentPhase = 0;
-
-                            if (!reader.IsDBNull(2))
-                                questData = reader.GetString(2);
-                            else
-                                questData = "{}";
-
-                            if (!reader.IsDBNull(3))
-                                questFlags = reader.GetUInt32(3);
-                            else
-                                questFlags = 0;
-
-                            if (!reader.IsDBNull(4))
-                                currentPhase = reader.GetUInt32(4);
-
-                            string questName = Server.GetStaticActors(player.playerWork.questScenario[index]).actorName;
-                            player.questScenario[index] = new Quest(player, player.playerWork.questScenario[index], questName, questData, questFlags, currentPhase);
+                            int index = reader.GetUInt16(0);                          
+                            Quest quest = Quest.LoadQuestDB(player, reader);
+                            player.questScenario[index] = quest;
+                            player.playerWork.questScenario[index] = quest.actorId;
                         }
                     }
 
@@ -1185,6 +1210,7 @@ namespace Meteor.Map
                         SELECT 
                         slot,
                         questId,
+                        questData,
                         abandoned,
                         completed  
                         FROM characters_quest_guildleve_local WHERE characterId = @charId";
@@ -1196,7 +1222,9 @@ namespace Meteor.Map
                         while (reader.Read())
                         {
                             int index = reader.GetUInt16(0);
-                            player.playerWork.questGuildleve[index] = 0xA0F00000 | reader.GetUInt32(1);
+                            Quest quest = Quest.LoadQuestDB(player, reader);
+                            player.questGuildleve[index] = quest;
+                            player.playerWork.questGuildleve[index] = quest.actorId;
                         }
                     }
 
@@ -1267,7 +1295,7 @@ namespace Meteor.Map
         {
             InventoryItem[] equipment = new InventoryItem[player.GetEquipment().GetCapacity()];
             
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1311,7 +1339,7 @@ namespace Meteor.Map
         public static void EquipItem(Player player, ushort equipSlot, ulong uniqueItemId)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1348,7 +1376,7 @@ namespace Meteor.Map
         public static void UnequipItem(Player player, ushort equipSlot)
         {
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1383,7 +1411,7 @@ namespace Meteor.Map
             if (commandId > 0)
             {
                 using (MySqlConnection conn = new MySqlConnection(
-                    String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
+                    string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
                     ConfigConstants.DATABASE_HOST,
                     ConfigConstants.DATABASE_PORT,
                     ConfigConstants.DATABASE_NAME,
@@ -1428,7 +1456,7 @@ namespace Meteor.Map
         public static void UnequipAbility(Player player, ushort hotbarSlot)
         {
             using (MySqlConnection conn = new MySqlConnection(
-                    String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
+                    string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
                     ConfigConstants.DATABASE_HOST,
                     ConfigConstants.DATABASE_PORT,
                     ConfigConstants.DATABASE_NAME,
@@ -1468,7 +1496,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1519,7 +1547,7 @@ namespace Meteor.Map
         {
             ushort slot = 0;
             using (MySqlConnection conn = new MySqlConnection(
-                String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
+                string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}",
                 ConfigConstants.DATABASE_HOST,
                 ConfigConstants.DATABASE_PORT,
                 ConfigConstants.DATABASE_NAME,
@@ -1571,7 +1599,7 @@ namespace Meteor.Map
         {
             List<InventoryItem> items = new List<InventoryItem>();
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1651,7 +1679,7 @@ namespace Meteor.Map
         {
             InventoryItem insertedItem = null;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1704,7 +1732,7 @@ namespace Meteor.Map
 
         public static void AddItem(Character owner, InventoryItem addedItem, ushort itemPackage, ushort slot)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1739,7 +1767,7 @@ namespace Meteor.Map
 
         public static void RemoveItem(Character owner, ulong serverItemId)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}; Allow User Variables=True", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}; Allow User Variables=True", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1769,7 +1797,7 @@ namespace Meteor.Map
 
         public static void UpdateItemPositions(List<InventoryItem> updated)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1811,7 +1839,7 @@ namespace Meteor.Map
 
         public static void SetQuantity(ulong serverItemId, int quantity)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1843,7 +1871,7 @@ namespace Meteor.Map
 
         public static void SetDealingInfo(InventoryItem item)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1872,7 +1900,7 @@ namespace Meteor.Map
 
         public static void ClearDealingInfo(InventoryItem item)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1902,7 +1930,7 @@ namespace Meteor.Map
         public static SubPacket GetLatestAchievements(Player player)
         {
             uint[] latestAchievements = new uint[5];
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1944,7 +1972,7 @@ namespace Meteor.Map
         {
             SetCompletedAchievementsPacket cheevosPacket = new SetCompletedAchievementsPacket();
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -1989,7 +2017,7 @@ namespace Meteor.Map
         public static SubPacket GetAchievementProgress(Player player, uint achievementId)
         {
             uint progress = 0, progressFlags = 0;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2027,7 +2055,7 @@ namespace Meteor.Map
         public static bool CreateLinkshell(Player player, string lsName, ushort lsCrest)
         {
             bool success = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2067,7 +2095,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2107,7 +2135,7 @@ namespace Meteor.Map
             MySqlCommand cmd;
             bool wasError = false;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2144,7 +2172,7 @@ namespace Meteor.Map
         public static bool isTicketOpen(string playerName)
         {
             bool isOpen = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2185,7 +2213,7 @@ namespace Meteor.Map
         public static void closeTicket(string playerName)
         {
             bool isOpen = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2217,7 +2245,7 @@ namespace Meteor.Map
         {
             string[] faqs = null;
             List<string> raw = new List<string>();
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2260,7 +2288,7 @@ namespace Meteor.Map
         public static string getFAQBody(uint slot, uint langCode = 1)
         {
             string body = string.Empty;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2300,7 +2328,7 @@ namespace Meteor.Map
         {
             string[] issues = null;
             List<string> raw = new List<string>();
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2341,7 +2369,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2379,7 +2407,7 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2413,7 +2441,7 @@ namespace Meteor.Map
         {
             var effects = new Dictionary<uint, StatusEffect>();
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2461,7 +2489,7 @@ namespace Meteor.Map
         {
             string[] faqs = null;
             List<string> raw = new List<string>();
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2508,7 +2536,7 @@ namespace Meteor.Map
 
         public static void LoadGlobalBattleCommandList(Dictionary<ushort, BattleCommand> battleCommandDict, Dictionary<Tuple<byte, short>, List<ushort>> battleCommandIdByLevel)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2608,7 +2636,7 @@ namespace Meteor.Map
                         }
                     }
 
-                    Program.Log.Info(String.Format("Loaded {0} battle commands.", count));
+                    Program.Log.Info(string.Format("Loaded {0} battle commands.", count));
                 }
                 catch (MySqlException e)
                 {
@@ -2623,7 +2651,7 @@ namespace Meteor.Map
 
         public static void LoadGlobalBattleTraitList(Dictionary<ushort, BattleTrait> battleTraitDict, Dictionary<byte, List<ushort>> battleTraitJobDict)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2662,7 +2690,7 @@ namespace Meteor.Map
                             count++;
                         }
                     }
-                    Program.Log.Info(String.Format("Loaded {0} battle traits.", count));
+                    Program.Log.Info(string.Format("Loaded {0} battle traits.", count));
                 }
                 catch (MySqlException e)
                 {
@@ -2677,13 +2705,13 @@ namespace Meteor.Map
 
         public static void SetExp(Player player, byte classId, int exp)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
                     conn.Open();
 
-                    var query = String.Format(@"
+                    var query = string.Format(@"
                     UPDATE characters_class_exp
                     SET
                     {0} = @exp
@@ -2710,13 +2738,13 @@ namespace Meteor.Map
 
         public static void SetLevel(Player player, byte classId, short level)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
                     conn.Open();
 
-                    var query = String.Format(@"
+                    var query = string.Format(@"
                     UPDATE characters_class_levels
                     SET
                     {0} = @lvl
@@ -2745,7 +2773,7 @@ namespace Meteor.Map
         {
             Retainer retainer = null;
 
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
@@ -2843,13 +2871,13 @@ namespace Meteor.Map
                 "fsh"
             };
             
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {
                     conn.Open();
 
-                    query = String.Format(@"
+                    query = string.Format(@"
                     UPDATE characters_class_levels
                     SET
                     {0}=@level

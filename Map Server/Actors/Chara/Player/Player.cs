@@ -46,6 +46,7 @@ using Meteor.Map.packets.send.actor.battle;
 using Meteor.Map.packets.receive.events;
 using static Meteor.Map.LuaUtils;
 using Meteor.Map.packets.send.actor.events;
+using Meteor.Map.DataObjects;
 
 namespace Meteor.Map.Actors
 {
@@ -146,7 +147,7 @@ namespace Meteor.Map.Actors
 
         //Quest Actors (MUST MATCH playerWork.questScenario/questGuildleve)
         public Quest[] questScenario = new Quest[16];
-        public uint[] questGuildleve = new uint[8];
+        public Quest[] questGuildleve = new Quest[8];
 
         //Aetheryte
         public uint homepoint = 0;
@@ -161,6 +162,10 @@ namespace Meteor.Map.Actors
         public Retainer currentSpawnedRetainer = null;
         public bool sentRetainerSpawn = false;
 
+        //Crafting
+        public List<Recipe> recentRecipes = new List<Recipe>();
+        public List<Recipe> awardedRecipes = new List<Recipe>();
+
         private List<Director> ownedDirectors = new List<Director>();
         private Director loginInitDirector = null;
 
@@ -173,7 +178,7 @@ namespace Meteor.Map.Actors
         public Player(Session cp, uint actorID) : base(actorID)
         {
             playerSession = cp;
-            actorName = String.Format("_pc{0:00000000}", actorID);
+            actorName = string.Format("_pc{0:00000000}", actorID);
             className = "Player";
 
             moveSpeeds[0] = SetActorSpeedPacket.DEFAULT_STOP;
@@ -274,6 +279,17 @@ namespace Meteor.Map.Actors
             this.aiContainer = new AIContainer(this, new PlayerController(this), null, new TargetFind(this));
             allegiance = CharacterTargetingAllegiance.Player;
             CalculateBaseStats();
+
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(36));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(37));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(38));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(39));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(40));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(41));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(42));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(43));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(2));
+            AddRecentRecipe(Server.ResolveRecipe().GetRecipeByID(3));
         }
 
         public List<SubPacket> Create0x132Packets()
@@ -402,7 +418,7 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < charaWork.property.Length; i++)
             {
                 if (charaWork.property[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.property[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.property[{0}]", i));
             }
 
             //Parameters
@@ -418,21 +434,21 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < charaWork.statusShownTime.Length; i++)
             {
                 if (charaWork.statusShownTime[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.statusShownTime[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.statusShownTime[{0}]", i));
             }
 
             //General Parameters
             for (int i = 3; i < charaWork.battleTemp.generalParameter.Length; i++)
             {
                 if (charaWork.battleTemp.generalParameter[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.battleTemp.generalParameter[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.battleTemp.generalParameter[{0}]", i));
             }
 
             propPacketUtil.AddProperty("charaWork.battleTemp.castGauge_speed[0]");
             propPacketUtil.AddProperty("charaWork.battleTemp.castGauge_speed[1]");
 
             //Battle Save Skillpoint
-            propPacketUtil.AddProperty(String.Format("charaWork.battleSave.skillPoint[{0}]", charaWork.parameterSave.state_mainSkill[0] - 1));
+            propPacketUtil.AddProperty(string.Format("charaWork.battleSave.skillPoint[{0}]", charaWork.parameterSave.state_mainSkill[0] - 1));
 
             //Commands
             propPacketUtil.AddProperty("charaWork.commandBorder");
@@ -443,12 +459,12 @@ namespace Meteor.Map.Actors
             {
                 if (charaWork.command[i] != 0)
                 {
-                    propPacketUtil.AddProperty(String.Format("charaWork.command[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.command[{0}]", i));
                     //Recast Timers
                     if (i >= charaWork.commandBorder)
                     {
-                        propPacketUtil.AddProperty(String.Format("charaWork.parameterTemp.maxCommandRecastTime[{0}]", i - charaWork.commandBorder));
-                        propPacketUtil.AddProperty(String.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", i - charaWork.commandBorder));
+                        propPacketUtil.AddProperty(string.Format("charaWork.parameterTemp.maxCommandRecastTime[{0}]", i - charaWork.commandBorder));
+                        propPacketUtil.AddProperty(string.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", i - charaWork.commandBorder));
                     }
                 }
             }
@@ -457,32 +473,32 @@ namespace Meteor.Map.Actors
             {
                 charaWork.commandCategory[i] = 1;
                 if (charaWork.commandCategory[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.commandCategory[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.commandCategory[{0}]", i));
             }
 
             for (int i = 0; i < charaWork.commandAcquired.Length; i++)
             {
                 if (charaWork.commandAcquired[i] != false)
-                    propPacketUtil.AddProperty(String.Format("charaWork.commandAcquired[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.commandAcquired[{0}]", i));
             }
 
             for (int i = 0; i < charaWork.additionalCommandAcquired.Length; i++)
             {
                 if (charaWork.additionalCommandAcquired[i] != false)
-                    propPacketUtil.AddProperty(String.Format("charaWork.additionalCommandAcquired[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.additionalCommandAcquired[{0}]", i));
             }
 
             for (int i = 0; i < charaWork.parameterSave.commandSlot_compatibility.Length; i++)
             {
                 charaWork.parameterSave.commandSlot_compatibility[i] = true;
                 if (charaWork.parameterSave.commandSlot_compatibility[i])
-                    propPacketUtil.AddProperty(String.Format("charaWork.parameterSave.commandSlot_compatibility[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.parameterSave.commandSlot_compatibility[{0}]", i));
             }
 
             for (int i = 0; i < charaWork.parameterSave.commandSlot_recastTime.Length; i++)
             {
                 if (charaWork.parameterSave.commandSlot_recastTime[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", i));
             }
 
             //System
@@ -505,25 +521,25 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < playerWork.questScenario.Length; i++)
             {
                 if (playerWork.questScenario[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("playerWork.questScenario[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("playerWork.questScenario[{0}]", i));
             }
 
             //Guildleve - Local
             for (int i = 0; i < playerWork.questGuildleve.Length; i++)
             {
                 if (playerWork.questGuildleve[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("playerWork.questGuildleve[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("playerWork.questGuildleve[{0}]", i));
             }
 
             //Guildleve - Regional
             for (int i = 0; i < work.guildleveId.Length; i++)
             {
                 if (work.guildleveId[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("work.guildleveId[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("work.guildleveId[{0}]", i));
                 if (work.guildleveDone[i] != false)
-                    propPacketUtil.AddProperty(String.Format("work.guildleveDone[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("work.guildleveDone[{0}]", i));
                 if (work.guildleveChecked[i] != false)
-                    propPacketUtil.AddProperty(String.Format("work.guildleveChecked[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("work.guildleveChecked[{0}]", i));
             }
 
             //Bazaar
@@ -541,9 +557,9 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < playerWork.npcLinkshellChatCalling.Length; i++)
             {
                 if (playerWork.npcLinkshellChatCalling[i] != false)
-                    propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatCalling[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("playerWork.npcLinkshellChatCalling[{0}]", i));
                 if (playerWork.npcLinkshellChatExtra[i] != false)
-                    propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatExtra[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("playerWork.npcLinkshellChatExtra[{0}]", i));
             }
 
             propPacketUtil.AddProperty("playerWork.restBonusExpRate");
@@ -560,7 +576,7 @@ namespace Meteor.Map.Actors
 
         public void SendSeamlessZoneInPackets()
         {
-            QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.bgmDay, SetMusicPacket.EFFECT_FADEIN));
+            QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.GetCurrentMusic(), SetMusicPacket.EFFECT_FADEIN));
             QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
         }
 
@@ -583,7 +599,7 @@ namespace Meteor.Map.Actors
                 }
             }
             else
-                QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.bgmDay, 0x01)); //Zone
+                QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.GetCurrentMusic(), 0x01)); //Zone
 
             QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
 
@@ -806,11 +822,6 @@ namespace Meteor.Map.Actors
             Database.SavePlayerStatusEffects(this);
         }
 
-        public Area GetZone()
-        {
-            return zone;
-        }
-
         public void SendMessage(uint logType, string sender, string message)
         {
             QueuePacket(SendMessagePacket.BuildPacket(actorId, logType, sender, message));
@@ -893,6 +904,12 @@ namespace Meteor.Map.Actors
         public void ChangeMusic(ushort musicId)
         {
             QueuePacket(SetMusicPacket.BuildPacket(actorId, musicId, 1));
+        }
+
+        public void ResetMusic()
+        {
+            if (zone != null)
+                QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.GetCurrentMusic(), 1));
         }
 
         public void SendMountAppearance()
@@ -1193,7 +1210,7 @@ namespace Meteor.Map.Actors
             propertyBuilder.NewTarget("playerWork/expBonus");
             propertyBuilder.AddProperty("playerWork.restBonusExpRate");
             propertyBuilder.NewTarget("charaWork/battleStateForSelf");
-            propertyBuilder.AddProperty(String.Format("charaWork.battleSave.skillPoint[{0}]", classId - 1));
+            propertyBuilder.AddProperty(string.Format("charaWork.battleSave.skillPoint[{0}]", classId - 1));
             Database.LoadHotbar(this);
 
             var time = Utils.UnixTimeStampUTC();
@@ -1221,7 +1238,7 @@ namespace Meteor.Map.Actors
             Database.PlayerCharacterUpdateClassLevel(this, classId, level);
             charaWork.battleSave.skillLevel[classId - 1] = level;
             ActorPropertyPacketUtil propertyBuilder = new ActorPropertyPacketUtil("charaWork/stateForAll", this);
-            propertyBuilder.AddProperty(String.Format("charaWork.battleSave.skillLevel[{0}]", classId-1));
+            propertyBuilder.AddProperty(string.Format("charaWork.battleSave.skillLevel[{0}]", classId-1));
             List<SubPacket> packets = propertyBuilder.Done();
             QueuePackets(packets);
         }
@@ -1363,6 +1380,16 @@ namespace Meteor.Map.Actors
 
             return -1;
         }
+        public int GetFreeQuestGuildleveSlot()
+        {
+            for (int i = 0; i < questGuildleve.Length; i++)
+            {
+                if (questGuildleve[i] == null)
+                    return i;
+            }
+
+            return -1;
+        }
 
         public int GetFreeGuildleveSlot()
         {
@@ -1447,37 +1474,61 @@ namespace Meteor.Map.Actors
                 }
             }
         }
+        public void AddQuest(string name, bool isSilent = false)
+        {
+            Actor actor = Server.GetStaticActors(name);
+            AddQuestInternal(actor as Quest, isSilent);
+        }
 
         public void AddQuest(uint id, bool isSilent = false)
         {
             Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            AddQuest(actor.actorName, isSilent);
+            AddQuestInternal(actor as Quest, isSilent);
         }
 
-        public void AddQuest(string name, bool isSilent = false)
+        public void AddQuestGuildleve(uint id, byte difficulty)
         {
-            Actor actor = Server.GetStaticActors(name);
-
-            if (actor == null)
+            Quest staticQuest = (Quest) Server.GetStaticActors((0xA0F00000 | id));
+            if (staticQuest == null)
                 return;
 
-            uint id = actor.actorId;
+            PassiveGuildleve newQuest = new PassiveGuildleve(staticQuest, this, difficulty);
+
+            int freeSlot = GetFreeQuestGuildleveSlot();
+
+            if (freeSlot == -1)
+                return;
+
+            playerWork.questGuildleve[freeSlot] = newQuest.actorId;
+            questGuildleve[freeSlot] = newQuest;
+
+            Database.SaveQuest(this, newQuest);
+            SendQuestGuildleveClientUpdate(freeSlot);
+        }
+
+        private void AddQuestInternal(Quest staticQuest, bool isSilent = false)
+        {
+            if (staticQuest == null)
+                return;
+
+            Scenario newQuest = new Scenario(staticQuest, this, null, 0, 0);
 
             int freeSlot = GetFreeQuestSlot();
 
             if (freeSlot == -1)
                 return;
 
-            playerWork.questScenario[freeSlot] = id;
-            questScenario[freeSlot] = new Quest(this, playerWork.questScenario[freeSlot], name, null, 0, 0);
-            Database.SaveQuest(this, questScenario[freeSlot]);
+            playerWork.questScenario[freeSlot] = newQuest.actorId;
+            questScenario[freeSlot] = newQuest;
+
+            Database.SaveQuest(this, newQuest);
             SendQuestClientUpdate(freeSlot);
 
             if (!isSilent)
             {
                 SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId());
-                questScenario[freeSlot].NextPhase(0);
-            }
+                (questScenario[freeSlot] as Scenario).NextPhase(0);
+            }          
         }        
 
         public void CompleteQuest(uint id)
@@ -1541,9 +1592,9 @@ namespace Meteor.Map.Actors
                 {
                     if (questScenario[i] != null && questScenario[i].GetQuestId() == oldId)
                     {
-                        Actor actor = Server.GetStaticActors((0xA0F00000 | newId));
+                        Quest quest = Server.GetStaticActors((0xA0F00000 | newId)) as Quest;
                         playerWork.questScenario[i] = (0xA0F00000 | newId);
-                        questScenario[i] = new Quest(this, playerWork.questScenario[i], actor.actorName, null, 0, 0);
+                        questScenario[i] = new Scenario(quest, this, null, 0, 0);
                         Database.SaveQuest(this, questScenario[i]);
                         SendQuestClientUpdate(i);
                         break;
@@ -1598,6 +1649,16 @@ namespace Meteor.Map.Actors
 
             return null;
         }
+        public Quest GetQuestGuildleve(uint id)
+        {
+            for (int i = 0; i < questGuildleve.Length; i++)
+            {
+                if (questGuildleve[i] != null && questGuildleve[i].actorId == (0xA0F00000 | id))
+                    return questGuildleve[i];
+            }
+
+            return null;
+        }
 
         public bool HasQuest(string name)
         {
@@ -1621,6 +1682,17 @@ namespace Meteor.Map.Actors
             return false;
         }
 
+        public bool HasQuestGuildleve(uint id)
+        {
+            for (int i = 0; i < questGuildleve.Length; i++)
+            {
+                if (questGuildleve[i] != null && questGuildleve[i].actorId == (0xA0F00000 | id))
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool HasGuildleve(uint id)
         {
             for (int i = 0; i < work.guildleveId.Length; i++)
@@ -1637,6 +1709,17 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < questScenario.Length; i++)
             {
                 if (questScenario[i] != null && questScenario[i].actorId == (0xA0F00000 | id))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        public int GetQuestGuildleveSlot(uint id)
+        {
+            for (int i = 0; i < questGuildleve.Length; i++)
+            {
+                if (questGuildleve[i] != null && questGuildleve[i].actorId == (0xA0F00000 | id))
                     return i;
             }
 
@@ -1679,30 +1762,36 @@ namespace Meteor.Map.Actors
             Database.SaveNpcLS(this, npcLSId, isCalling, isExtra);
 
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("playerWork/npcLinkshellChat", this);
-            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatExtra[{0}]", npcLSId));
-            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatCalling[{0}]", npcLSId));
+            propPacketUtil.AddProperty(string.Format("playerWork.npcLinkshellChatExtra[{0}]", npcLSId));
+            propPacketUtil.AddProperty(string.Format("playerWork.npcLinkshellChatCalling[{0}]", npcLSId));
             QueuePackets(propPacketUtil.Done());
         }
 
         private void SendQuestClientUpdate(int slot)
         {
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("playerWork/journal", this);
-            propPacketUtil.AddProperty(String.Format("playerWork.questScenario[{0}]", slot));
+            propPacketUtil.AddProperty(string.Format("playerWork.questScenario[{0}]", slot));
+            QueuePackets(propPacketUtil.Done());
+        }
+        private void SendQuestGuildleveClientUpdate(int slot)
+        {
+            ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("playerWork/journal", this);
+            propPacketUtil.AddProperty(string.Format("playerWork.questGuildleve[{0}]", slot));
             QueuePackets(propPacketUtil.Done());
         }
 
         private void SendGuildleveClientUpdate(int slot)
         {
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("work/guildleve", this);
-            propPacketUtil.AddProperty(String.Format("work.guildleveId[{0}]", slot));
+            propPacketUtil.AddProperty(string.Format("work.guildleveId[{0}]", slot));
             QueuePackets(propPacketUtil.Done());
         }
 
         private void SendGuildleveMarkClientUpdate(int slot)
         {
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("work/guildleve", this);
-            propPacketUtil.AddProperty(String.Format("work.guildleveDone[{0}]", slot));
-            propPacketUtil.AddProperty(String.Format("work.guildleveChecked[{0}]", slot));
+            propPacketUtil.AddProperty(string.Format("work.guildleveDone[{0}]", slot));
+            propPacketUtil.AddProperty(string.Format("work.guildleveChecked[{0}]", slot));
             QueuePackets(propPacketUtil.Done());
         }
 
@@ -2034,10 +2123,35 @@ namespace Meteor.Map.Actors
                 retainerMeetingGroup = null;
             }
         }
-        
-        public override void Update(DateTime tick)
+
+        public void AddRecentRecipe(Recipe recipe)
         {
-            
+            recentRecipes.Remove(recipe);
+            if (recentRecipes.Count > 8)
+                recentRecipes.RemoveAt(7);
+            recentRecipes.Add(recipe);
+        }
+
+        public List<Recipe> GetRecentRecipes()
+        {
+            return recentRecipes;
+        }
+
+        public void AddAwardedRecipe(Recipe recipe)
+        {
+            awardedRecipes.Remove(recipe);
+            if (awardedRecipes.Count > 8)
+                awardedRecipes.RemoveAt(7);
+            awardedRecipes.Add(recipe);
+        }
+
+        public List<Recipe> GetAwardedRecipes()
+        {
+            return awardedRecipes;
+        }
+
+        public override void Update(DateTime tick)
+        {            
             // Chocobo Rental Expirey
             if (rentalExpireTime != 0)
             {
@@ -2048,7 +2162,7 @@ namespace Meteor.Map.Actors
                 {
                     rentalExpireTime = 0;
                     rentalMinLeft = 0;
-                    ChangeMusic(GetZone().bgmDay);
+                    ResetMusic();
                     SetMountState(0);
                     ChangeSpeed(0.0f, 2.0f, 5.0f, 5.0f);
                     ChangeState(0);
@@ -2102,7 +2216,7 @@ namespace Meteor.Map.Actors
                     if (GetMod(i) != charaWork.battleTemp.generalParameter[i])
                     {
                         charaWork.battleTemp.generalParameter[i] = (short)GetMod(i);
-                        propPacketUtil.AddProperty(String.Format("charaWork.battleTemp.generalParameter[{0}]", i));
+                        propPacketUtil.AddProperty(string.Format("charaWork.battleTemp.generalParameter[{0}]", i));
                     }
                 }
 
@@ -2149,8 +2263,8 @@ namespace Meteor.Map.Actors
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("charaWork/command", this);
             foreach (ushort slot in slotsToUpdate)
             {
-                propPacketUtil.AddProperty(String.Format("charaWork.command[{0}]", slot));
-                propPacketUtil.AddProperty(String.Format("charaWork.commandCategory[{0}]", slot));
+                propPacketUtil.AddProperty(string.Format("charaWork.command[{0}]", slot));
+                propPacketUtil.AddProperty(string.Format("charaWork.commandCategory[{0}]", slot));
             }
 
             propPacketUtil.NewTarget("charaWork/commandDetailForSelf");
@@ -2158,7 +2272,7 @@ namespace Meteor.Map.Actors
             foreach (ushort slot in slotsToUpdate)
             {
                 charaWork.parameterSave.commandSlot_compatibility[slot - charaWork.commandBorder] = charaWork.command[slot] != 0;
-                propPacketUtil.AddProperty(String.Format("charaWork.parameterSave.commandSlot_compatibility[{0}]", slot - charaWork.commandBorder));
+                propPacketUtil.AddProperty(string.Format("charaWork.parameterSave.commandSlot_compatibility[{0}]", slot - charaWork.commandBorder));
             }
 
             QueuePackets(propPacketUtil.Done());
@@ -2172,8 +2286,8 @@ namespace Meteor.Map.Actors
 
             foreach (ushort slot in slotsToUpdate)
             {
-                recastPacketUtil.AddProperty(String.Format("charaWork.parameterTemp.maxCommandRecastTime[{0}]", slot - charaWork.commandBorder));
-                recastPacketUtil.AddProperty(String.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", slot - charaWork.commandBorder));
+                recastPacketUtil.AddProperty(string.Format("charaWork.parameterTemp.maxCommandRecastTime[{0}]", slot - charaWork.commandBorder));
+                recastPacketUtil.AddProperty(string.Format("charaWork.parameterSave.commandSlot_recastTime[{0}]", slot - charaWork.commandBorder));
             }
 
             QueuePackets(recastPacketUtil.Done());
@@ -2595,7 +2709,7 @@ namespace Meteor.Map.Actors
                 charaWork.battleSave.skillPoint[classId - 1] = 0;
                 //send new level
                 ActorPropertyPacketUtil levelPropertyPacket = new ActorPropertyPacketUtil("charaWork/stateForAll", this);
-                levelPropertyPacket.AddProperty(String.Format("charaWork.battleSave.skillLevel[{0}]", classId - 1));
+                levelPropertyPacket.AddProperty(string.Format("charaWork.battleSave.skillLevel[{0}]", classId - 1));
                 levelPropertyPacket.AddProperty("charaWork.parameterSave.state_mainSkillLevel");
                 QueuePackets(levelPropertyPacket.Done());
 
@@ -2606,7 +2720,7 @@ namespace Meteor.Map.Actors
             charaWork.battleSave.skillPoint[classId - 1] = Math.Min(charaWork.battleSave.skillPoint[classId - 1] + exp, MAXEXP[GetLevel() - 1]);
 
             ActorPropertyPacketUtil expPropertyPacket = new ActorPropertyPacketUtil("charaWork/battleStateForSelf", this);
-            expPropertyPacket.AddProperty(String.Format("charaWork.battleSave.skillPoint[{0}]", classId - 1));
+            expPropertyPacket.AddProperty(string.Format("charaWork.battleSave.skillPoint[{0}]", classId - 1));
             
             QueuePackets(expPropertyPacket.Done());
             Database.SetExp(this, classId, charaWork.battleSave.skillPoint[classId - 1]);

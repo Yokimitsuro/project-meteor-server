@@ -27,6 +27,7 @@ using Meteor.Map.dataobjects;
 
 using Meteor.Common;
 using Meteor.Map.Actors;
+using Meteor.Map.DataObjects;
 
 namespace Meteor.Map
 {
@@ -47,11 +48,15 @@ namespace Meteor.Map
         private static CommandProcessor mCommandProcessor = new CommandProcessor();
         private static ZoneConnection mWorldConnection = new ZoneConnection();
         private static WorldManager mWorldManager;
-        private static Dictionary<uint, ItemData> mGamedataItems;
-        private static Dictionary<uint, GuildleveData> mGamedataGuildleves;
         private static StaticActors mStaticActors;
 
-        private PacketProcessor mProcessor;        
+        private PacketProcessor mProcessor;
+
+        //Game Data
+        private static Dictionary<uint, ItemData> gamedataItems;
+        private static Dictionary<uint, GuildleveData> gamedataGuildleves;
+        private static Dictionary<uint, PassiveGuildleveData> gamedataPassiveGL;
+        private static RecipeResolver gamedataRecipeResolver;
 
         public Server()
         {
@@ -62,10 +67,14 @@ namespace Meteor.Map
         {           
             mStaticActors = new StaticActors(STATIC_ACTORS_PATH);
 
-            mGamedataItems = Database.GetItemGamedata();
-            Program.Log.Info("Loaded {0} items.", mGamedataItems.Count);
-            mGamedataGuildleves = Database.GetGuildleveGamedata();
-            Program.Log.Info("Loaded {0} guildleves.", mGamedataGuildleves.Count);
+            gamedataItems = Database.GetItemGamedata();
+            Program.Log.Info("Loaded {0} items.", gamedataItems.Count);
+            gamedataGuildleves = Database.GetGuildleveGamedata();
+            Program.Log.Info("Loaded {0} guildleves.", gamedataGuildleves.Count);
+            gamedataPassiveGL = Database.GetPassiveGuildleveGamedata();
+            Program.Log.Info("Loaded {0} passive (local) guildleves.", gamedataPassiveGL.Count);
+            gamedataRecipeResolver = RecipeResolver.Init();
+            Program.Log.Info("Loaded {0} crafting recipes.", gamedataRecipeResolver.GetNumRecipes());
 
             mWorldManager = new WorldManager(this);
             mWorldManager.LoadZoneList();
@@ -299,7 +308,7 @@ namespace Meteor.Map
         
         public static Dictionary<uint, ItemData> GetGamedataItems()
         {
-            return mGamedataItems;
+            return gamedataItems;
         }
 
         public static Actor GetStaticActors(uint id)
@@ -314,19 +323,31 @@ namespace Meteor.Map
 
         public static ItemData GetItemGamedata(uint id)
         {
-            if (mGamedataItems.ContainsKey(id))
-                return mGamedataItems[id];
+            if (gamedataItems.ContainsKey(id))
+                return gamedataItems[id];
             else
                 return null;
         }
 
         public static GuildleveData GetGuildleveGamedata(uint id)
         {
-            if (mGamedataGuildleves.ContainsKey(id))
-                return mGamedataGuildleves[id];
+            if (gamedataGuildleves.ContainsKey(id))
+                return gamedataGuildleves[id];
             else
                 return null;
         }
 
+        public static PassiveGuildleveData GetPassiveGLGamedata(uint id)
+        {
+            if (gamedataPassiveGL.ContainsKey(id))
+                return gamedataPassiveGL[id];
+            else
+                return null;
+        }
+
+        public static RecipeResolver ResolveRecipe()
+        {
+            return gamedataRecipeResolver;
+        }
     }
 }

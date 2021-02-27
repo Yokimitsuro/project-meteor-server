@@ -27,9 +27,9 @@ namespace Meteor.Map.actors.chara
     class ModifierListEntry
     {
         public uint id;
-        public Int64 value;
+        public long value;
 
-        public ModifierListEntry(uint id, Int64 value)
+        public ModifierListEntry(uint id, long value)
         {
             this.id = id;
             this.value = value;
@@ -47,13 +47,13 @@ namespace Meteor.Map.actors.chara
             mobModList = new Dictionary<uint, ModifierListEntry>();
         }
 
-        public void AddModifier(uint id, Int64 val, bool isMobMod)
+        public void AddModifier(uint id, long val, bool isMobMod)
         {
             var list = isMobMod ? mobModList : modList;
             list.Add(id, new ModifierListEntry(id, val));
         }
 
-        public void SetModifier(uint id, Int64 val, bool isMobMod)
+        public void SetModifier(uint id, long val, bool isMobMod)
         {
             var list = isMobMod ? mobModList : modList;
             if (list.ContainsKey(id))
@@ -62,7 +62,7 @@ namespace Meteor.Map.actors.chara
                 list.Add(id, new ModifierListEntry(id, val));
         }
 
-        public Int64 GetModifier(uint id, bool isMobMod)
+        public long GetModifier(uint id, bool isMobMod)
         {
             ModifierListEntry retVal;
             var list = isMobMod ? mobModList : modList;

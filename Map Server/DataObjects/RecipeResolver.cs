@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Linq;
+using MoonSharp.Interpreter;
 
 namespace Meteor.Map.DataObjects
 {
@@ -37,8 +39,6 @@ namespace Meteor.Map.DataObjects
             mats[6] = mat7;
             mats[7] = mat8;
 
-            Array.Sort(mats);
-
             byte[] result = new byte[8 * sizeof(int)];
             Buffer.BlockCopy(mats, 0, result, 0, result.Length);
             string hash;
@@ -53,8 +53,33 @@ namespace Meteor.Map.DataObjects
                 return null;
         }
 
-        public Recipe GetMatsForRecipe(uint recipeID)
+        public Recipe GetRecipeByItemID(int objectiveItemID)
         {
+            return recipeList.Where(recipe => recipe.Value.resultItemID == objectiveItemID).FirstOrDefault().Value;
+        }
+
+        public DynValue RecipesToItemIdTable(List<Recipe> recipeList)
+        {
+            DynValue[] itemIDs = new DynValue[8];
+            for (int i = 0; i < 8; i++)
+                itemIDs[i] = recipeList != null && i < recipeList.Count ? DynValue.NewNumber(recipeList[i].resultItemID) : DynValue.NewNil();
+
+            return DynValue.NewTable(new Table(new Script(), itemIDs));
+        }
+        public DynValue RecipeToMatIdTable(Recipe recipe)
+        {
+            DynValue[] itemIDs = new DynValue[8];   
+            for (int i = 0; i < 8; i++)
+                itemIDs[i] = DynValue.NewNumber(recipe.materials[i]);
+
+            return DynValue.NewTable(new Table(new Script(), itemIDs));
+        }
+
+        public Recipe GetRecipeByID(uint recipeID)
+        {
+            if (recipeID == 0)
+                return null;
+
             if (recipeList.ContainsKey(recipeID))
                 return recipeList[recipeID];
             else

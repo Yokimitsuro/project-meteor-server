@@ -83,7 +83,7 @@ namespace Meteor.Map.Actors
         public ModifierList genusMods;
         public ModifierList spawnMods;
 
-        protected Dictionary<MobModifier, Int64> mobModifiers = new Dictionary<MobModifier, Int64>();
+        protected Dictionary<MobModifier, long> mobModifiers = new Dictionary<MobModifier, long>();
 
         public BattleNpc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot,
             ushort actorState, uint animationId, string customDisplayName)
@@ -320,7 +320,7 @@ namespace Meteor.Map.Actors
             }
             else
             {
-                var err = String.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", actorId, GetUniqueId(), positionX, positionY, positionZ, GetZone().GetName());
+                var err = string.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", actorId, GetUniqueId(), positionX, positionY, positionZ, GetZone().GetName());
                 Program.Log.Error(err);
                 //throw new Exception(err);
             }
@@ -434,20 +434,20 @@ namespace Meteor.Map.Actors
             this.bnpcId = id;
         }
 
-        public Int64 GetMobMod(MobModifier mobMod)
+        public long GetMobMod(MobModifier mobMod)
         {
             return GetMobMod((uint)mobMod);
         }
 
-        public Int64 GetMobMod(uint mobModId)
+        public long GetMobMod(uint mobModId)
         {
-            Int64 res;
+            long res;
             if (mobModifiers.TryGetValue((MobModifier)mobModId, out res))
                 return res;
             return 0;
         }
 
-        public void SetMobMod(uint mobModId, Int64 val)
+        public void SetMobMod(uint mobModId, long val)
         {
             if (mobModifiers.ContainsKey((MobModifier)mobModId))
                 mobModifiers[(MobModifier)mobModId] = val;

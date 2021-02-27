@@ -68,7 +68,7 @@ namespace Meteor.Map.utils
             return faceInfo;
         }
 
-        public static UInt32 GetTribeModel(byte tribe)
+        public static uint GetTribeModel(byte tribe)
         {
             switch (tribe)
             {

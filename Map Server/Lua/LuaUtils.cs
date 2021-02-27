@@ -25,6 +25,7 @@ using Meteor.Map.lua;
 using MoonSharp.Interpreter;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -158,7 +159,7 @@ namespace Meteor.Map
                         isDone = true;
                         continue;
                     default:
-                        throw new ArgumentException("Unknown lua param...");
+                        throw new ArgumentOutOfRangeException();
                 }
 
                 if (isDone)
@@ -287,22 +288,22 @@ namespace Meteor.Map
             foreach (LuaParam l in luaParams)
             {           
                 if (l.typeID == 0x1)
-                    writer.Write((Byte)0);
+                    writer.Write((byte)0);
                 else
-                    writer.Write((Byte)l.typeID);
+                    writer.Write((byte)l.typeID);
 
                 switch (l.typeID)
                 {
                     case 0x0: //Int32                        
-                        writer.Write((Int32)Utils.SwapEndian((Int32)l.value));
+                        writer.Write((int)Utils.SwapEndian((int)l.value));
                         break;
                     case 0x1: //Int32                        
-                        writer.Write((UInt32)Utils.SwapEndian((UInt32)l.value));
+                        writer.Write((uint)Utils.SwapEndian((uint)l.value));
                         break;
                     case 0x2: //Null Termed String
                         string sv = (string)l.value;
                         writer.Write(Encoding.ASCII.GetBytes(sv), 0, Encoding.ASCII.GetByteCount(sv));
-                        writer.Write((Byte)0);
+                        writer.Write((byte)0);
                         break;
                     case 0x3: //Boolean True                        
                         break;
@@ -311,21 +312,21 @@ namespace Meteor.Map
                     case 0x5: //Nil                        
                         break;
                     case 0x6: //Actor (By Id)
-                        writer.Write((UInt32)Utils.SwapEndian((UInt32)l.value));
+                        writer.Write((uint)Utils.SwapEndian((uint)l.value));
                         break;
                     case 0x7: //Weird one used for inventory
                         ItemRefParam type7 = (ItemRefParam)l.value;
-                        writer.Write((UInt32)Utils.SwapEndian((UInt32)type7.actorId));
-                        writer.Write((Byte)type7.unknown);
-                        writer.Write((Byte)type7.slot);
-                        writer.Write((Byte)type7.itemPackage);
+                        writer.Write((uint)Utils.SwapEndian((uint)type7.actorId));
+                        writer.Write((byte)type7.unknown);
+                        writer.Write((byte)type7.slot);
+                        writer.Write((byte)type7.itemPackage);
                         break;
                     case 0x9: //Two Longs (only storing first one)
-                        writer.Write((UInt64)Utils.SwapEndian(((Type9Param)l.value).item1));
-                        writer.Write((UInt64)Utils.SwapEndian(((Type9Param)l.value).item2));
+                        writer.Write((ulong)Utils.SwapEndian(((Type9Param)l.value).item1));
+                        writer.Write((ulong)Utils.SwapEndian(((Type9Param)l.value).item2));
                         break;
                     case 0xC: //Byte
-                        writer.Write((Byte)l.value);
+                        writer.Write((byte)l.value);
                         break;
                     case 0x1B: //Short?                        
                         break;
@@ -334,7 +335,7 @@ namespace Meteor.Map
                 }
             }
 
-            writer.Write((Byte)0xF);
+            writer.Write((byte)0xF);
         }
 
         public static List<LuaParam> CreateLuaParamList(DynValue fromScript)
@@ -417,7 +418,7 @@ namespace Meteor.Map
             {
                 luaParams.Add(new LuaParam(0x1, (uint)o));
             }                
-            else if (o is Double)
+            else if (o is double)
             {
                 if (((double)o) % 1 == 0)
                     luaParams.Add(new LuaParam(0x0, (int)(double)o));
@@ -481,13 +482,13 @@ namespace Meteor.Map
                 switch (lParams[i].typeID)
                 {
                     case 0x0: //Int32
-                        dumpString += String.Format("0x{0:X}", (int)lParams[i].value);
+                        dumpString += string.Format("0x{0:X}", (int)lParams[i].value);
                         break;
                     case 0x1: //Int32
-                        dumpString += String.Format("0x{0:X}", (uint)lParams[i].value);
+                        dumpString += string.Format("0x{0:X}", (uint)lParams[i].value);
                         break;
                     case 0x2: //Null Termed String                        
-                        dumpString += String.Format("\"{0}\"", (string)lParams[i].value);
+                        dumpString += string.Format("\"{0}\"", (string)lParams[i].value);
                         break;
                     case 0x3: //Boolean True
                         dumpString += "true";
@@ -499,25 +500,25 @@ namespace Meteor.Map
                         dumpString += "nil";
                         break;
                     case 0x6: //Actor (By Id)
-                        dumpString += String.Format("0x{0:X}", (uint)lParams[i].value);
+                        dumpString += string.Format("0x{0:X}", (uint)lParams[i].value);
                         break;
                     case 0x7: //Weird one used for inventory
                         ItemRefParam type7Param = ((ItemRefParam)lParams[i].value);
-                        dumpString += String.Format("Type7 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X})", type7Param.actorId, type7Param.unknown, type7Param.slot, type7Param.itemPackage);
+                        dumpString += string.Format("Type7 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X})", type7Param.actorId, type7Param.unknown, type7Param.slot, type7Param.itemPackage);
                         break;
                     case 0x8: //Weird one used for inventory
                         ItemOfferParam itemOfferParam = ((ItemOfferParam)lParams[i].value);
-                        dumpString += String.Format("Type8 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X})", itemOfferParam.actorId, itemOfferParam.offerSlot, itemOfferParam.offerPackageId, itemOfferParam.unknown1, itemOfferParam.seekSlot, itemOfferParam.seekPackageId, itemOfferParam.unknown2);
+                        dumpString += string.Format("Type8 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X})", itemOfferParam.actorId, itemOfferParam.offerSlot, itemOfferParam.offerPackageId, itemOfferParam.unknown1, itemOfferParam.seekSlot, itemOfferParam.seekPackageId, itemOfferParam.unknown2);
                         break;
                     case 0x9: //Long (+ 8 bytes ignored)
                         Type9Param type9Param = ((Type9Param)lParams[i].value);
-                        dumpString += String.Format("Type9 Param: (0x{0:X}, 0x{1:X})", type9Param.item1, type9Param.item2);
+                        dumpString += string.Format("Type9 Param: (0x{0:X}, 0x{1:X})", type9Param.item1, type9Param.item2);
                         break;
                     case 0xC: //Byte
-                        dumpString += String.Format("0x{0:X}", (byte)lParams[i].value);
+                        dumpString += string.Format("0x{0:X}", (byte)lParams[i].value);
                         break;                   
                     case 0x1B: //Short?
-                        dumpString += String.Format("0x{0:X}", (ushort)lParams[i].value);
+                        dumpString += string.Format("0x{0:X}", (ushort)lParams[i].value);
                         break;
                     case 0xF: //End
                         break;

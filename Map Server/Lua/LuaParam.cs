@@ -26,9 +26,9 @@ namespace Meteor.Map.lua
     class LuaParam
     {
         public int typeID;
-        public Object value;
+        public object value;
 
-        public LuaParam(int type, Object value)
+        public LuaParam(int type, object value)
         {
             this.typeID = type;
             this.value = value;

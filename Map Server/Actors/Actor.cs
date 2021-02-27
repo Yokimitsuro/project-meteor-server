@@ -363,7 +363,7 @@ namespace Meteor.Map.Actors
             return packets;
         }
 
-        public override bool Equals(Object obj)
+        public override bool Equals(object obj)
         {
             Actor actorObj = obj as Actor;
             if (actorObj == null)
@@ -508,7 +508,7 @@ namespace Meteor.Map.Actors
                                              .Replace("Object", "Obj")
                                              .Replace("Retainer", "Rtn")
                                              .Replace("Standard", "Std");
-            className = Char.ToLowerInvariant(className[0]) + className.Substring(1);
+            className = char.ToLowerInvariant(className[0]) + className.Substring(1);
 
             //Format Zone Name
             string zoneName = zone.zoneName.Replace("Field", "Fld")
@@ -524,7 +524,7 @@ namespace Meteor.Map.Actors
                 //Check if "normal"
                 zoneName = zoneName.Remove(zoneName.Length - 1, 1) + "P";
             }
-            zoneName = Char.ToLowerInvariant(zoneName[0]) + zoneName.Substring(1);
+            zoneName = char.ToLowerInvariant(zoneName[0]) + zoneName.Substring(1);
 
             try
             {
@@ -542,7 +542,7 @@ namespace Meteor.Map.Actors
             if (zone is PrivateArea)
                 privLevel = ((PrivateArea)zone).GetPrivateAreaType();
 
-            actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
+            actorName = string.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }
 
         public bool SetWorkValue(Player player, string name, string uiFunc, object value)
@@ -553,8 +553,8 @@ namespace Meteor.Map.Actors
             if (!(split[0].Equals("work") || split[0].Equals("charaWork") || split[0].Equals("playerWork") || split[0].Equals("npcWork")))
                 return false;
 
-            Object parentObj = null;
-            Object curObj = this;
+            object parentObj = null;
+            object curObj = this;
             for (int i = 0; i < split.Length; i++)
             {
                 //For arrays
@@ -759,7 +759,7 @@ namespace Meteor.Map.Actors
         {
             if (target == null)
             {
-                Program.Log.Error(String.Format("[{0} {1}] FindRandomPointAroundTarget: no target found!", this.actorId, this.customDisplayName));
+                Program.Log.Error(string.Format("[{0} {1}] FindRandomPointAroundTarget: no target found!", this.actorId, this.customDisplayName));
                 return GetPosAsVector3();
             }
             return FindRandomPoint(target.positionX, target.positionY, target.positionZ, minRadius, maxRadius);

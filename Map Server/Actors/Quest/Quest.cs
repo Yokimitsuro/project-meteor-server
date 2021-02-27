@@ -20,6 +20,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 */
 
 using Meteor.Map.lua;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -28,40 +29,18 @@ namespace Meteor.Map.Actors
 {
     class Quest : Actor
     {
-        private Player owner;
-        private uint currentPhase = 0;
-        private uint questFlags = 0;
-        private Dictionary<string, Object> questData = new Dictionary<string, object>();
+        protected Player owner;
 
         public Quest(uint actorID, string name)
             : base(actorID)
         {
-            actorName = name;            
+            actorName = name;
         }
 
-        public Quest(Player owner, uint actorID, string name, string questDataJson, uint questFlags, uint currentPhase)
-            : base(actorID)
+        public Quest(Quest staticQuest, Player owner) : base(staticQuest.actorId)
         {
             this.owner = owner;
-            actorName = name;            
-            this.questFlags = questFlags;
-
-            if (questDataJson != null)
-                this.questData = JsonConvert.DeserializeObject<Dictionary<string, Object>>(questDataJson);
-            else
-                questData = null;
-
-            if (questData == null)
-                questData = new Dictionary<string, object>();
-
-            this.currentPhase = currentPhase;
-        }
-       
-        public void SetQuestData(string dataName, object data)
-        {            
-                questData[dataName] = data;
-
-            //Inform update
+            actorName = staticQuest.actorName;
         }
 
         public uint GetQuestId()
@@ -69,81 +48,8 @@ namespace Meteor.Map.Actors
             return actorId & 0xFFFFF;
         }
 
-        public object GetQuestData(string dataName)
-        {
-            if (questData.ContainsKey(dataName))
-                return questData[dataName];
-            else
-                return null;
-        }
-
-        public void ClearQuestData()
-        {
-            questData.Clear();
-        }       
-
-        public void ClearQuestFlags()
-        {
-            questFlags = 0;
-        }
-
-        public void SetQuestFlag(int bitIndex, bool value)
-        {
-            if (bitIndex >= 32)
-            {
-                Program.Log.Error("Tried to access bit flag >= 32 for questId: {0}", actorId);
-                return;
-            }
-            
-            int mask = 1 << bitIndex;
-
-            if (value)
-                questFlags |= (uint)(1 << bitIndex);
-            else
-                questFlags &= (uint)~(1 << bitIndex);
-
-            DoCompletionCheck();
-        }
-
-        public bool GetQuestFlag(int bitIndex)
-        {
-            if (bitIndex >= 32)
-            {
-                Program.Log.Error("Tried to access bit flag >= 32 for questId: {0}", actorId);
-                return false;
-            }
-            else
-            return (questFlags & (1 << bitIndex)) == (1 << bitIndex);
-        }
-
-        public uint GetPhase()
-        {
-            return currentPhase;
-        }
-
-        public void NextPhase(uint phaseNumber)
-        {
-            currentPhase = phaseNumber;
-            owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
-            SaveData();
-
-            DoCompletionCheck();
-        }
-
-        public uint GetQuestFlags()
-        {
-            return questFlags;
-        }
-
-        public string GetSerializedQuestData()
-        {
-            return JsonConvert.SerializeObject(questData, Formatting.Indented);
-        }
-
-        public void SaveData()
-        {
-            Database.SaveQuest(owner, this);
-        }
+        public virtual void SaveData() { }
+        public virtual string GetSerializedQuestData() { return null; }
 
         public void DoCompletionCheck()
         {
@@ -161,5 +67,45 @@ namespace Meteor.Map.Actors
             owner.SendGameMessage(owner, Server.GetWorldManager().GetActor(), 25236, 0x20, (object)GetQuestId());
         }
 
+        public static Quest LoadQuestDB(Player player, MySqlDataReader reader)
+        {
+            uint questID = 0xA0F00000 | reader.GetUInt32("questId");
+            Quest staticQuest = Server.GetStaticActors(questID) as Quest;
+            string questData = null;
+
+            if (!reader.IsDBNull(reader.GetOrdinal("questData")))
+                questData = reader.GetString("questData");
+            else
+                questData = "{}";
+
+            if (staticQuest.IsScenario())
+            {
+                uint questFlags = 0;
+                uint currentPhase = 0;
+
+                if (!reader.IsDBNull(reader.GetOrdinal("questFlags")))
+                    questFlags = reader.GetUInt32("questFlags");
+
+                if (!reader.IsDBNull(reader.GetOrdinal("currentPhase")))
+                    currentPhase = reader.GetUInt32("currentPhase");
+
+                return new Scenario(staticQuest, player, questData, questFlags, currentPhase);
+            }
+            else if (staticQuest.IsCraftPassiveGuildleve())
+            {
+                return new PassiveGuildleve(staticQuest, player, questData);
+            }
+            throw new NotImplementedException("Unknown quest type added");
+        }
+
+        public bool IsScenario()
+        {
+            return !IsCraftPassiveGuildleve();
+        }
+
+        public bool IsCraftPassiveGuildleve()
+        {
+            return GetQuestId() > 120000 && GetQuestId() < 121024;
+        }
     }
 }

@@ -137,7 +137,7 @@ namespace Meteor.Map.actors.director
             
             if (wasCompleted)
             {
-                Npc aetheryteNode = zone.SpawnActor(1200040, String.Format("{0}:warpExit", guildleveOwner.actorName), guildleveOwner.positionX, guildleveOwner.positionY, guildleveOwner.positionZ);
+                Npc aetheryteNode = zone.SpawnActor(1200040, string.Format("{0}:warpExit", guildleveOwner.actorName), guildleveOwner.positionX, guildleveOwner.positionY, guildleveOwner.positionZ);
                 AddMember(aetheryteNode);
 
                 foreach (Actor a in GetPlayerMembers())
@@ -168,7 +168,7 @@ namespace Meteor.Map.actors.director
             foreach (Actor p in GetPlayerMembers())
             {
                 Player player = (Player)p;
-                player.ChangeMusic(player.GetZone().bgmDay);
+                player.ResetMusic();
             }
         }
 
@@ -210,7 +210,7 @@ namespace Meteor.Map.actors.director
         {
             guildleveWork.aimNumNow[index] = value;
             ActorPropertyPacketUtil propertyBuilder = new ActorPropertyPacketUtil("guildleveWork/infoVariable", this);
-            propertyBuilder.AddProperty(String.Format("guildleveWork.aimNumNow[{0}]", index));
+            propertyBuilder.AddProperty(string.Format("guildleveWork.aimNumNow[{0}]", index));
             SendPacketsToPlayers(propertyBuilder.Done());
         }
 
@@ -218,7 +218,7 @@ namespace Meteor.Map.actors.director
         {
             guildleveWork.uiState[index] = value;
             ActorPropertyPacketUtil propertyBuilder = new ActorPropertyPacketUtil("guildleveWork/infoVariable", this);
-            propertyBuilder.AddProperty(String.Format("guildleveWork.uiState[{0}]", index));
+            propertyBuilder.AddProperty(string.Format("guildleveWork.uiState[{0}]", index));
             SendPacketsToPlayers(propertyBuilder.Done());
         }
 
@@ -228,9 +228,9 @@ namespace Meteor.Map.actors.director
             guildleveWork.markerY[markerIndex] = y;
             guildleveWork.markerZ[markerIndex] = z;
             ActorPropertyPacketUtil propertyBuilder = new ActorPropertyPacketUtil("guildleveWork/marker", this);
-            propertyBuilder.AddProperty(String.Format("guildleveWork.markerX[{0}]", markerIndex));
-            propertyBuilder.AddProperty(String.Format("guildleveWork.markerY[{0}]", markerIndex));
-            propertyBuilder.AddProperty(String.Format("guildleveWork.markerZ[{0}]", markerIndex));
+            propertyBuilder.AddProperty(string.Format("guildleveWork.markerX[{0}]", markerIndex));
+            propertyBuilder.AddProperty(string.Format("guildleveWork.markerY[{0}]", markerIndex));
+            propertyBuilder.AddProperty(string.Format("guildleveWork.markerZ[{0}]", markerIndex));
             SendPacketsToPlayers(propertyBuilder.Done());
         }
 

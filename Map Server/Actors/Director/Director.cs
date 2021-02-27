@@ -239,7 +239,7 @@ namespace Meteor.Map.actors.director
             //Format Class Name
             string className = this.className;
                 
-            className = Char.ToLowerInvariant(className[0]) + className.Substring(1);
+            className = char.ToLowerInvariant(className[0]) + className.Substring(1);
 
             //Format Zone Name
             string zoneName = zone.zoneName.Replace("Field", "Fld")
@@ -255,7 +255,7 @@ namespace Meteor.Map.actors.director
                 //Check if "normal"
                 zoneName = zoneName.Remove(zoneName.Length - 1, 1) + "P";
             }
-            zoneName = Char.ToLowerInvariant(zoneName[0]) + zoneName.Substring(1);
+            zoneName = char.ToLowerInvariant(zoneName[0]) + zoneName.Substring(1);
 
             try
             {
@@ -273,7 +273,7 @@ namespace Meteor.Map.actors.director
             if (zone is PrivateArea)
                 privLevel = ((PrivateArea)zone).GetPrivateAreaType();
 
-            actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
+            actorName = string.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }
 
         public string GetScriptPath()
@@ -283,7 +283,7 @@ namespace Meteor.Map.actors.director
 
         private void LoadLuaScript()
         {
-            string luaPath = String.Format(LuaEngine.FILEPATH_DIRECTORS, GetScriptPath());
+            string luaPath = string.Format(LuaEngine.FILEPATH_DIRECTORS, GetScriptPath());
             directorScript = LuaEngine.LoadScript(luaPath);
             if (directorScript == null)
                 Program.Log.Error("Could not find script for director {0}.", GetName());
@@ -293,7 +293,7 @@ namespace Meteor.Map.actors.director
         {
             if (directorScript != null)
             {
-                directorScript = LuaEngine.LoadScript(String.Format(LuaEngine.FILEPATH_DIRECTORS, directorScriptPath));
+                directorScript = LuaEngine.LoadScript(string.Format(LuaEngine.FILEPATH_DIRECTORS, directorScriptPath));
                 if (!directorScript.Globals.Get(funcName).IsNil())
                 {
                     DynValue result = directorScript.Call(directorScript.Globals[funcName], args);

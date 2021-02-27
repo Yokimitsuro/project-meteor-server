@@ -39,7 +39,7 @@ namespace Meteor.Map.actors.chara.npc
         {
             this.retainerId = retainerId;
             this.ownerPlayer = player;
-            this.actorName = String.Format("_rtnre{0:x7}", actorId);
+            this.actorName = string.Format("_rtnre{0:x7}", actorId);
 
             itemPackages[ItemPackage.NORMAL] = new ItemPackage(this, MAXSIZE_INVENTORY_NORMAL, ItemPackage.NORMAL);
             itemPackages[ItemPackage.CURRENCY_CRYSTALS] = new ItemPackage(this, MAXSIZE_INVENTORY_CURRANCY, ItemPackage.CURRENCY_CRYSTALS);

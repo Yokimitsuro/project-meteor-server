@@ -32,7 +32,7 @@ namespace Meteor.Map.actors.area
         private Director currentDirector;
         private bool isContentFinished = false;
 
-        public static PrivateAreaContent CreateContentArea(String scriptPath)
+        public static PrivateAreaContent CreateContentArea(string scriptPath)
         {
             return null;
         }

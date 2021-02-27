@@ -81,7 +81,7 @@ namespace Meteor.Map.Actors
             LoadNpcAppearance(actorClass.actorClassId);
 
             className = actorClass.classPath.Substring(actorClass.classPath.LastIndexOf("/") + 1);
-            this.classPath = String.Format("{0}/{1}", actorClass.classPath.Substring(0, actorClass.classPath.LastIndexOf('/')).ToLower(), className);
+            this.classPath = string.Format("{0}/{1}", actorClass.classPath.Substring(0, actorClass.classPath.LastIndexOf('/')).ToLower(), className);
 
             charaWork.battleSave.potencial = 1.0f;
 
@@ -109,8 +109,8 @@ namespace Meteor.Map.Actors
                     isMapObj = false;
                 else
                 {                   
-                    layout = (uint)(Int32)lParams[4].value;
-                    instance = (uint)(Int32)lParams[5].value;
+                    layout = (uint)(int)lParams[4].value;
+                    instance = (uint)(int)lParams[5].value;
                     isStatic = true;
                 }
             }
@@ -236,7 +236,7 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < charaWork.property.Length; i++)
             {
                 if (charaWork.property[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.property[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.property[{0}]", i));
             }
 
             //Parameters
@@ -261,14 +261,14 @@ namespace Meteor.Map.Actors
             for (int i = 0; i < charaWork.statusShownTime.Length; i++)
             {
                 if (charaWork.statusShownTime[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.statusShownTime[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.statusShownTime[{0}]", i));
             }
 
             //General Parameters
             for (int i = 3; i < charaWork.battleTemp.generalParameter.Length; i++)
             {
                 if (charaWork.battleTemp.generalParameter[i] != 0)
-                    propPacketUtil.AddProperty(String.Format("charaWork.battleTemp.generalParameter[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.battleTemp.generalParameter[{0}]", i));
             }
 
             propPacketUtil.AddProperty("npcWork.hateType");
@@ -302,7 +302,7 @@ namespace Meteor.Map.Actors
 
         public void LoadNpcAppearance(uint id)
         {
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            using (MySqlConnection conn = new MySqlConnection(string.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
                 {

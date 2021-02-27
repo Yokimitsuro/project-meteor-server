@@ -33,14 +33,14 @@ namespace Meteor.Map.actors.area
     {        
         Dictionary<string, Dictionary<uint, PrivateArea>> privateAreas = new Dictionary<string, Dictionary<uint, PrivateArea>>();
         Dictionary<string, List<PrivateAreaContent>> contentAreas = new Dictionary<string, List<PrivateAreaContent>>();
-        Object contentAreasLock = new Object();
+        object contentAreasLock = new object();
 
         public SharpNav.TiledNavMesh tiledNavMesh;
         public SharpNav.NavMeshQuery navMeshQuery;
 
-        public Int64 pathCalls;
-        public Int64 prevPathCalls = 0;
-        public Int64 pathCallTime;
+        public long pathCalls;
+        public long prevPathCalls = 0;
+        public long pathCallTime;
 
         public Zone(uint id, string zoneName, ushort regionId, string classPath, ushort bgmDay, ushort bgmNight, ushort bgmBattle, bool isIsolated, bool isInn, bool canRideChocobo, bool canStealth, bool isInstanceRaid, bool loadNavMesh = false)
             : base(id, zoneName, regionId, classPath, bgmDay, bgmNight, bgmBattle, isIsolated, isInn, canRideChocobo, canStealth, isInstanceRaid)

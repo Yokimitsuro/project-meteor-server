@@ -152,7 +152,7 @@ namespace Meteor.Map.Actors
         public uint extraUint;
         public float extraFloat;
 
-        protected Dictionary<string, UInt64> tempVars = new Dictionary<string, UInt64>();
+        protected Dictionary<string, ulong> tempVars = new Dictionary<string, ulong>();
         
         //Inventory        
         protected Dictionary<ushort, ItemPackage> itemPackages = new Dictionary<ushort, ItemPackage>();
@@ -227,8 +227,8 @@ namespace Meteor.Map.Actors
             {
                 if (!effect.GetHidden())
                 {
-                    propPacketUtil.AddProperty(String.Format("charaWork.statusShownTime[{0}]", i));
-                    propPacketUtil.AddProperty(String.Format("charaWork.statusShownTime[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.statusShownTime[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.statusShownTime[{0}]", i));
                     i++;
                 }
             }
@@ -908,9 +908,9 @@ namespace Meteor.Map.Actors
             AddTP((int)Math.Ceiling(tpModifier * action.amount));
         }
 
-        public UInt64 GetTempVar(string name)
+        public ulong GetTempVar(string name)
         {
-            UInt64 retVal = 0;
+            ulong retVal = 0;
             if (tempVars.TryGetValue(name, out retVal))
                 return retVal;
             return 0;
@@ -923,7 +923,7 @@ namespace Meteor.Map.Actors
                 tempVars[name] = val;
         }
 
-        public void SetTempVar(string name, UInt64 val)
+        public void SetTempVar(string name, ulong val)
         {
             if (tempVars.ContainsKey(name))
                 tempVars[name] = val;
@@ -994,7 +994,7 @@ namespace Meteor.Map.Actors
                 {
                     shouldSend = true;
                     charaWork.battleTemp.timingCommandFlag[i] = false;
-                    propPacketUtil.AddProperty(String.Format("charaWork.battleTemp.timingCommandFlag[{0}]", i));
+                    propPacketUtil.AddProperty(string.Format("charaWork.battleTemp.timingCommandFlag[{0}]", i));
                 }
             }
 
@@ -1025,7 +1025,7 @@ namespace Meteor.Map.Actors
             if (this is Player)
             {
                 var propPacketUtil = new ActorPropertyPacketUtil("charaWork/timingCommand", this);
-                propPacketUtil.AddProperty(String.Format("charaWork.battleTemp.timingCommandFlag[{0}]", procId));
+                propPacketUtil.AddProperty(string.Format("charaWork.battleTemp.timingCommandFlag[{0}]", procId));
                 ((Player)this).QueuePackets(propPacketUtil.Done());
             }
         }

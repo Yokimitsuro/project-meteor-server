@@ -59,8 +59,8 @@ namespace Meteor.Map.Actors
                 try
                 {
                     byte byteIn = binReader.ReadByte();
-                    byte byteOut = (Byte)(byteIn ^ 0x73);
-                    binWriter.Write((Byte)byteOut);
+                    byte byteOut = (byte)(byteIn ^ 0x73);
+                    binWriter.Write((byte)byteOut);
                 }
                 catch (EndOfStreamException) { break; }
             }

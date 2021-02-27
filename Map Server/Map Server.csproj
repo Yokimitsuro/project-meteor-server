@@ -164,9 +164,12 @@
     <Compile Include="Actors\Group\Work\PartyWork.cs" />
     <Compile Include="Actors\Group\Work\RelationWork.cs" />
     <Compile Include="Actors\Judge\Judge.cs" />
+    <Compile Include="Actors\Quest\Scenario.cs" />
+    <Compile Include="Actors\Quest\PassiveGuildleve.cs" />
     <Compile Include="Actors\Quest\Quest.cs" />
     <Compile Include="Actors\StaticActors.cs" />
     <Compile Include="Actors\World\WorldMaster.cs" />
+    <Compile Include="DataObjects\PassiveGuildleveData.cs" />
     <Compile Include="DataObjects\GuildleveData.cs" />
     <Compile Include="DataObjects\Recipe.cs" />
     <Compile Include="DataObjects\RecipeResolver.cs" />

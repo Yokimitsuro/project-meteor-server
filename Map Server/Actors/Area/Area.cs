@@ -48,7 +48,7 @@ namespace Meteor.Map.Actors
         protected int halfWidth, halfHeight;
 
         private Dictionary<uint, Director> currentDirectors = new Dictionary<uint, Director>();
-        private Object directorLock = new Object();
+        private object directorLock = new object();
         private uint directorIdCount = 0;
 
         protected Director mWeatherDirector;
@@ -77,7 +77,7 @@ namespace Meteor.Map.Actors
 
             this.displayNameId = 0;
             this.customDisplayName = "_areaMaster";
-            this.actorName = String.Format("_areaMaster@{0:X5}", id << 8);
+            this.actorName = string.Format("_areaMaster@{0:X5}", id << 8);
 
             this.classPath = classPath;
             this.className = classPath.Substring(classPath.LastIndexOf("/") + 1);
@@ -611,7 +611,7 @@ namespace Meteor.Map.Actors
 
         public Director CreateGuildleveDirector(uint glid, byte difficulty, Player owner, params object[] args)
         {
-            String directorScriptPath = "";
+            string directorScriptPath = "";
 
             uint type = Server.GetGuildleveGamedata(glid).plateId;
 
@@ -677,6 +677,11 @@ namespace Meteor.Map.Actors
             return null;
         }
 
+        public ushort GetCurrentMusic()
+        {
+            return bgmDay;
+        }
+
         public override void Update(DateTime tick)
         {
             lock (mActorList)
@@ -691,6 +696,5 @@ namespace Meteor.Map.Actors
                 }
             }
         }
-
     }
 }
