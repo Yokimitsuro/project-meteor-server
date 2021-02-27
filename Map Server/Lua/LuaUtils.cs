@@ -38,10 +38,10 @@ namespace Meteor.Map
         {
             public uint actorId;
             public byte unknown;
-            public byte slot;
+            public ushort slot;
             public byte itemPackage;
 
-            public ItemRefParam(uint actorId, byte unknown, byte slot, byte itemPackage)
+            public ItemRefParam(uint actorId, ushort slot, byte itemPackage)
             {
                 this.actorId = actorId;
                 this.unknown = unknown;
@@ -50,25 +50,17 @@ namespace Meteor.Map
             }
         }
 
-        public class ItemOfferParam
+        public class MultiItemRefParam
         {
-            public uint actorId;
-            public ushort offerSlot;
-            public byte offerPackageId;
-            public byte unknown1;
-            public ushort seekSlot;
-            public byte seekPackageId;
-            public byte unknown2;
+            public readonly uint actorId;
+            public readonly ushort[] itemSlots;
+            public readonly byte[] itemPackages;
 
-            public ItemOfferParam(uint actorId, ushort offerSlot, byte offerPackageId, byte unknown1, ushort seekSlot, byte seekPackageId, byte unknown2)
+            public MultiItemRefParam(uint actorId, ushort[] itemSlots, byte[] itemPackages)
             {
                 this.actorId = actorId;
-                this.offerSlot = offerSlot;
-                this.offerPackageId = offerPackageId;
-                this.unknown1 = unknown1;
-                this.seekSlot = seekSlot;
-                this.seekPackageId = seekPackageId;
-                this.unknown2 = unknown2;
+                this.itemSlots = itemSlots;
+                this.itemPackages = itemPackages;
             }
         }
 
@@ -127,23 +119,37 @@ namespace Meteor.Map
                         break;
                     case 0x7: //Item Reference to Inventory Spot
                         {
-                            uint type7ActorId = Utils.SwapEndian(reader.ReadUInt32());
-                            byte type7Unknown = reader.ReadByte();
-                            byte type7Slot = reader.ReadByte();
-                            byte type7InventoryType = reader.ReadByte();
-                            value = new ItemRefParam(type7ActorId, type7Unknown, type7Slot, type7InventoryType);
+                            uint actorId = Utils.SwapEndian(reader.ReadUInt32());
+                            ushort slot = Utils.SwapEndian(reader.ReadUInt16());
+                            byte itemPackage = reader.ReadByte();
+                            value = new ItemRefParam(actorId, slot, itemPackage);
                         }
                         break;  
-                    case 0x8: //Used for offering
+                    case 0x8: //Multi Item Reference to Inventory Spot
                         {
+                            long currentPosition = reader.BaseStream.Position - 1;
                             uint actorId = Utils.SwapEndian(reader.ReadUInt32());
-                            ushort rewardSlot = Utils.SwapEndian(reader.ReadUInt16());
-                            byte   rewardPackageId = reader.ReadByte();
-                            byte   unk1 = reader.ReadByte(); //Always 0x2?
-                            ushort seekSlot = Utils.SwapEndian(reader.ReadUInt16());
-                            byte   seekPackageId = reader.ReadByte();
-                            byte   unk2 = reader.ReadByte(); //Always 0xD?
-                            value = new ItemOfferParam(actorId, rewardSlot, rewardPackageId, unk1, seekSlot, seekPackageId, unk2);
+                            ushort itemSlot0 = Utils.SwapEndian(reader.ReadUInt16());
+                            byte packageId0 = reader.ReadByte();
+
+                            byte numberOfEntries = reader.ReadByte();
+
+                            ushort[] itemSlots = new ushort[numberOfEntries];
+                            byte[] packageIds = new byte[numberOfEntries];
+                            itemSlots[0] = itemSlot0;
+                            packageIds[0] = packageId0;
+
+                            for (int i = 1; i < numberOfEntries; i++)
+                            {
+                                itemSlots[i] = Utils.SwapEndian(reader.ReadUInt16());
+                                packageIds[i] = reader.ReadByte();
+                            }
+
+                            byte byteSize = reader.ReadByte();
+
+                            reader.BaseStream.Seek(currentPosition + byteSize, SeekOrigin.Begin);
+
+                            value = new MultiItemRefParam(actorId, itemSlots, packageIds);
                         }
                         break;
                     case 0x9: //Two Longs (only storing first one)
@@ -165,13 +171,7 @@ namespace Meteor.Map
                 if (isDone)
                     break;
 
-                //Special case cause fuck Type8
-                if (value != null && value is ItemOfferParam)
-                {
-                    luaParams.Add(new LuaParam(code, value));
-                    luaParams.Add(new LuaParam(0x5, null)); //This is to clean up the seek script as it fucks with the args.
-                }
-                else if (value != null)
+                if (value != null)
                     luaParams.Add(new LuaParam(code, value));
                 else if (wasNil)
                     luaParams.Add(new LuaParam(code, value));
@@ -226,23 +226,41 @@ namespace Meteor.Map
                             case 0x6: //Actor (By Id)
                                 value = Utils.SwapEndian(reader.ReadUInt32());
                                 break;
-                            case 0x7: //Weird one used for inventory
-                                uint type7ActorId = Utils.SwapEndian(reader.ReadUInt32());
-                                byte type7Unknown = reader.ReadByte();
-                                byte type7Slot = reader.ReadByte();
-                                byte type7InventoryType = reader.ReadByte();
-                                value = new ItemRefParam(type7ActorId, type7Unknown, type7Slot, type7InventoryType);
-                                break;
-                            case 0x8:
-                                uint actorId = Utils.SwapEndian(reader.ReadUInt32());
-                                ushort rewardSlot = Utils.SwapEndian(reader.ReadUInt16());
-                                byte rewardPackageId = reader.ReadByte();
-                                byte unk1 = reader.ReadByte(); //Always 0x2?
-                                ushort seekSlot = Utils.SwapEndian(reader.ReadUInt16());
-                                byte seekPackageId = reader.ReadByte();
-                                byte unk2 = reader.ReadByte(); //Always 0xD?
-                                value = new ItemOfferParam(actorId, rewardSlot, rewardPackageId, unk1, seekSlot, seekPackageId, unk2);
-                                break;
+                            case 0x7: //Item Reference
+                                {
+                                    uint actorId = Utils.SwapEndian(reader.ReadUInt32());
+                                    ushort slot = Utils.SwapEndian(reader.ReadUInt16());
+                                    byte itemPackage = reader.ReadByte();
+                                    value = new ItemRefParam(actorId, slot, itemPackage);
+                                    break;
+                                }
+                            case 0x8: //Multi Item Reference
+                                {
+                                    long currentPosition = reader.BaseStream.Position - 1;
+                                    uint actorId = Utils.SwapEndian(reader.ReadUInt32());
+                                    ushort itemSlot0 = Utils.SwapEndian(reader.ReadUInt16());
+                                    byte packageId0 = reader.ReadByte();
+
+                                    byte numberOfEntries = reader.ReadByte();
+
+                                    ushort[] itemSlots = new ushort[numberOfEntries];
+                                    byte[] packageIds = new byte[numberOfEntries];
+                                    itemSlots[0] = itemSlot0;
+                                    packageIds[0] = packageId0;
+
+                                    for (int i = 1; i < numberOfEntries; i++)
+                                    {
+                                        itemSlots[i] = Utils.SwapEndian(reader.ReadUInt16());
+                                        packageIds[i] = reader.ReadByte();
+                                    }
+
+                                    byte byteSize = reader.ReadByte();
+
+                                    reader.BaseStream.Seek(currentPosition + byteSize, SeekOrigin.Begin);
+
+                                    value = new MultiItemRefParam(actorId, itemSlots, packageIds);
+                                    break;
+                                }
                             case 0x9: //Two Longs (only storing first one)
                                 value = new Type9Param(Utils.SwapEndian(reader.ReadUInt64()), Utils.SwapEndian(reader.ReadUInt64()));
                                 break;
@@ -262,12 +280,7 @@ namespace Meteor.Map
                         if (isDone)
                             break;
 
-                        if (value != null && value is ItemOfferParam)
-                        {
-                            luaParams.Add(new LuaParam(code, value));
-                            luaParams.Add(new LuaParam(0x5, null)); //This is to clean up the seek script as it fucks with the args.
-                        }
-                        else if (value != null)
+                        if (value != null)
                             luaParams.Add(new LuaParam(code, value));
                         else if (wasNil)
                             luaParams.Add(new LuaParam(code, value));
@@ -317,9 +330,11 @@ namespace Meteor.Map
                     case 0x7: //Weird one used for inventory
                         ItemRefParam type7 = (ItemRefParam)l.value;
                         writer.Write((uint)Utils.SwapEndian((uint)type7.actorId));
-                        writer.Write((byte)type7.unknown);
-                        writer.Write((byte)type7.slot);
+                        writer.Write((ushort)type7.slot);
                         writer.Write((byte)type7.itemPackage);
+                        break;
+                    case 0x8:
+                        //TODO: Fill it out even if not used
                         break;
                     case 0x9: //Two Longs (only storing first one)
                         writer.Write((ulong)Utils.SwapEndian(((Type9Param)l.value).item1));
@@ -446,9 +461,9 @@ namespace Meteor.Map
             {
                 luaParams.Add(new LuaParam(0x7, (ItemRefParam)o));
             }
-            else if (o is ItemOfferParam)
+            else if (o is MultiItemRefParam)
             {
-                luaParams.Add(new LuaParam(0x8, (ItemOfferParam)o));
+                luaParams.Add(new LuaParam(0x8, (MultiItemRefParam)o));
             }
             else if (o is Type9Param)
             {
@@ -496,19 +511,29 @@ namespace Meteor.Map
                     case 0x4: //Boolean False
                         dumpString += "false";
                         break;
-                    case 0x5: //NULL???                        
+                    case 0x5: //Null
                         dumpString += "nil";
                         break;
                     case 0x6: //Actor (By Id)
                         dumpString += string.Format("0x{0:X}", (uint)lParams[i].value);
                         break;
-                    case 0x7: //Weird one used for inventory
+                    case 0x7: //Single Item Reference
                         ItemRefParam type7Param = ((ItemRefParam)lParams[i].value);
-                        dumpString += string.Format("Type7 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X})", type7Param.actorId, type7Param.unknown, type7Param.slot, type7Param.itemPackage);
+                        dumpString += string.Format("Item Ref: (0x{0:X}, 0x{1:X}, 0x{2:X})", type7Param.actorId, type7Param.slot, type7Param.itemPackage);
                         break;
-                    case 0x8: //Weird one used for inventory
-                        ItemOfferParam itemOfferParam = ((ItemOfferParam)lParams[i].value);
-                        dumpString += string.Format("Type8 Param: (0x{0:X}, 0x{1:X}, 0x{2:X}, 0x{3:X}, 0x{4:X}, 0x{5:X}, 0x{6:X})", itemOfferParam.actorId, itemOfferParam.offerSlot, itemOfferParam.offerPackageId, itemOfferParam.unknown1, itemOfferParam.seekSlot, itemOfferParam.seekPackageId, itemOfferParam.unknown2);
+                    case 0x8: //Multi Item Reference
+                        MultiItemRefParam multiItemRef = ((MultiItemRefParam)lParams[i].value);
+                        string array = "";
+
+                        for (int j = 0; j < multiItemRef.itemSlots.Length; j++)
+                        {
+                            if (j + 1 != multiItemRef.itemSlots.Length)
+                                array += string.Format("[0x{0:X}, 0x{1:X}], ", multiItemRef.itemSlots[j], multiItemRef.itemPackages[j]);
+                            else
+                                array += string.Format("[0x{0:X}, 0x{1:X}]", multiItemRef.itemSlots[j], multiItemRef.itemPackages[j]);
+                        }
+
+                        dumpString += string.Format("Item Ref: (0x{0:X}, [{1}])", multiItemRef.actorId, array);
                         break;
                     case 0x9: //Long (+ 8 bytes ignored)
                         Type9Param type9Param = ((Type9Param)lParams[i].value);
