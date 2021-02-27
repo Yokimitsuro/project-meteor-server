@@ -243,7 +243,7 @@ namespace Meteor.Map.Actors
             charaWork.command[12] = 0xA0F00000 | 22012;
             charaWork.command[13] = 0xA0F00000 | 22013;
             charaWork.command[14] = 0xA0F00000 | 29497;
-            charaWork.command[15] = 0xA0F00000 | 22015;            
+            charaWork.command[15] = 0xA0F00000 | 22015;      
 
             charaWork.commandAcquired[27150 - 26000] = true;
 
@@ -275,6 +275,8 @@ namespace Meteor.Map.Actors
 
             Database.LoadPlayerCharacter(this);
             lastPlayTimeUpdate = Utils.UnixTimeStampUTC();
+
+            SetSpecialCommands(charaWork.parameterSave.state_mainSkill[0]);
 
             this.aiContainer = new AIContainer(this, new PlayerController(this), null, new TargetFind(this));
             allegiance = CharacterTargetingAllegiance.Player;
@@ -1222,6 +1224,7 @@ namespace Meteor.Map.Actors
                 }
             }
 
+            SetSpecialCommands(charaWork.parameterSave.state_mainSkill[0]);
             UpdateHotbar();
 
             List<SubPacket> packets = propertyBuilder.Done();
@@ -1231,6 +1234,37 @@ namespace Meteor.Map.Actors
 
             Database.SavePlayerCurrentClass(this);
             RecalculateStats();
+        }
+
+        private void SetSpecialCommands(byte classId)
+        {
+            //Added special commands for crafter/gatherer
+            charaWork.command[16] = 0;
+            charaWork.command[17] = 0;
+            if (classId >= 29 && classId <= 36)
+            {
+                charaWork.command[16] = 0xA0F00000 | 22001; //Synthesize
+            }
+            else if (classId == 39) //Miner
+            {
+                charaWork.command[16] = 0xA0F00000 | 22002; //Mine
+                charaWork.command[17] = 0xA0F00000 | 22006; //Quarry
+            }
+            else if (classId == 40) //Botanist
+            {
+                charaWork.command[16] = 0xA0F00000 | 22003; //Log
+                charaWork.command[17] = 0xA0F00000 | 22007; //Harvest
+            }
+            else if (classId == 41) //Fisher
+            {
+                charaWork.command[16] = 0xA0F00000 | 22004; //Fish
+                charaWork.command[17] = 0xA0F00000 | 22008; //Spearfish
+            }
+            else if (classId == 42) //Shepherd
+            {
+                charaWork.command[16] = 0xA0F00000 | 22005; //Herd
+                charaWork.command[17] = 0xA0F00000 | 22009; //Herd 2
+            }
         }
 
         public void UpdateClassLevel(byte classId, short level)
