@@ -267,7 +267,15 @@ namespace Meteor.Common
 
         public static string ReadNullTermString(BinaryReader reader, int maxSize = 0x20)
         {
-            return Encoding.ASCII.GetString(reader.ReadBytes(maxSize)).Trim(new[] { '\0' });
+            byte[] str = reader.ReadBytes(maxSize);
+            int i;
+            for (i = 0; i <= str.Length; i++)
+            {
+                if (str[i] == 0)
+                    break;
+            }
+
+            return Encoding.ASCII.GetString(str, 0, i);
         }
 
         public static void WriteNullTermString(BinaryWriter writer, string value, int maxSize = 0x20)
