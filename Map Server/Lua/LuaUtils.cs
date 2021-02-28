@@ -37,14 +37,12 @@ namespace Meteor.Map
         public class ItemRefParam
         {
             public uint actorId;
-            public byte unknown;
             public ushort slot;
             public byte itemPackage;
 
             public ItemRefParam(uint actorId, ushort slot, byte itemPackage)
             {
                 this.actorId = actorId;
-                this.unknown = unknown;
                 this.slot = slot;
                 this.itemPackage = itemPackage;
             }

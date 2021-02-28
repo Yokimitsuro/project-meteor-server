@@ -22,6 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using Meteor.Map.dataobjects;
 using Meteor.Map.DataObjects;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace Meteor.Map.Actors
@@ -31,7 +32,7 @@ namespace Meteor.Map.Actors
         private Recipe targetRecipe;
 
         private byte currentDifficulty;
-        private short numSuccesses;
+        private short currentCrafted;
         private short currentAttempt;
 
         private bool hasMaterials;
@@ -45,7 +46,7 @@ namespace Meteor.Map.Actors
             targetRecipe = Server.ResolveRecipe().GetRecipeByItemID(passiveGLData.objectiveItemId[currentDifficulty]);
             this.currentDifficulty = currentDifficulty;
             currentAttempt = 0;
-            numSuccesses = 0;
+            currentCrafted = 0;
             hasMaterials = false;
         }
 
@@ -61,9 +62,9 @@ namespace Meteor.Map.Actors
             if (questData == null)
                 questData = new Dictionary<string, object>();
 
-            currentDifficulty = questData.ContainsKey("currentDifficulty") ? (byte)questData["currentDifficulty"] : (byte)0;
-            currentAttempt = questData.ContainsKey("currentAttempt") ? (short)questData["currentAttempt"] : (short)0;
-            numSuccesses = questData.ContainsKey("numSuccesses") ? (short)questData["numSuccesses"] : (short)0;
+            currentDifficulty = questData.ContainsKey("currentDifficulty") ? (byte)Convert.ToByte(questData["currentDifficulty"]) : (byte)0;
+            currentAttempt = questData.ContainsKey("currentAttempt") ? (short)Convert.ToInt16(questData["currentAttempt"]) : (short)0;
+            currentCrafted = questData.ContainsKey("currentCrafted") ? (short)Convert.ToInt16(questData["currentCrafted"]) : (short)0;
             hasMaterials = questData.ContainsKey("hasMaterials") ? (bool)questData["hasMaterials"] : false;
 
             targetRecipe = Server.ResolveRecipe().GetRecipeByItemID(passiveGLData.objectiveItemId[currentDifficulty]);
@@ -71,7 +72,7 @@ namespace Meteor.Map.Actors
 
         public void CraftSuccess()
         {
-            numSuccesses++;
+            currentCrafted += (short) targetRecipe.resultQuantity;
             currentAttempt++;
         }
 
@@ -85,9 +86,14 @@ namespace Meteor.Map.Actors
             return targetRecipe;
         }
 
-        public int GetNumberOfSuccesses()
+        public int GetObjectiveQuantity()
         {
-            return numSuccesses;
+            return passiveGLData.objectiveQuantity[currentDifficulty];
+        }
+
+        public int getCurrentCrafted()
+        {
+            return currentCrafted;
         }
 
         public int GetRemainingMaterials()
@@ -130,7 +136,7 @@ namespace Meteor.Map.Actors
             {
                 { "currentDifficulty", currentDifficulty },
                 { "currentAttempt", currentAttempt },
-                { "itemsCompleted", numSuccesses },
+                { "currentCrafted", currentCrafted },
                 { "hasMaterials", hasMaterials }
             };
             return JsonConvert.SerializeObject(questData, Formatting.Indented);
