@@ -154,20 +154,22 @@ local skillAnim = {
     [29531] = 0x10009002;
 }
 
+local craftStartWidgetOpen = false;
+
 function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg4, checkedActorId)
     local MENU_CANCEL, MENU_MAINHAND, MENU_OFFHAND, MENU_REQUEST = 0, 1, 2, 3;
     local MENU_RECENT, MENU_AWARDED, MENU_RECENT_DETAILED, MENU_AWARDED_DETAILED = 7, 8, 9, 10;
     
     local debugMessage = false;
 
-	local craftStartWidgetOpen = false;
     local isRecipeRecentSent = false;
     local isRecipeAwardSent = false;
 	
 	local craftJudge = GetStaticActor("CraftJudge");
     local recipeResolver = GetRecipeResolver();	
 
-	local chosenOperation;
+	local operationResult;
+	local operationMode;
 	local recipeMode;
 	local chosenMaterials;
 	
@@ -183,9 +185,9 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 
 	player:ChangeState(30); 
 	
-	while chosenOperation ~= 0 do
+	while operationMode ~= 0 do
         
-        if debugMessage then player:SendMessage(0x20, "", "[DEBUG] Menu ID: "..tostring(chosenOperation).."   Recipe : "..tostring(recipeMode).."   Quest : "..chosenQuest); end        
+        if debugMessage then player:SendMessage(0x20, "", "[DEBUG] Menu ID: "..tostring(operationMode).."   Recipe : "..tostring(recipeMode).."   Quest : "..chosenQuest); end        
         
 		-- Operate the start crafting window... confusing shit
 		if (craftStartWidgetOpen == false) then
@@ -194,32 +196,63 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 			if (isRequestedItemsMode == true) then -- If requested items, preload the quest recipe materials
 				startMats = recipeResolver.RecipeToMatIdTable(currentCraftQuestGuildleve.getRecipe());
 			end
-			chosenOperation, recipeMode = callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, facilityId, isRequestedItemsMode, unpack(startMats));
+			operationResult = {callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, facilityId, isRequestedItemsMode, unpack(startMats))};
 			craftStartWidgetOpen = true;
-		elseif ((chosenOperation == MENU_RECENT or chosenOperation == MENU_AWARDED) and recipeMode != 0) then
+		elseif ((operationMode == MENU_RECENT or operationMode == MENU_AWARDED) and chosenOperation[2] != 0) then
 			local prepedMaterials;
 			-- Recent Recipes/Awarded Recipes
-			if (chosenOperation == MENU_RECENT) then
-				prepedMaterials = recipeResolver.RecipeToMatIdTable(recentRecipes[recipeMode]);
+			if (operationMode == MENU_RECENT) then
+				prepedMaterials = recipeResolver.RecipeToMatIdTable(recentRecipes[chosenOperation[2]]);
 			else 			
-				prepedMaterials = recipeResolver.RecipeToMatIdTable(awardedRecipes[recipeMode]);
+				prepedMaterials = recipeResolver.RecipeToMatIdTable(awardedRecipes[chosenOperation[2]]);
 			end
 			-- Causes the item info window to appear for recent/awarded recipes. Only happens if a recipe was chosen.
-			chosenOperation, recipeMode = callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, -2, isRequestedItemsMode, unpack(prepedMaterials));
+			operationResult = {callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, -2, isRequestedItemsMode, unpack(prepedMaterials))};
 		else
 			-- Keep window going if the user "returned" to the starting point
-			chosenOperation, recipeMode = callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, -1, isRequestedItemsMode);
+			operationResult = {callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, -1, isRequestedItemsMode)};
         end
 		
+		operationMode = operationResult[1];
+		recipeMode = operationResult[2];
+		
 		-- Operation 
-        if chosenOperation == MENU_CANCEL then 
-            callClientFunction(player, "delegateCommand", craftJudge, "closeCraftStartWidget", commandactor);
-        elseif (chosenOperation == MENU_MAINHAND or chosenOperation == MENU_OFFHAND) then 
+        if operationMode == MENU_CANCEL then 
+            closeCraftStartWidget(player, craftJudge, commandactor);
+        elseif (operationMode == MENU_MAINHAND or operationMode == MENU_OFFHAND) then 
             -- Recipe choosing loop
 			while (true) do			
+				-- Figure out the number of preloaded mats
+				local numArgs = #operationResult;
+				local numMatArgs = numArgs - 2;
+				local materials;
+				player:SendMessage(0x20, "", "[DEBUG] " .. tostring(numArgs));				
+				player:SendMessage(0x20, "", "[DEBUG] " .. tostring(numMatArgs));
+				
+				-- Handle the possible args returned: Either 0 player items, 1 player item, 2+ palyer items. The rest is always the remaining prepped items.
+				if (numMatArgs == 8 and type(operationResult[3]) == "number") then
+					materials = {unpack(operationResult, 3)};
+				elseif (numMatArgs == 8 and type(operationResult[3]) ~= "number") then
+					player:SendMessage(0x20, "", "[DEBUG] " .. tostring(player:GetItemPackage(operationResult[3].itemPackage):GetItemAtSlot(operationResult[3].slot).itemId));
+					materials = {player:GetItemPackage(operationResult[3].itemPackage):GetItemAtSlot(operationResult[3].slot).itemId, unpack(operationResult, 3)};
+				else
+					local itemIds = {};
+					for i=0,operationResult[3].itemSlots.length do
+						converted = player:GetItemPackage(operationResult[3].itemPackages[i]):GetItemAtSlot(operationResult[3].slots[i]).itemId
+					end
+					materials = {unpack(itemIds), unpack(operationResult, 4)};
+				end				
+				
 				-- Choosing a recipe from the given materials
-				local recipes = recipeResolver.GetRecipeFromMats();
+				local recipes = recipeResolver.GetRecipeFromMats(unpack(materials));				
 				local itemIds = recipeResolver.RecipesToItemIdTable(recipes);
+				
+				-- No recipes found
+				if (#itemIds == 0) then
+					player:SendGameMessage(GetWorldMaster(), 40201, 0x20); -- You cannot synthesize with those materials.
+					break;
+				end
+				
 				local chosenRecipeIndex = callClientFunction(player, "delegateCommand", craftJudge, "selectRcp", commandactor, unpack(itemIds));
 				
 				-- Hit back on recipe list
@@ -240,18 +273,23 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 						0); 
 
 					if recipeConfirmed then
-						callClientFunction(player, "delegateCommand", craftJudge, "closeCraftStartWidget", commandactor);
+						closeCraftStartWidget(player, craftJudge, commandactor);
 						isRecipeRecentSent = false;
 						isRecipeAwardSent = false;
-						currentlyCrafting = startCrafting(player, chosenOperation, chosenRecipe, isRequestedItemsMode, 80, 100, 50); 
+						currentlyCrafting = startCrafting(player, commandactor, craftJudge, operationMode, chosenRecipe, currentCraftQuestGuildleve, 80, 100, 50); 
+						
+						--Once crafting is over, return to the original non-quest state.
+						isRequestedItemsMode = false;
+						currentCraftQuestGuildleve = nil;  
+						currentCraftQuest = nil;           
+						
 						break;
 					end
 				end
 			end
 			-- End of Recipe choosing loops
-        elseif chosenOperation == MENU_REQUEST then -- Conditional button label based on isRequestedItemsMode 
-			callClientFunction(player, "delegateCommand", craftJudge, "closeCraftStartWidget", commandactor);
-			craftStartWidgetOpen = false;
+        elseif operationMode == MENU_REQUEST then -- Conditional button label based on isRequestedItemsMode 
+			closeCraftStartWidget(player, craftJudge, commandactor);
 				
             if isRequestedItemsMode == false then    -- "Request Items" hit, close Start and open up the Quest select                
                 isRecipeRecentSent = false;
@@ -269,24 +307,24 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
             elseif isRequestedItemsMode == true then -- "Normal Synthesis" button hit   
                 isRequestedItemsMode = false;
                 currentCraftQuestGuildleve = nil;  
-                currentCraftQuest = nil;           
+                currentCraftQuest = nil;
             end        
-        elseif chosenOperation == MENU_RECENT then -- "Recipes" button hit
+        elseif operationMode == MENU_RECENT then -- "Recipes" button hit
             if isRecipeRecentSent == false then
 				recentRecipes = player.GetRecentRecipes();
 				local itemIds = recipeResolver.RecipesToItemIdTable(recentRecipes);
                 callClientFunction(player, "delegateCommand", craftJudge, "selectRcp", commandactor, unpack(itemIds)); -- Load up recipe list
                 isRecipeRecentSent = true;
             end
-        elseif chosenOperation == MENU_AWARDED then -- "Awarded Recipes" tab hit  
+        elseif operationMode == MENU_AWARDED then -- "Awarded Recipes" tab hit  
             if isRecipeAwardSent == false then
 				awardedRecipes = player.GetAwardedRecipes();
 				local itemIds = recipeResolver.RecipesToItemIdTable(awardedRecipes);
                 callClientFunction(player, "delegateCommand", craftJudge, "selectRcp", commandactor, unpack(itemIds)); -- Load up Award list
                 isRecipeAwardSent = true;
             end
-        elseif ((chosenOperation == MENU_RECENT_DETAILED or chosenOperation == MENU_AWARDED_DETAILED) and recipeMode > 0) then -- Pop-up for an item's stats/craft mats on a recent recipe			
-			local chosenRecipe = chosenOperation == MENU_RECENT_DETAILED and recentRecipes[recipeMode-1] or recentRecipes[awardedMode-1];
+        elseif ((operationMode == MENU_RECENT_DETAILED or operationMode == MENU_AWARDED_DETAILED) and recipeMode > 0) then -- Pop-up for an item's stats/craft mats on a recent recipe			
+			local chosenRecipe = operationMode == MENU_RECENT_DETAILED and recentRecipes[recipeMode-1] or recentRecipes[awardedMode-1];
 			local recipeConfirmed = callClientFunction(player, "delegateCommand", craftJudge, "confirmRcp", commandactor, 
 				chosenRecipe.resultItemID, 
 				chosenRecipe.resultQuantity, 
@@ -297,10 +335,10 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 				0, 
 				0);
 			if (recipeConfirmed) then
-				callClientFunction(player, "delegateCommand", craftJudge, "closeCraftStartWidget", commandactor);
+				closeCraftStartWidget(player, craftJudge, commandactor);
 				isRecipeRecentSent = false;
 				isRecipeAwardSent = false;
-				currentlyCrafting = startCrafting(player, chosenOperation, chosenRecipe, isRequestedItemsMode, 80, 100, 50);
+				currentlyCrafting = startCrafting(player, commandactor, craftJudge, operationMode, chosenRecipe, isRequestedItemsMode, 80, 100, 50);
 			end
         else
             break;
@@ -323,39 +361,52 @@ function getCraftQuest(player, craftJudge, commandactor);
 		if questCommandId then
 			questId = questCommandId - 0xA0F00000;
 			
+			-- Craft Quest Chosen
 			if isCraftQuest(questId) then
 				local quest = player.GetQuest(questId);			
 				local confirm = callClientFunction(player, "delegateCommand", craftJudge, "cfmQst", commandactor, quest.getQuestId(), 20, 1, 1, 1, 0, 0, "<Path Companion>");				
 				if confirm == true then
 					player:SendGameMessage(craftJudge, 21, 0x20);
 					return quest;
-				end                      				
+				end
+			-- PassiveGL Quest Chosen
 			elseif isLocalLeve(questId) then
 				local difficulty = 0;
 				local hasMaterials = 1;
 				
-				local quest = player.getQuestGuildleve(questId);
+				local quest = player:getQuestGuildleve(questId);
 				
-				if (quest ~= nil) then				
-					local confirm = callClientFunction(player, "delegateCommand", craftJudge, "confirmLeve", commandactor, 
-						quest.getQuestId(),
-						quest.getCurrentDifficulty(),
-						0, 
-						quest.getNumberOfSuccesses(),
-						quest.getRemainingMaterials(),
-						quest.hasMaterials() and 1 or 0, -- Fucked up way of doing terneries on Lua 
-						0
-					);
-					
-					if (confirm == true) then          
-						return quest;
-					end	
+				if (quest ~= nil) then
+					-- Did they pickup the materials?
+					if (quest:hasMaterials() == false) then
+						player:SendGameMessage(GetWorldMaster(), 40210, 0x20); -- You have not obtained the proper materials from the client.						
+					-- Did they use em all up?
+					elseif (quest:getRemainingMaterials() == 0) then
+						player:SendGameMessage(GetWorldMaster(), 40211, 0x20); -- You have used up all of the provided materials.			
+					-- Confirm dialog
+					else
+						local confirm = callClientFunction(player, "delegateCommand", craftJudge, "confirmLeve", commandactor, 
+							quest:getQuestId(),
+							quest:getCurrentDifficulty() + 1, -- Lua, 1-indexed
+							0, 
+							quest:getCurrentCrafted(),
+							quest:getRemainingMaterials(),
+							quest:hasMaterials() and 1 or 0, -- Fucked up way of doing terneries on Lua 
+							0
+						);
+
+						-- Quest confirmed
+						if (confirm == true) then
+							return quest;
+						end	
+					end
 				else
-					return nil; -- Shouldn't happen unless db corrupted
-				end				
+					return nil; -- Shouldn't happen unless db fucked with
+				end
+			-- Scenario Quest Chosen
 			else
 				-- TEMP for now. Cannot find source for what happens if you confirm a non-craft quest.
-			   player:SendGameMessage(GetWorldMaster(), 40209, 0x20);
+			   player:SendGameMessage(GetWorldMaster(), 40209, 0x20); -- You cannot undertake that endeavor.
 			end
 		else
 			return nil;
@@ -364,7 +415,6 @@ function getCraftQuest(player, craftJudge, commandactor);
 end
 
 function isScenarioQuest(id)
-
     if (id >= 110001 and id <= 120026) then
         return true;
     else
@@ -383,7 +433,6 @@ end
 
 
 function isLocalLeve(id)
-
     if (id >= 120001 and id <= 120452) then
         return true;
     else
@@ -391,12 +440,15 @@ function isLocalLeve(id)
     end
 end
 
+function closeCraftStartWidget(player, craftJudge, commandactor)
+	callClientFunction(player, "delegateCommand", craftJudge, "closeCraftStartWidget", commandactor);
+	craftStartWidgetOpen = false;
+end
 
 -- No real logic in this function.  Just smoke and mirrors to 'see' the minigame in action at the minimum level.
-function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
+function startCrafting(player, commandactor, craftJudge, hand, recipe, quest, startDur, startQly, startHQ)
     
     local worldMaster = GetWorldMaster();
-	local itemId = recipe.resultItemID;
     local progress = 0;
     local attempts = 5;
     local craftedCount = 0;
@@ -406,36 +458,55 @@ function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
     player:ChangeMusic(73);
     callClientFunction(player, "delegateCommand", craftJudge, "openCraftProgressWidget", commandactor, startDur, startQly, startHQ); 
 
-    while true do 
-    
+    while (true) do     
         local progDiff = math.random(30,50);
         local duraDiff = math.random(1,3);
         local qltyDiff = math.random(0,2);
 
-        if progress >= 100 then
-            player:SendGameMessage(GetWorldMaster(), 40111, 0x20, player, itemId, 3, 8);  -- "You create <#3 quantity> <#1 item> <#2 quality>."
+        if (progress >= 100) then            
             callClientFunction(player, "delegateCommand", craftJudge, "closeCraftProgressWidget", commandactor);
             
-            if quest then
-                continueLeve = callClientFunction(player, "delegateCommand", craftJudge, "askContinueLocalLeve", 120001, itemId, craftedCount, craftTotal, attempts);
+			-- Handle local levequest craft success
+            if quest then	
+				quest:craftSuccess();
+				
+				if (quest:getCurrentCrafted() >= quest:getObjectiveQuantity()) then
+					attentionMessage(player, 40121, quest:getQuestId(), quest:getCurrentCrafted(), quest:getObjectiveQuantity()); -- "All items for <QuestId> complete!"
+				else
+					attentionMessage(player, 40119, quest:getQuestId(), quest:getCurrentCrafted(), quest:getObjectiveQuantity()); -- "<QuestId> Successfull. (<crafted> of <attempts>)"
+				end
+			
+				-- Continue local levequest  (should this be in here??)
+				if (quest:getRemainingMaterials() ~= 0) then
+					continueLeve = callClientFunction(player, "delegateCommand", craftJudge, "askContinueLocalleve", commandactor,
+						quest:getQuestId(),
+						quest:getRecipe().resultItemID, 
+						quest:getCurrentCrafted(),
+						quest:getObjectiveQuantity(), 
+						quest:getRemainingMaterials()
+					);
 
-                if continueLeve == true then
-                    progress = 0;
-                    callClientFunction(player, "delegateCommand", craftJudge, "openCraftProgressWidget", commandactor, startDur, startQly, startHQ);
-                else
-                    break;
-                end
-            else
-                break;
+					if (continueLeve == 1) then
+						progress = 0;
+						callClientFunction(player, "delegateCommand", craftJudge, "openCraftProgressWidget", commandactor, startDur, startQly, startHQ);
+					else
+						break;
+					end
+				else
+					break;
+				end				
+			-- Normal synth craft success
+            else                
+				player:SendGameMessage(GetWorldMaster(), 40111, 0x20, player, recipe.resultItemID, 1, recipe.resultQuantity);  -- "You create <#3 quantity> <#1 item> <#2 quality>."				
+				player:getItemPackage(location):addItem(recipe.resultItemID, recipe.resultQuantity, 1);
+				break;
             end
-        end
+        end		
         
         choice = callClientFunction(player, "delegateCommand", craftJudge, "craftCommandUI", commandactor, 29, 2, 29530,29531,29532,29533,29534);
         --player:SendMessage(0x20, "", "[DEBUG] Command id selected: "..choice);
-        
-
-        
-        if choice then
+                
+        if (choice) then
             
             if skillAnim[choice] then
                 player:PlayAnimation(skillAnim[choice]);
@@ -445,10 +516,10 @@ function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
 
             player:SendGameMessage(worldMaster, 40108, 0x20, choice,2);
             
-            if choice ~= 29531 then
+            if (choice ~= 29531) then
                 progress = progress + progDiff;
                 
-                if progress >= 100 then 
+                if (progress >= 100) then 
                     progress = 100;
                 end
                 
@@ -465,6 +536,4 @@ function startCrafting(player, hand, recipe, quest, startDur, startQly, startHQ)
             --testChoice = callClientFunction(player, "delegateCommand", craftJudge, "craftTuningUI", commandactor, 29501, 24233, 29501,29501, 24223, 29501,12008,12004);
         end
     end
-
-    return -1;
 end

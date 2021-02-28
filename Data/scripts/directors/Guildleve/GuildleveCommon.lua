@@ -47,8 +47,3 @@ function main(thisDirector)
 	thisDirector:UpdateAimNumNow(0, 3);
 	
 end
-
-function attentionMessage(player, textId, ...)
-	player:SendGameMessage(GetWorldMaster(), textId, 0x20, ...);
-	player:SendDataPacket("attention", GetWorldMaster(), "", textId, ...);
-end

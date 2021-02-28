@@ -74,6 +74,7 @@ namespace Meteor.Map.Actors
         {
             currentCrafted += (short) targetRecipe.resultQuantity;
             currentAttempt++;
+
         }
 
         public void CraftFail()

@@ -174,7 +174,7 @@ function equipItem(player, equipSlot, item)
 			if (gItem:IsWeaverWeapon() == true) then graphicSlot = GRAPHICSLOT_SPOFFHAND; end
 			if (gItem:IsGoldSmithWeapon() == true) then graphicSlot = GRAPHICSLOT_SPOFFHAND; end
 		end
-				
+				 
 		--Graphic Slot was set, otherwise it's a special case
 		if (graphicSlot ~= nil) then
 			player:GraphicChange(graphicSlot, item);

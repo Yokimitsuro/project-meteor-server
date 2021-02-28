@@ -1265,6 +1265,12 @@ namespace Meteor.Map.Actors
                 charaWork.command[16] = 0xA0F00000 | 22005; //Herd
                 charaWork.command[17] = 0xA0F00000 | 22009; //Herd 2
             }
+
+            ActorPropertyPacketUtil propertyBuilder = new ActorPropertyPacketUtil("charaWork/command", this);
+            propertyBuilder.AddProperty(string.Format("charaWork.command[{0}]", 16));
+            propertyBuilder.AddProperty(string.Format("charaWork.commandCategory[{0}]", 17));
+            List<SubPacket> packets = propertyBuilder.Done();
+            QueuePackets(packets);
         }
 
         public void UpdateClassLevel(byte classId, short level)
