@@ -160,7 +160,7 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
     local MENU_CANCEL, MENU_MAINHAND, MENU_OFFHAND, MENU_REQUEST = 0, 1, 2, 3;
     local MENU_RECENT, MENU_AWARDED, MENU_RECENT_DETAILED, MENU_AWARDED_DETAILED = 7, 8, 9, 10;
     
-    local debugMessage = false;
+    local debugMessage = true;
 
     local isRecipeRecentSent = false;
     local isRecipeAwardSent = false;
@@ -169,8 +169,8 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
     local recipeResolver = GetRecipeResolver();	
 
 	local operationResult;
-	local operationMode;
-	local recipeMode;
+	local operationMode = -1;
+	local recipeMode = -1;
 	local chosenMaterials;
 	
 	local facilityId = 0;
@@ -187,8 +187,6 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 	
 	while operationMode ~= 0 do
         
-        if debugMessage then player:SendMessage(0x20, "", "[DEBUG] Menu ID: "..tostring(operationMode).."   Recipe : "..tostring(recipeMode).."   Quest : "..chosenQuest); end        
-        
 		-- Operate the start crafting window... confusing shit
 		if (craftStartWidgetOpen == false) then
 			-- Shows the initial window 
@@ -198,13 +196,13 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 			end
 			operationResult = {callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, facilityId, isRequestedItemsMode, unpack(startMats))};
 			craftStartWidgetOpen = true;
-		elseif ((operationMode == MENU_RECENT or operationMode == MENU_AWARDED) and chosenOperation[2] != 0) then
+		elseif ((operationMode == MENU_RECENT or operationMode == MENU_AWARDED) and recipeMode != 0) then
 			local prepedMaterials;
 			-- Recent Recipes/Awarded Recipes
 			if (operationMode == MENU_RECENT) then
-				prepedMaterials = recipeResolver.RecipeToMatIdTable(recentRecipes[chosenOperation[2]]);
+				prepedMaterials = recipeResolver.RecipeToMatIdTable(recentRecipes[recipeMode]);
 			else 			
-				prepedMaterials = recipeResolver.RecipeToMatIdTable(awardedRecipes[chosenOperation[2]]);
+				prepedMaterials = recipeResolver.RecipeToMatIdTable(awardedRecipes[recipeMode]);
 			end
 			-- Causes the item info window to appear for recent/awarded recipes. Only happens if a recipe was chosen.
 			operationResult = {callClientFunction(player, "delegateCommand", craftJudge, "start", commandactor, -2, isRequestedItemsMode, unpack(prepedMaterials))};
@@ -215,6 +213,8 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 		
 		operationMode = operationResult[1];
 		recipeMode = operationResult[2];
+				
+        if debugMessage then player:SendMessage(0x20, "", "[DEBUG] Menu ID: " .. tostring(operationMode) .. ", RecipeMode : " .. recipeMode); end      
 		
 		-- Operation 
         if operationMode == MENU_CANCEL then 
@@ -276,6 +276,8 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 						closeCraftStartWidget(player, craftJudge, commandactor);
 						isRecipeRecentSent = false;
 						isRecipeAwardSent = false;
+						
+						-- CRAFTING STARTED
 						currentlyCrafting = startCrafting(player, commandactor, craftJudge, operationMode, chosenRecipe, currentCraftQuestGuildleve, 80, 100, 50); 
 						
 						--Once crafting is over, return to the original non-quest state.
@@ -334,6 +336,8 @@ function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg
 				chosenRecipe.crystalQuantity2, 
 				0, 
 				0);
+				
+			-- This should never call? The window with this button only appears when you select a recent recipe with not enough materials. Otherwise it just auto-fills your "table".
 			if (recipeConfirmed) then
 				closeCraftStartWidget(player, craftJudge, commandactor);
 				isRecipeRecentSent = false;
