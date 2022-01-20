@@ -978,29 +978,6 @@ namespace Meteor.Map.Actors
             //zone.BroadcastPacketAroundActor(this, worldMasterMessage);
         }
 
-        public void GraphicChange(uint slot, uint graphicId)
-        {
-            appearanceIds[slot] = graphicId;           
-        }
-
-        public void GraphicChange(uint slot, uint weapId, uint equipId, uint variantId, uint colorId)
-        {
-
-            uint mixedVariantId;
-
-            if (weapId == 0)
-                mixedVariantId = ((variantId & 0x1F) << 5) | colorId;
-            else
-                mixedVariantId = variantId;
-
-            uint graphicId =
-                    (weapId & 0x3FF)  << 20 |
-                    (equipId & 0x3FF) << 10 |
-                    (mixedVariantId & 0x3FF);
-
-            appearanceIds[slot] = graphicId;            
-            
-        }
 
         public void GraphicChange(int slot, InventoryItem invItem)
         {
@@ -1059,11 +1036,6 @@ namespace Meteor.Map.Actors
             }
 
             Database.SavePlayerAppearance(this);
-            BroadcastPacket(CreateAppearancePacket(), true);
-        }
-
-        public void SendAppearance()
-        {
             BroadcastPacket(CreateAppearancePacket(), true);
         }
 

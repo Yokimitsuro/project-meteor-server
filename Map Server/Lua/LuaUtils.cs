@@ -33,7 +33,6 @@ namespace Meteor.Map
 {
     class LuaUtils
     {
-    
         public class ItemRefParam
         {
             public uint actorId;
@@ -53,12 +52,22 @@ namespace Meteor.Map
             public readonly uint actorId;
             public readonly ushort[] itemSlots;
             public readonly byte[] itemPackages;
+            public readonly int numItems;
 
             public MultiItemRefParam(uint actorId, ushort[] itemSlots, byte[] itemPackages)
             {
                 this.actorId = actorId;
                 this.itemSlots = itemSlots;
                 this.itemPackages = itemPackages;
+                this.numItems = itemSlots.Length;
+            }
+
+            public MultiItemRefParam(uint actorId, ushort itemSlot, byte itemPackage)
+            {
+                this.actorId = actorId;
+                this.itemSlots = new ushort[] { itemSlot };
+                this.itemPackages = new byte[] { itemPackage };
+                numItems = 1;
             }
         }
 
@@ -120,7 +129,7 @@ namespace Meteor.Map
                             uint actorId = Utils.SwapEndian(reader.ReadUInt32());
                             ushort slot = Utils.SwapEndian(reader.ReadUInt16());
                             byte itemPackage = reader.ReadByte();
-                            value = new ItemRefParam(actorId, slot, itemPackage);
+                            value = new MultiItemRefParam(actorId, slot, itemPackage);
                         }
                         break;  
                     case 0x8: //Multi Item Reference to Inventory Spot

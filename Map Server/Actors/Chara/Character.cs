@@ -1182,6 +1182,35 @@ namespace Meteor.Map.Actors
             return targetFind.GetTargets();
         }
 
+        public void GraphicChange(uint slot, uint graphicId)
+        {
+            appearanceIds[slot] = graphicId;
+        }
+
+        public void GraphicChange(uint slot, uint weapId, uint equipId, uint variantId, uint colorId)
+        {
+
+            uint mixedVariantId;
+
+            if (weapId == 0)
+                mixedVariantId = ((variantId & 0x1F) << 5) | colorId;
+            else
+                mixedVariantId = variantId;
+
+            uint graphicId =
+                    (weapId & 0x3FF) << 20 |
+                    (equipId & 0x3FF) << 10 |
+                    (mixedVariantId & 0x3FF);
+
+            appearanceIds[slot] = graphicId;
+
+        }
+
+        public void SendAppearance()
+        {
+            zone.BroadcastPacketAroundActor(this, CreateAppearancePacket());
+        }
+
         #region Inventory
         public void SendItemPackage(Player player, uint id)
         {
