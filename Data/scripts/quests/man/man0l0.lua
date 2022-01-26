@@ -61,9 +61,9 @@ function onSequence(player, quest, sequence)
 		local fStrtTut = quest:GetFlag(FLAG_SEQ000_MINITUT0)
 		
 		-- Setup states incase we loaded in.
-		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_PLATE or QFLAG_NONE;
-		local vixenFlag = quest:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_PLATE or QFLAG_NONE;
-		local babyfaceFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_PLATE or QFLAG_NONE;
+		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
+		local vixenFlag = quest:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
+		local babyfaceFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
 		local exitFlag = quest:GetFlags() == 0xF and QFLAG_PLATE or QFLAG_NONE;		
 		local rostnsthalCanPush = not fStrtTut;
 		local exitCanPush = quest:GetFlags() == 0xF;
