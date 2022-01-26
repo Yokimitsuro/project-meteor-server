@@ -55,6 +55,8 @@ namespace Meteor.Map.dataobjects
 
         public void QueuePacket(SubPacket subPacket)
         {
+            ////if (subPacket.gameMessage.opcode != 1)
+                //subPacket.DebugPrintSubPacket();
             subPacket.SetTargetId(id);
             Server.GetWorldConnection().QueuePacket(subPacket);
         }
@@ -185,7 +187,7 @@ namespace Meteor.Map.dataobjects
             {
                 if (!clearInstance)
                 {
-                    QueuePacket(actor.GetSetEventStatusPackets());
+                    QueuePacket(actor.GetSetEventStatusPackets(questInstance.isTalkEnabled, questInstance.isEmoteEnabled, questInstance.isPushEnabled));
                     QueuePacket(SetActorQuestGraphicPacket.BuildPacket(actor.actorId, questInstance.questFlagType));
                 }
                 else

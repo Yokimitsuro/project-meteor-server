@@ -31,8 +31,7 @@ function onBeginLogin(player)
 		player.positionY = 10.35;
 		player.positionZ = -36.91;
 		player.rotation = 0.025;
-		player:GetQuest(110001):ClearQuestData();
-		player:GetQuest(110001):ClearQuestFlags();
+		player:GetQuest(110001):ClearData();
 	elseif (player:HasQuest(110005) == true and player:GetZoneID() == 166) then 
 		director = player:GetZone():CreateDirector("OpeningDirector", false);		
 		player:AddDirector(director);

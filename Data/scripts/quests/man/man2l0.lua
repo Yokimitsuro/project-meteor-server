@@ -1,4 +1,4 @@
-require("global.lua")
+require("global")
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);

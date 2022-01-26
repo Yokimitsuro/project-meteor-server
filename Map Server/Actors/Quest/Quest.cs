@@ -30,6 +30,9 @@ namespace Meteor.Map.Actors
     {
         public const ushort SEQ_NOT_STARTED = ushort.MaxValue;
 
+        public enum QuestFlag { None = 0, Map = 1, Plate = 2 }
+        public enum ENpcProperty { QuestFlag = 0, CanTalk = 1, CanPush = 2,  CanEmote = 3, CanNotice = 4}
+
         public class ENpcQuestInstance
         {
             public readonly uint actorClassId;
@@ -72,7 +75,7 @@ namespace Meteor.Map.Actors
         private QuestData data = new QuestData();
         private Dictionary<uint, ENpcQuestInstance> ActiveENpcs = new Dictionary<uint, ENpcQuestInstance>();
 
-        public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = false, bool isEmoteEnabled = false, bool isPushEnabled = false, bool isSpawned = false)
+        public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isEmoteEnabled = false, bool isPushEnabled = false, bool isSpawned = false)
         {
             if (ActiveENpcs.ContainsKey(classId))
                 return;
@@ -90,10 +93,33 @@ namespace Meteor.Map.Actors
             ActiveENpcs.Clear();
         }
 
-        public void UpdateENpc(uint classId, int param, object value)
+        public void UpdateENpc(uint classId, ENpcProperty property, object value)
         {
             if (!ActiveENpcs.ContainsKey(classId))
                 return;
+
+            ENpcQuestInstance instance = ActiveENpcs[classId];
+
+            switch (property)
+            {
+                case ENpcProperty.QuestFlag:                    
+                    if (value is double)
+                        instance.questFlagType = (byte)(double)value;
+                    else if (value is int)
+                        instance.questFlagType = (byte)value;
+                    break;
+                case ENpcProperty.CanTalk:
+                    instance.isTalkEnabled = (bool)value;
+                    break;
+                case ENpcProperty.CanPush:
+                    instance.isPushEnabled = (bool)value;
+                    break;
+                case ENpcProperty.CanEmote:
+                    instance.isEmoteEnabled = (bool)value;
+                    break;
+            }
+
+            Owner.playerSession.UpdateQuestNpcInInstance(instance, false);
         }
 
         public ENpcQuestInstance GetENpcInstance(uint classId)

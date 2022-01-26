@@ -24,7 +24,7 @@ function onEventStarted(player, actor, triggerName)
 	
 end
 
-function onUpdate()
+function main()
 end
 
 function onTalkEvent(player, npc)

@@ -146,6 +146,24 @@ SPAWN_CHOCOBO_RENTAL = 0x14;
 SPAWN_CUTTER_SANDS = 0x17;
 SPAWN_NIGHTMARE = 0x18;
 
+-- EVENTS
+ETYPE_COMMAND = 0;
+ETYPE_TALK = 1;
+ETYPE_PUSH = 2;
+ETYPE_EMOTE = 3;
+ETYPE_NOTICE = 5;
+
+-- QUEST INSTANCE
+ENPC_PROP_QFLAG = 0;
+ENPC_PROP_CAN_TALK = 1;
+ENPC_PROP_CAN_PUSH = 2;
+ENPC_PROP_CAN_EMOTE = 3;
+ENPC_PROP_CAN_NOTICE = 4;
+
+QFLAG_NONE = 0;
+QFLAG_MAP = 1;
+QFLAG_PLATE = 2;
+
 -- Common Helper Functions
 function attentionMessage(player, textId, ...)
 	player:SendGameMessage(GetWorldMaster(), textId, 0x20, ...);
