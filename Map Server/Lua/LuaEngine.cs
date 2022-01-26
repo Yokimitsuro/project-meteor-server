@@ -69,6 +69,8 @@ namespace Meteor.Map.lua
             UserData.RegisterType<Command>();
             UserData.RegisterType<Npc>();
             UserData.RegisterType<Quest>();
+            UserData.RegisterType<Zone>();
+            UserData.RegisterType<Director>();
             UserData.RegisterType<WorldManager>();
             UserData.RegisterType<WorldMaster>();
         }

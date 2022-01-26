@@ -341,6 +341,24 @@ namespace Meteor.Map.Actors
             return subpackets;
         }
 
+        public new SubPacket CreateNamePacket()
+        {
+            bool isMale = true;
+            switch (playerWork.tribe)
+            {
+                case 2:
+                case 5:
+                case 7:
+                case 9:
+                case 11:
+                case 12:
+                case 13:
+                    isMale = false;
+                    break;
+            }
+            return SetActorNamePacket.BuildPacket(actorId, customDisplayName != null ? 0 : displayNameId, displayNameId == 0xFFFFFFFF | displayNameId == 0x0 | customDisplayName != null ? customDisplayName : "", isMale);
+        }
+
         public List<SubPacket> CreatePlayerRelatedPackets(uint requestingPlayerActorId)
         {
             List<SubPacket> subpackets = new List<SubPacket>();
@@ -778,6 +796,13 @@ namespace Meteor.Map.Actors
             Database.SavePlayerPlayTime(this);
             Database.SavePlayerPosition(this);
             Database.SavePlayerStatusEffects(this);
+
+            //Save Quests
+            foreach (Quest quest in questScenario)
+            {
+                if (quest != null)
+                    quest.SaveData();
+            }    
         }
 
         public void CleanupAndSave(uint destinationZone, ushort spawnType, float destinationX, float destinationY, float destinationZ, float destinationRot)
