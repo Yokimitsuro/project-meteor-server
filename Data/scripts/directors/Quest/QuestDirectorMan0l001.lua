@@ -52,7 +52,7 @@ function onEventStarted(player, director, triggerName)
 	
 	wait(6); --Should be wait for mobkill
 	worldMaster = GetWorldMaster();
-	player:SendDataPacket("attention", worldMaster, "", 51073, 1);
+	attentionMessage(player, 51073, 1);
 	wait(7);
 	player:ChangeMusic(7);
 	player:ChangeState(0); 
