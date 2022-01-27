@@ -43,13 +43,13 @@ namespace Meteor.Map.lua
 {
     class LuaEngine
     {
-        public const string FILEPATH_PLAYER = "./scripts/player.lua";
-        public const string FILEPATH_ZONE = "./scripts/unique/{0}/zone.lua";
-        public const string FILEPATH_CONTENT = "./scripts/content/{0}.lua";
-        public const string FILEPATH_COMMANDS = "./scripts/commands/{0}.lua";
-        public const string FILEPATH_DIRECTORS = "./scripts/directors/{0}.lua";
-        public const string FILEPATH_NPCS = "./scripts/unique/{0}/{1}/{2}.lua";
-        public const string FILEPATH_QUEST = "./scripts/quests/{0}/{1}.lua";
+        public const string FILEPATH_PLAYER = "/player.lua";
+        public const string FILEPATH_ZONE = "/unique/{0}/zone.lua";
+        public const string FILEPATH_CONTENT = "/content/{0}.lua";
+        public const string FILEPATH_COMMANDS = "/commands/{0}.lua";
+        public const string FILEPATH_DIRECTORS = "/directors/{0}.lua";
+        public const string FILEPATH_NPCS = "/unique/{0}/{1}/{2}.lua";
+        public const string FILEPATH_QUEST = "/quests/{0}/{1}.lua";
 
         private static LuaEngine mThisEngine;
         private Dictionary<Coroutine, ulong> mSleepingOnTime = new Dictionary<Coroutine, ulong>();
@@ -64,12 +64,14 @@ namespace Meteor.Map.lua
             luaTimer = new Timer(new TimerCallback(PulseSleepingOnTime),
                            null, TimeSpan.Zero, TimeSpan.FromMilliseconds(50));
 
-
+            UserData.RegisterType<LuaEngine>();
             UserData.RegisterType<Player>();
             UserData.RegisterType<Command>();
             UserData.RegisterType<Npc>();
             UserData.RegisterType<Quest>();
             UserData.RegisterType<Zone>();
+            UserData.RegisterType<PrivateArea>();
+            UserData.RegisterType<PrivateAreaContent>();
             UserData.RegisterType<Director>();
             UserData.RegisterType<WorldManager>();
             UserData.RegisterType<WorldMaster>();
@@ -178,7 +180,7 @@ namespace Meteor.Map.lua
             {
                 // todo: this is probably unnecessary as im not sure there were pets for players
                 if (!(actor.aiContainer.GetController<PetController>()?.GetPetMaster() is Player))
-                    path = String.Format("./scripts/unique/{0}/{1}/{2}.lua", actor.zone.zoneName, actor is BattleNpc ? "Monster" : "PopulaceStandard", ((Npc)actor).GetUniqueId());
+                    path = String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/{1}/{2}.lua", actor.zone.zoneName, actor is BattleNpc ? "Monster" : "PopulaceStandard", ((Npc)actor).GetUniqueId());
             }
             // dont wanna throw an error if file doesnt exist
             if (File.Exists(path))
@@ -204,7 +206,7 @@ namespace Meteor.Map.lua
         public static int CallLuaStatusEffectFunction(Character actor, StatusEffect effect, string functionName, params object[] args)
         {
             // todo: this is stupid, load the actual effect name from db table
-            string path = $"./scripts/effects/{effect.GetName()}.lua";
+            string path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/effects/{effect.GetName()}.lua";
 
             if (File.Exists(path))
             {
@@ -236,7 +238,7 @@ namespace Meteor.Map.lua
 
         public static int CallLuaBattleCommandFunction(Character actor, BattleCommand command, string folder, string functionName, params object[] args)
         {
-            string path = $"./scripts/commands/{folder}/{command.name}.lua";
+            string path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/commands/{folder}/{command.name}.lua";
 
             if (File.Exists(path))
             {
@@ -261,7 +263,7 @@ namespace Meteor.Map.lua
             }
             else
             {
-                path = $"./scripts/commands/{folder}/default.lua";
+                path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/commands/{folder}/default.lua";
                 //Program.Log.Error($"LuaEngine.CallLuaBattleCommandFunction [{command.name}] Unable to find script {path}");
                 var script = LoadGlobals();
 
@@ -289,7 +291,7 @@ namespace Meteor.Map.lua
 
         public static void LoadBattleCommandScript(BattleCommand command, string folder)
         {
-            string path = $"./scripts/commands/{folder}/{command.name}.lua";
+            string path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/commands/{folder}/{command.name}.lua";
 
             if (File.Exists(path))
             {
@@ -307,7 +309,7 @@ namespace Meteor.Map.lua
             }
             else
             {
-                path = $"./scripts/commands/{folder}/default.lua";
+                path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/commands/{folder}/default.lua";
                 //Program.Log.Error($"LuaEngine.CallLuaBattleCommandFunction [{command.name}] Unable to find script {path}");
                 var script = LoadGlobals();
 
@@ -326,7 +328,7 @@ namespace Meteor.Map.lua
 
         public static void LoadStatusEffectScript(StatusEffect effect)
         {
-            string path = $"./scripts/effects/{effect.GetName()}.lua";
+            string path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/effects/{effect.GetName()}.lua";
 
             if (File.Exists(path))
             {
@@ -344,7 +346,7 @@ namespace Meteor.Map.lua
             }
             else
             {
-                path = $"./scripts/effects/default.lua";
+                path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/effects/default.lua";
                 //Program.Log.Error($"LuaEngine.CallLuaBattleCommandFunction [{command.name}] Unable to find script {path}");
                 var script = LoadGlobals();
 
@@ -364,35 +366,36 @@ namespace Meteor.Map.lua
 
         public static string GetScriptPath(Actor target)
         {
+            string root = ConfigConstants.OPTIONS_SCRIPTPATH;
             if (target is Player)
             {
-                return String.Format(FILEPATH_PLAYER);
+                return root + FILEPATH_PLAYER;
             }
             else if (target is Npc)
             {
                 return null;
             }
             else if (target is Command)
-            {
-                return String.Format(FILEPATH_COMMANDS, target.GetName());
+            {                
+                return root + String.Format(FILEPATH_COMMANDS, target.GetName());
             }
             else if (target is Director)
             {
-                return String.Format(FILEPATH_DIRECTORS, ((Director)target).GetScriptPath());
+                return root + String.Format(FILEPATH_DIRECTORS, ((Director)target).GetScriptPath());
             }
             else if (target is PrivateAreaContent)
             {
-                return String.Format(FILEPATH_CONTENT, ((PrivateAreaContent)target).GetPrivateAreaName());
+                return root + String.Format(FILEPATH_CONTENT, ((PrivateAreaContent)target).GetPrivateAreaName());
             }
             else if (target is Area)
             {
-                return String.Format(FILEPATH_ZONE, ((Area)target).zoneName);
+                return root + String.Format(FILEPATH_ZONE, ((Area)target).zoneName);
             }
             else if (target is Quest)
             {
                 string initial = ((Quest)target).actorName.Substring(0, 3);
                 string questName = ((Quest)target).actorName;
-                return String.Format(FILEPATH_QUEST, initial, questName);
+                return root + String.Format(FILEPATH_QUEST, initial, questName);
             }
             else
                 return "";
@@ -413,8 +416,8 @@ namespace Meteor.Map.lua
             LuaScript parent = null, child = null;
             string errorMsg = "";
 
-            if (File.Exists("./scripts/base/" + target.classPath + ".lua"))
-                parent = LuaEngine.LoadScript("./scripts/base/" + target.classPath + ".lua", ref errorMsg);
+            if (File.Exists($"{ConfigConstants.OPTIONS_SCRIPTPATH}/base/" + target.classPath + ".lua"))
+                parent = LuaEngine.LoadScript($"{ConfigConstants.OPTIONS_SCRIPTPATH}/base/" + target.classPath + ".lua", ref errorMsg);
 
             if (!errorMsg.Equals(""))
                 SendError(player, errorMsg);
@@ -422,13 +425,13 @@ namespace Meteor.Map.lua
             Area area = target.zone;
             if (area is PrivateArea)
             {
-                if (File.Exists(String.Format("./scripts/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId())))
-                    child = LuaEngine.LoadScript(String.Format("./scripts/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId()), ref errorMsg);
+                if (File.Exists(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId())))
+                    child = LuaEngine.LoadScript(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId()), ref errorMsg);
             }
             else
             {
-                if (File.Exists(String.Format("./scripts/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId())))
-                    child = LuaEngine.LoadScript(String.Format("./scripts/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId()), ref errorMsg);
+                if (File.Exists(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId())))
+                    child = LuaEngine.LoadScript(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId()), ref errorMsg);
             }
 
             if (parent == null && child == null)
@@ -465,19 +468,19 @@ namespace Meteor.Map.lua
             LuaScript parent = null, child = null;
             string errorMsg = "";
 
-            if (File.Exists("./scripts/base/" + target.classPath + ".lua"))
-                parent = LuaEngine.LoadScript("./scripts/base/" + target.classPath + ".lua", ref errorMsg);
+            if (File.Exists($"{ConfigConstants.OPTIONS_SCRIPTPATH}/base/" + target.classPath + ".lua"))
+                parent = LuaEngine.LoadScript($"{ConfigConstants.OPTIONS_SCRIPTPATH}/base/" + target.classPath + ".lua", ref errorMsg);
 
             Area area = target.zone;
             if (area is PrivateArea)
             {
-                if (File.Exists(String.Format("./scripts/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId())))
-                    child = LuaEngine.LoadScript(String.Format("./scripts/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId()), ref errorMsg);
+                if (File.Exists(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId())))
+                    child = LuaEngine.LoadScript(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/privatearea/{1}_{2}/{3}/{4}.lua", area.zoneName, ((PrivateArea)area).GetPrivateAreaName(), ((PrivateArea)area).GetPrivateAreaType(), target.className, target.GetUniqueId()), ref errorMsg);
             }
             else
             {
-                if (File.Exists(String.Format("./scripts/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId())))
-                    child = LuaEngine.LoadScript(String.Format("./scripts/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId()), ref errorMsg);
+                if (File.Exists(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId())))
+                    child = LuaEngine.LoadScript(String.Format($"{ConfigConstants.OPTIONS_SCRIPTPATH}/unique/{0}/{1}/{2}.lua", area.zoneName, target.className, target.GetUniqueId()), ref errorMsg);
             }
 
             if (parent == null && child == null)
@@ -698,9 +701,9 @@ namespace Meteor.Map.lua
 
             if (playerNull && param.Length >= 3)
                 player = Server.GetWorldManager().GetPCInWorld(param[1] + " " + param[2]);
-            
+
             // load from scripts/commands/gm/ directory
-            var path = String.Format("./scripts/commands/gm/{0}.lua", cmd.ToLower());
+            var path = $"{ConfigConstants.OPTIONS_SCRIPTPATH}/commands/gm/{cmd.ToLower()}.lua";
 
             // check if the file exists
             if (File.Exists(path))
@@ -869,7 +872,7 @@ namespace Meteor.Map.lua
             script = script ?? new LuaScript();
 
             // register and load all global functions here
-            ((FileSystemScriptLoader)script.Options.ScriptLoader).ModulePaths = FileSystemScriptLoader.UnpackStringPaths("./scripts/?;./scripts/?.lua");
+            ((FileSystemScriptLoader)script.Options.ScriptLoader).ModulePaths = FileSystemScriptLoader.UnpackStringPaths($"{ConfigConstants.OPTIONS_SCRIPTPATH}/?;{ConfigConstants.OPTIONS_SCRIPTPATH}/?.lua");
             script.Globals["GetWorldManager"] = (Func<WorldManager>)Server.GetWorldManager;
             script.Globals["GetStaticActor"] = (Func<string, Actor>)Server.GetStaticActors;
             script.Globals["GetStaticActorById"] = (Func<uint, Actor>)Server.GetStaticActors;

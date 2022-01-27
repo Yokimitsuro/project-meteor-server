@@ -85,10 +85,10 @@ namespace Meteor.Map
                     }
 
                     // print out all commands
-                    foreach (var str in Directory.GetFiles("./scripts/commands/gm/"))
+                    foreach (var str in Directory.GetFiles(ConfigConstants.OPTIONS_SCRIPTPATH + "/commands/gm/"))
                     {
                         var c = str.Replace(".lua", "");
-                        c = c.Replace("./scripts/commands/gm/", "");
+                        c = c.Replace(ConfigConstants.OPTIONS_SCRIPTPATH + "/scripts/commands/gm/", "");
 
                         LuaEngine.RunGMCommand(player, c, null, true);
                     }

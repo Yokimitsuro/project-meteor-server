@@ -267,7 +267,20 @@ namespace Meteor.Common
 
         public static string ReadNullTermString(BinaryReader reader, int maxSize = 0x20)
         {
-            return Encoding.ASCII.GetString(reader.ReadBytes(maxSize)).Trim(new[] { '\0' });
+            long pos = reader.BaseStream.Position;
+            int size = 0;
+            for (int i = 0; i < maxSize; i++)
+            {
+                if (reader.ReadByte() == 0)
+                {
+                    size = i;
+                    break;
+                }
+            }
+            reader.BaseStream.Seek(pos, SeekOrigin.Begin);
+            string result =  Encoding.ASCII.GetString(reader.ReadBytes(size));
+            reader.BaseStream.Seek(pos + maxSize, SeekOrigin.Begin);
+            return result;
         }
 
         public static void WriteNullTermString(BinaryWriter writer, string value, int maxSize = 0x20)

@@ -284,7 +284,7 @@ namespace Meteor.Map.actors.director
         private void LoadLuaScript()
         {
             string errorMsg = "";
-            string luaPath = String.Format(LuaEngine.FILEPATH_DIRECTORS, GetScriptPath());
+            string luaPath = ConfigConstants.OPTIONS_SCRIPTPATH + String.Format(LuaEngine.FILEPATH_DIRECTORS, GetScriptPath());
             directorScript = LuaEngine.LoadScript(luaPath, ref errorMsg);
             if (directorScript == null)
                 Program.Log.Error("Could not find script for director {0}.", GetName());          
@@ -295,7 +295,7 @@ namespace Meteor.Map.actors.director
             if (directorScript != null)
             {
                 string errorMsg = "";
-                directorScript = LuaEngine.LoadScript(String.Format(LuaEngine.FILEPATH_DIRECTORS, directorScriptPath), ref errorMsg);
+                directorScript = LuaEngine.LoadScript(ConfigConstants.OPTIONS_SCRIPTPATH + String.Format(LuaEngine.FILEPATH_DIRECTORS, directorScriptPath), ref errorMsg);
                 if (!directorScript.Globals.Get(funcName).IsNil())
                 {
                     DynValue result = directorScript.Call(directorScript.Globals[funcName], args);

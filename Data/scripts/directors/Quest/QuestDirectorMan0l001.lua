@@ -72,10 +72,8 @@ function onEventStarted(player, director, triggerName)
 		OpenWidget (DEFEAT ENEMY)			
 	]]
 	
-	man0l0Quest:NextPhase(10);	
-	player:EndEvent();
-	
+	man0l0Quest:StartSequence(10);	
 	player:GetZone():ContentFinished();
 	GetWorldManager():DoZoneChange(player, 230, "PrivateAreaMasterPast", 1, 15, -826.868469, 6, 193.745865, -0.008368492);
-	
+	player:EndEvent();
 end

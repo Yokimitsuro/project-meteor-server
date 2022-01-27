@@ -34,7 +34,16 @@ GRINNING_ADVENTURER 	= 1000451;
 ROSTNSTHAL 				= 1001652;
 EXIT_TRIGGER 			= 1090025;
 
+HOB						= 1000151;
+GERT					= 1500004;
+LORHZANT				= 1500005;
+MUSCLEBOUND_DECKHAND	= 1000261;
+PEARLYTOOTHED_PORTER	= 1000260;
+--PASTYFACED_ADVENTURER	= 1000264; -- Missing?
+PRIVAREA_PAST_EXIT		= 1290002;
+
 -- Quest Markers
+MRKR_HOB					= 11000202;
 MRKR_ROSTNSTHAL 			= 11000203;
 MRKR_VOLUPTUOUS_VIXEN 		= 11000204;
 MRKR_BABYFACED_ADVENTURER 	= 11000205;
@@ -58,15 +67,13 @@ function onSequence(player, quest, sequence)
 	quest:ClearData();
 	
 	if (sequence == SEQ_000) then
-		local fStrtTut = quest:GetFlag(FLAG_SEQ000_MINITUT0)
-		
 		-- Setup states incase we loaded in.
 		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
 		local vixenFlag = quest:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
 		local babyfaceFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
-		local exitFlag = quest:GetFlags() == 0xF and QFLAG_PLATE or QFLAG_NONE;		
-		local rostnsthalCanPush = not fStrtTut;
+		local rostnsthalCanPush = not quest:GetFlag(FLAG_SEQ000_MINITUT0);
 		local exitCanPush = quest:GetFlags() == 0xF;
+		local exitFlag = quest:GetFlags() == 0xF and QFLAG_PLATE or QFLAG_NONE;		
 		
 		quest:AddENpc(WELLTRAVELED_MERCHANT);
 		quest:AddENpc(TIPSY_ADVENTURER);
@@ -80,11 +87,22 @@ function onSequence(player, quest, sequence)
 		quest:AddENpc(VOLUPTUOUS_VIXEN, vixenFlag);
 		quest:AddENpc(INDIFFERENT_PASSERBY);
 		quest:AddENpc(PRATTLING_ADVENTURER);
+		quest:AddENpc(LANKY_TRAVELER);
 		quest:AddENpc(GRINNING_ADVENTURER);
 		quest:AddENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
-		quest:AddENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
+		quest:AddENpc(EXIT_TRIGGER, exitFlag, false, false, exitCanPush);
 	elseif (sequence == SEQ_005) then
-	elseif (sequence == SEQ_010) then
+	elseif (sequence == SEQ_010) then		
+		quest:AddENpc(HOB);
+		quest:AddENpc(GERT);
+		quest:AddENpc(LORHZANT);
+		quest:AddENpc(MUSCLEBOUND_DECKHAND);
+		quest:AddENpc(PEARLYTOOTHED_PORTER);
+		quest:AddENpc(UNDIGNIFIED_ADVENTURER);
+		quest:AddENpc(WELLTRAVELED_MERCHANT);
+		quest:AddENpc(VOLUPTUOUS_VIXEN);
+		quest:AddENpc(LANKY_TRAVELER);
+		quest:AddENpc(PRIVAREA_PAST_EXIT, QFLAG_NONE, false, false, true);
 	end
 end
 
@@ -95,9 +113,41 @@ function onTalk(player, quest, npc)
 	if (sequence == SEQ_000) then
 		seq000_onTalk(player, quest, npc, classId);
 	elseif (sequence == SEQ_010) then
-		sequence010_onTalk(player, quest, npc, classId);
+		seq010_onTalk(player, quest, npc, classId);		
+	end
+end
+
+function onPush(player, quest, npc)
+	local sequence = quest:getSequence();
+	local classId = npc:GetActorClassId();	
+	
+	if (sequence == SEQ_000) then
+		if (classId == EXIT_TRIGGER) then
+			doExitDoor(player, quest, npc);
+			return;
+		elseif (classId == ROSTNSTHAL) then
+			callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal002");
+			player:EndEvent();
+		end
+	elseif (sequence == SEQ_010) then
+		if (classId == PRIVAREA_PAST_EXIT) then
+			if (eventName == "caution") then
+				worldMaster = GetWorldMaster();
+				player:SendGameMessage(player, worldMaster, 34109, 0x20);
+			elseif (eventName == "exit") then		
+			end
+		end
+	end
+end
+
+function onNotice(player, quest, target)
+	local sequence = quest:getSequence();
+	
+	if (sequence == SEQ_000) then		
+		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ");		
 	end
 	
+	player:EndEvent();
 end
 
 function seq000_onTalk(player, quest, npc, classId)
@@ -111,8 +161,8 @@ function seq000_onTalk(player, quest, npc, classId)
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_7");
 	elseif (classId == BABYFACED_ADVENTURER) then
 		if (not quest:GetFlag(FLAG_SEQ000_MINITUT3)) then
-			callClientFunction(player, "delegateEvent", player, man0l0Quest, "processTtrMini003");
-			quest:UpdateENpc(VOLUPTUOUS_VIXEN, BABYFACED_ADVENTURER, QFLAG_NONE);
+			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini003");
+			quest:UpdateENpc(BABYFACED_ADVENTURER, ENPC_PROP_QFLAG, QFLAG_NONE);
 			quest:SetFlag(FLAG_SEQ000_MINITUT3);
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent000_8");
@@ -127,7 +177,7 @@ function seq000_onTalk(player, quest, npc, classId)
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_12");
 	elseif (classId == VOLUPTUOUS_VIXEN) then
 		if (not quest:GetFlag(FLAG_SEQ000_MINITUT2)) then
-			callClientFunction(player, "delegateEvent", player, man0l0Quest, "processTtrMini002");
+			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini002");
 			quest:UpdateENpc(VOLUPTUOUS_VIXEN, ENPC_PROP_QFLAG, QFLAG_NONE);
 			quest:SetFlag(FLAG_SEQ000_MINITUT2);
 		else
@@ -157,9 +207,6 @@ function seq000_onTalk(player, quest, npc, classId)
 				quest:SetFlag(FLAG_SEQ000_MINITUT1);
 			end
 		end
-	elseif (classId == EXIT_TRIGGER) then
-		doExitDoor(player, quest, npc);
-		return;
 	end	
 		
 	if (quest:GetFlags() == 0xF) then
@@ -170,30 +217,32 @@ function seq000_onTalk(player, quest, npc, classId)
 	player:EndEvent();
 end
 
-function sequence010_onTalk(player, quest, npc, classId)
-end
-
-function onPush(player, quest, npc)
-	local sequence = quest:getSequence();
-	local classId = npc:GetActorClassId();	
-	
-	if (sequence == SEQ_000) then
-		if (classId == EXIT_TRIGGER) then
-			doExitDoor(player, quest, npc);
+function seq010_onTalk(player, quest, npc, classId)	
+	if (classId == MUSCLEBOUND_DECKHAND) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_2");
+	elseif (classId == PEARLYTOOTHED_PORTER) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_3");
+	elseif (classId == UNDIGNIFIED_ADVENTURER) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_5");
+	elseif (classId == VOLUPTUOUS_VIXEN) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_6");
+	elseif (classId == WELLTRAVELED_MERCHANT) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_7");
+	elseif (classId == LANKY_TRAVELER) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
+	elseif (classId == HOB) then
+		local choice = callClientFunction(player, "delegateEvent", player, quest, "processEvent020_9");
+		if (choice == 1) then
+			quest:completeAndReplace(110002);
 			return;
-		elseif (classId == ROSTNSTHAL) then
-			callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal002");
-			player:EndEvent();
 		end
+	elseif (classId == GERT) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_10");
+	elseif (classId == LORHZANT) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_11");
 	end
-end
-
-function onNotice(player, quest, target)
-	local sequence = quest:getSequence();
 	
-	if (sequence == SEQ_000) then		
-		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ");
-	end
+	player:EndEvent();
 end
 
 function getJournalMapMarkerList(player, quest)
@@ -201,6 +250,8 @@ function getJournalMapMarkerList(player, quest)
 	
 	if (sequence == SEQ_000) then
 		return MRKR_ROSTNSTHAL, MRKR_BABYFACED_ADVENTURER, MRKR_VOLUPTUOUS_VIXEN;
+	elseif (sequence == SEQ_010) then
+		return MRKR_HOB;
 	end
 end
 

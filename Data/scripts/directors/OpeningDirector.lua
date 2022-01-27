@@ -1,26 +1,21 @@
-require ("global")
-require ("quests/man/man0l0")
-require ("quests/man/man0g0")
-require ("quests/man/man0u0")
+require("global")
 
 function init()
 	return "/Director/OpeningDirector";
 end
 
-function onEventStarted(player, actor, triggerName)		
+function onEventStarted(player, actor, eventTrigger, eventName)		
 	
 	if (player:HasQuest(110001) == true) then
 		quest = player:GetQuest("Man0l0");
-		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ", nil, nil, nil);		
+		quest:OnNotice(player);
 	elseif (player:HasQuest(110005) == true) then
 		quest = player:GetQuest("Man0g0");
-		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ", nil, nil, nil);
+		quest:OnNotice(player);
 	elseif (player:HasQuest(110009) == true) then
 		quest = player:GetQuest("Man0u0");
-		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ", nil, nil, nil);
+		quest:OnNotice(player);
 	end
-	
-	player:EndEvent();
 	
 end
 
@@ -55,16 +50,4 @@ function onTalkEvent(player, npc)
 		end
 	end
 
-end
-
-function onPushEvent(player, npc)
-end
-
-function onCommandEvent(player, command)
-end
-
-function onEventUpdate(player, npc)
-end
-
-function onCommand(player, command)	
 end

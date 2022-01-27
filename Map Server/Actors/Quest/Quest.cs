@@ -144,9 +144,9 @@ namespace Meteor.Map.Actors
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onPush", true, npc);
         }
 
-        public void OnNotice(Player caller, Npc npc)
+        public void OnNotice(Player caller)
         {
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true, npc);
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true);
         }
 
         public void OnNpcLS(Player caller, uint npcLSId)
