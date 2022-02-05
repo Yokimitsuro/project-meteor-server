@@ -23,16 +23,18 @@ function onTrigger(player, argc, animation, regionId, layoutId, maxLayoutId)
 		end	
 
 		local pos = player:GetPos();
-		local x = pos[0];
-		local y = pos[1];
-		local z = pos[2];
-		local zone = pos[4];
+		local x = pos[1];
+		local y = pos[2];
+		local z = pos[3];
+		local zone = pos[5];
 			 
 		actorClassId = tonumber(actorClassId);
 		
 		if (actorClassId ~= nil) then		
 			zone = player:GetZone();
-			actor = zone:SpawnActor(actorClassId, "mapobj", pos[0], pos[1], pos[2], tonumber(regionId), tonumber(layoutId));
+			actor = zone:SpawnActor(actorClassId, "mapobj", pos[1], pos[2], pos[3], tonumber(regionId), tonumber(layoutId));
+			
+			 print("test");
 			wait(0.8);
 			actor:PlayMapObjAnimation(player, animation);
 			zone:DespawnActor("mapobj");

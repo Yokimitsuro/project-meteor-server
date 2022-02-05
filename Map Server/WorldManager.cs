@@ -49,7 +49,6 @@ namespace Meteor.Map
         private WorldMaster worldMaster = new WorldMaster();
         private Dictionary<uint, Zone> zoneList;
         private Dictionary<uint, List<SeamlessBoundry>> seamlessBoundryList;
-        private Dictionary<uint, ZoneEntrance> zoneEntranceList;
         private Dictionary<uint, ActorClass> actorClasses = new Dictionary<uint,ActorClass>();
         private Dictionary<ulong, Party> currentPlayerParties = new Dictionary<ulong, Party>(); //GroupId, Party object
         private Dictionary<uint, StatusEffect> statusEffectList = new Dictionary<uint, StatusEffect>();
@@ -182,57 +181,6 @@ namespace Meteor.Map
             }
 
             Program.Log.Info(String.Format("Loaded {0} zones and {1} private areas.", count1, count2));
-        }
-
-        public void LoadZoneEntranceList()
-        {
-            zoneEntranceList = new Dictionary<uint, ZoneEntrance>();
-            int count = 0;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
-            {
-                try
-                {
-                    conn.Open();
-
-                    string query = @"
-                                    SELECT 
-                                    id,
-                                    zoneId,
-                                    spawnType,
-                                    spawnX,
-                                    spawnY,
-                                    spawnZ,
-                                    spawnRotation,
-                                    privateAreaName
-                                    FROM server_zones_spawnlocations";
-
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            uint id = reader.GetUInt32(0);
-                            string privArea = null;
-
-                            if (!reader.IsDBNull(7))
-                                privArea = reader.GetString(7);
-
-                            ZoneEntrance entance = new ZoneEntrance(reader.GetUInt32(1), privArea, 1, reader.GetByte(2), reader.GetFloat(3), reader.GetFloat(4), reader.GetFloat(5), reader.GetFloat(6));
-                            zoneEntranceList[id] = entance;
-                            count++;
-                        }
-                    }
-                }
-                catch (MySqlException e)
-                { Console.WriteLine(e); }
-                finally
-                {
-                    conn.Dispose();
-                }
-            }
-
-            Program.Log.Info(String.Format("Loaded {0} zone spawn locations.", count));
         }
 
         public void LoadSeamlessBoundryList()
@@ -881,26 +829,13 @@ namespace Meteor.Map
             return xIsGood && yIsGood;
         }
 
-        //Moves actor to new zone, and sends packets to spawn at the given zone entrance
-        public void DoZoneChange(Player player, uint zoneEntrance)
-        {
-            if (!zoneEntranceList.ContainsKey(zoneEntrance))
-            {
-                Program.Log.Error("Given zone entrance was not found: " + zoneEntrance);
-                return;
-            }
-
-            ZoneEntrance ze = zoneEntranceList[zoneEntrance];
-            DoZoneChange(player, ze.zoneId, ze.privateAreaName, ze.privateAreaType, ze.spawnType, ze.spawnX, ze.spawnY, ze.spawnZ, ze.spawnRotation);
-        }
-
         //Moves actor to new zone, and sends packets to spawn at the given coords.
         public void DoZoneChange(Player player, uint destinationZoneId, string destinationPrivateArea, int destinationPrivateAreaType, byte spawnType, float spawnX, float spawnY, float spawnZ, float spawnRotation)
         {       
             //Add player to new zone and update
             Area newArea;
 
-            if (destinationPrivateArea == null)
+            if (destinationPrivateArea == null || destinationPrivateArea.Equals(""))
                 newArea = GetZone(destinationZoneId);
             else //Add check for -1 if it is a instance
                 newArea = GetZone(destinationZoneId).GetPrivateArea(destinationPrivateArea, (uint)destinationPrivateAreaType);
@@ -963,23 +898,6 @@ namespace Meteor.Map
                 player.SendGameMessage(GetActor(), 34108, 0x20);
 
             LuaEngine.GetInstance().CallLuaFunction(player, newArea, "onZoneIn", true);
-        }
-
-        //Moves actor within zone to spawn position
-        public void DoPlayerMoveInZone(Player player, uint zoneEntrance)
-        {
-            if (!zoneEntranceList.ContainsKey(zoneEntrance))
-            {
-                Program.Log.Error("Given zone entrance was not found: " + zoneEntrance);
-                return;
-            }
-
-            ZoneEntrance ze = zoneEntranceList[zoneEntrance];
-
-            if (ze.zoneId != player.zoneId)
-                return;
-
-            DoPlayerMoveInZone(player, ze.spawnX, ze.spawnY, ze.spawnZ, ze.spawnRotation, ze.spawnType);
         }
 
         //Moves actor within the zone
@@ -1945,14 +1863,6 @@ namespace Meteor.Map
                 this.spawnZ  = z;
                 this.spawnRotation = rot;
             }
-        }
-
-        public ZoneEntrance GetZoneEntrance(uint entranceId)
-        {
-            if (zoneEntranceList.ContainsKey(entranceId))
-                return zoneEntranceList[entranceId];
-            else
-                return null;
         }
 
         public ActorClass GetActorClass(uint id)
