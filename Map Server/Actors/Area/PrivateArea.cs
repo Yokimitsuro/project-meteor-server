@@ -32,10 +32,10 @@ namespace Meteor.Map.actors.area
     {
         private Zone parentZone;
         private string privateAreaName;
-        private uint privateAreaType;
+        private new uint privateAreaType;
 
-        public PrivateArea(Zone parent, uint id, string classPath, string privateAreaName, uint privateAreaType, ushort bgmDay, ushort bgmNight, ushort bgmBattle)
-            : base(id, parent.zoneName, parent.regionId, classPath, bgmDay, bgmNight, bgmBattle, parent.isIsolated, parent.isInn, parent.canRideChocobo, parent.canStealth, true)
+        public PrivateArea(Zone parent, string classPath, string privateAreaName, uint privateAreaType, ushort bgmDay, ushort bgmNight, ushort bgmBattle)
+            : base(parent.zoneId, parent.zoneName, parent.regionId, classPath, bgmDay, bgmNight, bgmBattle, parent.isIsolated, parent.isInn, parent.canRideChocobo, parent.canStealth, true)
         {
             this.parentZone = parent;
             this.zoneName = parent.zoneName;

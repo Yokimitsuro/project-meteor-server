@@ -119,7 +119,7 @@ namespace Meteor.Map
                         {
                             Zone zone = new Zone(reader.GetUInt32(0), reader.GetString(1), reader.GetUInt16(2), reader.GetString(3), reader.GetUInt16(4), reader.GetUInt16(5),
                                 reader.GetUInt16(6), reader.GetBoolean(7), reader.GetBoolean(8), reader.GetBoolean(9), reader.GetBoolean(10), reader.GetBoolean(11), reader.GetBoolean(12));
-                            zoneList[zone.actorId] = zone;
+                            zoneList[zone.zoneId] = zone;
                             count1++;
                         }
                     }
@@ -139,8 +139,7 @@ namespace Meteor.Map
                     conn.Open();
 
                     string query = @"
-                                    SELECT 
-                                    id,
+                                    SELECT
                                     parentZoneId,
                                     privateAreaName,
                                     privateAreaType,
@@ -162,7 +161,7 @@ namespace Meteor.Map
                             if (zoneList.ContainsKey(parentZoneId))
                             {
                                 Zone parent = zoneList[parentZoneId];
-                                PrivateArea privArea = new PrivateArea(parent, reader.GetUInt32("id"), reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetUInt32("privateAreaType"), reader.GetUInt16("dayMusic"), reader.GetUInt16("nightMusic"), reader.GetUInt16("battleMusic"));
+                                PrivateArea privArea = new PrivateArea(parent, reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetUInt32("privateAreaType"), reader.GetUInt16("dayMusic"), reader.GetUInt16("nightMusic"), reader.GetUInt16("battleMusic"));
                                 parent.AddPrivateArea(privArea);
                             }
                             else

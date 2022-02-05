@@ -58,7 +58,7 @@ namespace Meteor.Map.Actors
         public NpcSpawnType npcSpawnType;
 
         public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, ushort actorState, uint animationId, string customDisplayName)
-            : base((4 << 28 | spawnedArea.actorId << 19 | (uint)actorNumber))  
+            : base((4 << 28 | spawnedArea.actorId << 19 | ((uint)actorNumber + 5)))  
         {
             this.positionX = posX;
             this.positionY = posY;

@@ -38,7 +38,7 @@ namespace Meteor.Map.actors.area
         }
 
         public PrivateAreaContent(Zone parent, string classPath, string privateAreaName, uint privateAreaType, Director director, Player contentStarter) //TODO: Make it a list
-            : base(parent, parent.actorId, classPath, privateAreaName, privateAreaType, 0, 0, 0)
+            : base(parent, classPath, privateAreaName, privateAreaType, 0, 0, 0)
         {
             currentDirector = director;
             LuaEngine.GetInstance().CallLuaFunction(contentStarter, this, "onCreate", false, currentDirector);

@@ -59,8 +59,8 @@ namespace Meteor.Map.Actors
 
         LuaScript areaScript;
 
-        public Area(uint id, string zoneName, ushort regionId, string classPath, ushort bgmDay, ushort bgmNight, ushort bgmBattle, bool isIsolated, bool isInn, bool canRideChocobo, bool canStealth, bool isInstanceRaid)
-            : base(id)
+        public Area(uint zoneId, string zoneName, ushort regionId, string classPath, ushort bgmDay, ushort bgmNight, ushort bgmBattle, bool isIsolated, bool isInn, bool canRideChocobo, bool canStealth, bool isInstanceRaid)
+            : base((4 << 28 | zoneId << 19 | ((uint)1)))
         {
 
             this.zoneName = zoneName;
@@ -77,10 +77,11 @@ namespace Meteor.Map.Actors
 
             this.displayNameId = 0;
             this.customDisplayName = "_areaMaster";
-            this.actorName = String.Format("_areaMaster@{0:X5}", id << 8);
+            this.actorName = String.Format("_areaMaster@{0:X5}", zoneId << 8);
 
             this.classPath = classPath;
             this.className = classPath.Substring(classPath.LastIndexOf("/") + 1);
+            this.zoneId = zoneId;
 
             numXBlocks = (maxX - minX) / boundingGridSize;
             numYBlocks = (maxY - minY) / boundingGridSize;
