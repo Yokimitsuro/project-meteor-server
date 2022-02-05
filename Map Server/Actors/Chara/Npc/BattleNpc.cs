@@ -263,8 +263,8 @@ namespace Meteor.Map.Actors
 
             this.isMovingToSpawn = false;
             this.hateContainer.ClearHate();
-            zone.BroadcastPacketsAroundActor(this, GetSpawnPackets(null, 0x01));
-            zone.BroadcastPacketsAroundActor(this, GetInitPackets());
+            CurrentArea.BroadcastPacketsAroundActor(this, GetSpawnPackets(null, 0x01));
+            CurrentArea.BroadcastPacketsAroundActor(this, GetInitPackets());
             RecalculateStats();
 
             OnSpawn();
@@ -292,7 +292,7 @@ namespace Meteor.Map.Actors
                     {
                         foreach (var memberId in ((Party)lastAttacker.currentParty).members)
                         {
-                            var partyMember = zone.FindActorInArea<Character>(memberId);
+                            var partyMember = CurrentArea.FindActorInArea<Character>(memberId);
                             // onDeath(monster, player, killer)
                             lua.LuaEngine.CallLuaBattleFunction(this, "onDeath", this, partyMember, lastAttacker);
 
@@ -320,7 +320,7 @@ namespace Meteor.Map.Actors
             }
             else
             {
-                var err = String.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", actorId, GetUniqueId(), positionX, positionY, positionZ, GetZone().GetName());
+                var err = String.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", actorId, GetUniqueId(), positionX, positionY, positionZ, CurrentArea.GetName());
                 Program.Log.Error(err);
                 //throw new Exception(err);
             }
@@ -385,7 +385,7 @@ namespace Meteor.Map.Actors
 
             if (GetMobMod((uint)MobModifier.SpellScript) != 0)
                 foreach (var action in actions)
-                    lua.LuaEngine.CallLuaBattleFunction(this, "onCast", this, zone.FindActorInArea<Character>(action.targetId), ((MagicState)state).GetSpell(), action);
+                    lua.LuaEngine.CallLuaBattleFunction(this, "onCast", this, CurrentArea.FindActorInArea<Character>(action.targetId), ((MagicState)state).GetSpell(), action);
         }
 
         public override void OnAbility(State state, CommandResult[] actions, BattleCommand ability, ref CommandResult[] errors)
@@ -405,7 +405,7 @@ namespace Meteor.Map.Actors
 
             if (GetMobMod((uint)MobModifier.WeaponSkillScript) != 0)
                 foreach (var action in actions)
-                    lua.LuaEngine.CallLuaBattleFunction(this, "onWeaponSkill", this, zone.FindActorInArea<Character>(action.targetId), ((WeaponSkillState)state).GetWeaponSkill(), action);
+                    lua.LuaEngine.CallLuaBattleFunction(this, "onWeaponSkill", this, CurrentArea.FindActorInArea<Character>(action.targetId), ((WeaponSkillState)state).GetWeaponSkill(), action);
         }
 
         public override void OnSpawn()

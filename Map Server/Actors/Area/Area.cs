@@ -34,8 +34,9 @@ namespace Meteor.Map.Actors
 {
     class Area : Actor
     {
-        public string zoneName;        
-        public ushort regionId;
+        public string ZoneName { get; private set; }
+        public uint ZoneId { get; private set; }
+        public ushort RegionId { get; private set; }
         public bool isIsolated, canStealth, isInn, canRideChocobo, isInstanceRaid;
         public ushort weatherNormal, weatherCommon, weatherRare;
         public ushort bgmDay, bgmNight, bgmBattle;
@@ -59,12 +60,13 @@ namespace Meteor.Map.Actors
 
         LuaScript areaScript;
 
-        public Area(uint id, string zoneName, ushort regionId, string classPath, ushort bgmDay, ushort bgmNight, ushort bgmBattle, bool isIsolated, bool isInn, bool canRideChocobo, bool canStealth, bool isInstanceRaid)
-            : base(id)
+        public Area(uint zoneId, string zoneName, ushort regionId, string classPath, ushort bgmDay, ushort bgmNight, ushort bgmBattle, bool isIsolated, bool isInn, bool canRideChocobo, bool canStealth, bool isInstanceRaid)
+            : base((4 << 28 | zoneId << 19 | ((uint)1)))
         {
+            ZoneName = zoneName;
+            ZoneId = zoneId;
+            RegionId = regionId;
 
-            this.zoneName = zoneName;
-            this.regionId = regionId;
             this.canStealth = canStealth;
             this.isIsolated = isIsolated;
             this.isInn = isInn;
@@ -77,7 +79,7 @@ namespace Meteor.Map.Actors
 
             this.displayNameId = 0;
             this.customDisplayName = "_areaMaster";
-            this.actorName = String.Format("_areaMaster@{0:X5}", id << 8);
+            this.actorName = String.Format("_areaMaster@{0:X5}", zoneId << 8);
 
             this.classPath = classPath;
             this.className = classPath.Substring(classPath.LastIndexOf("/") + 1);
@@ -97,10 +99,20 @@ namespace Meteor.Map.Actors
             }
         }
 
+        public virtual string GetPrivateAreaName()
+        {
+            return "";
+        }
+
+        public virtual int GetPrivateAreaType()
+        {
+            return 0;
+        }
+
         public override SubPacket CreateScriptBindPacket()
         {
             List<LuaParam> lParams;
-            lParams = LuaUtils.CreateLuaParamList(classPath, false, true, zoneName, "/Area/Zone/ZoneDefault", -1, (byte)1, true, false, false, false, false, false, false, false);
+            lParams = LuaUtils.CreateLuaParamList(classPath, false, true, ZoneName, "/Area/Zone/ZoneDefault", -1, (byte)1, true, false, false, false, false, false, false, false);
             return ActorInstantiatePacket.BuildPacket(actorId, actorName, "ZoneDefault", lParams);
         }
 

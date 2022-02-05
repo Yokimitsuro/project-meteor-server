@@ -335,7 +335,7 @@ namespace Meteor.Map.actors.chara.ai
                 return false;
             }
 
-            if (target.zone != user.zone)
+            if (target.CurrentArea != user.CurrentArea)
                 return false;
 
             return true;

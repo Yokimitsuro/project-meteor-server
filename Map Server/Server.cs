@@ -69,7 +69,6 @@ namespace Meteor.Map
 
             mWorldManager = new WorldManager(this);
             mWorldManager.LoadZoneList();
-            mWorldManager.LoadZoneEntranceList();
             mWorldManager.LoadSeamlessBoundryList();
             mWorldManager.LoadActorClasses();
             mWorldManager.LoadSpawnLocations();

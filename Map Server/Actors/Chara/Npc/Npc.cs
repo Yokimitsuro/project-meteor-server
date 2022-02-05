@@ -58,7 +58,7 @@ namespace Meteor.Map.Actors
         public NpcSpawnType npcSpawnType;
 
         public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, ushort actorState, uint animationId, string customDisplayName)
-            : base((4 << 28 | spawnedArea.actorId << 19 | (uint)actorNumber))  
+            : base((4 << 28 | spawnedArea.actorId << 19 | ((uint)actorNumber + 5)))  
         {
             this.positionX = posX;
             this.positionY = posY;
@@ -72,8 +72,7 @@ namespace Meteor.Map.Actors
 
             this.uniqueIdentifier = uniqueId;
 
-            this.zoneId = spawnedArea.actorId;
-            this.zone = spawnedArea;
+            CurrentArea = spawnedArea;
 
             this.actorClassId = actorClass.actorClassId;
 
@@ -133,8 +132,7 @@ namespace Meteor.Map.Actors
 
             this.uniqueIdentifier = uniqueId;
 
-            this.zoneId = spawnedArea.actorId;
-            this.zone = spawnedArea;
+            CurrentArea = spawnedArea;
 
             this.actorClassId = actorClass.actorClassId;
 
@@ -298,7 +296,7 @@ namespace Meteor.Map.Actors
         public void ChangeNpcAppearance(uint id)
         {
             LoadNpcAppearance(id);
-            zone.BroadcastPacketAroundActor(this, CreateAppearancePacket());
+            CurrentArea.BroadcastPacketAroundActor(this, CreateAppearancePacket());
         }
 
         public void LoadNpcAppearance(uint id)
@@ -431,7 +429,7 @@ namespace Meteor.Map.Actors
 
         public void Despawn()
         {
-            zone.DespawnActor(this);
+            CurrentArea.DespawnActor(this);
         }
 
         public override void Update(DateTime tick)
@@ -463,7 +461,7 @@ namespace Meteor.Map.Actors
 
         public override void OnDespawn()
         {
-            zone.BroadcastPacketAroundActor(this, RemoveActorPacket.BuildPacket(this.actorId));
+            CurrentArea.BroadcastPacketAroundActor(this, RemoveActorPacket.BuildPacket(this.actorId));
             QueuePositionUpdate(spawnX, spawnY, spawnZ);
             LuaEngine.CallLuaBattleFunction(this, "onDespawn", this);
         }

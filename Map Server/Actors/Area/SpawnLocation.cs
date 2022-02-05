@@ -27,7 +27,7 @@ namespace Meteor.Map.actors.area
         public string uniqueId;
         public uint zoneId;
         public string privAreaName;
-        public uint privAreaLevel;
+        public int privAreaLevel;
         public float x;
         public float y;
         public float z;
@@ -35,7 +35,7 @@ namespace Meteor.Map.actors.area
         public ushort state;
         public uint animId;
 
-        public SpawnLocation(uint classId, string uniqueId, uint zoneId, string privAreaName, uint privAreaLevel, float x, float y, float z, float rot, ushort state, uint animId)
+        public SpawnLocation(uint classId, string uniqueId, uint zoneId, string privAreaName, int privAreaLevel, float x, float y, float z, float rot, ushort state, uint animId)
         {
             this.classId = classId;
             this.uniqueId = uniqueId;

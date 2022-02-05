@@ -45,7 +45,7 @@ namespace Meteor.Map.actors.chara.ai.controllers
                 contentGroupCharas = new List<Character>(owner.currentContentGroup.GetMemberCount());
                 foreach (var charaId in owner.currentContentGroup.GetMembers())
                 {
-                    var chara = owner.zone.FindActorInArea<Character>(charaId);
+                    var chara = owner.CurrentArea.FindActorInArea<Character>(charaId);
 
                     if (chara != null)
                         contentGroupCharas.Add(chara);

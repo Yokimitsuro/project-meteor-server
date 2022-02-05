@@ -20,8 +20,8 @@ function onBeginLogin(player)
 	end
 
 	--For Opening. Set Director and reset position incase d/c
-	if (player:HasQuest(110001) == true and player:GetZoneID() == 193) then
-		director = player:GetZone():CreateDirector("OpeningDirector", false);		
+	if (player:HasQuest(110001) == true and player.CurrentArea.ZoneId == 193) then
+		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
 		player:AddDirector(director);
 		director:StartDirector(true);
 		player:SetLoginDirector(director);		
@@ -32,8 +32,8 @@ function onBeginLogin(player)
 		player.positionZ = -36.91;
 		player.rotation = 0.025;
 		player:GetQuest(110001):ClearData();
-	elseif (player:HasQuest(110005) == true and player:GetZoneID() == 166) then 
-		director = player:GetZone():CreateDirector("OpeningDirector", false);		
+	elseif (player:HasQuest(110005) == true and player.CurrentArea.ZoneId == 166) then 
+		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
 		player:AddDirector(director);
 		director:StartDirector(false);		
 		player:SetLoginDirector(director);		
@@ -45,8 +45,8 @@ function onBeginLogin(player)
 		player.rotation = -1.26721;
 		player:GetQuest(110005):ClearQuestData();
 		player:GetQuest(110005):ClearQuestFlags();
-	elseif (player:HasQuest(110009) == true and player:GetZoneID() == 184) then
-		--director = player:GetZone():CreateDirector("OpeningDirector", false);		
+	elseif (player:HasQuest(110009) == true and player.CurrentArea.ZoneId == 184) then
+		--director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
 		--player:AddDirector(director);
 		--director:StartDirector(false);		
 		--player:SetLoginDirector(director);		

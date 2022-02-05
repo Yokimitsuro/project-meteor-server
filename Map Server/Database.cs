@@ -388,9 +388,9 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@y", player.positionY);
                     cmd.Parameters.AddWithValue("@z", player.positionZ);
                     cmd.Parameters.AddWithValue("@rot", player.rotation);
-                    cmd.Parameters.AddWithValue("@zoneId", player.zoneId);
-                    cmd.Parameters.AddWithValue("@privateArea", player.privateArea);
-                    cmd.Parameters.AddWithValue("@privateAreaType", player.privateAreaType);
+                    cmd.Parameters.AddWithValue("@zoneId", player.CurrentArea.ZoneId);
+                    cmd.Parameters.AddWithValue("@privateArea", player.CurrentArea.GetPrivateAreaName());
+                    cmd.Parameters.AddWithValue("@privateAreaType", player.CurrentArea.GetPrivateAreaType());
                     cmd.Parameters.AddWithValue("@destZone", player.destinationZone);
                     cmd.Parameters.AddWithValue("@destSpawn", player.destinationSpawnType);
 
@@ -783,15 +783,19 @@ namespace Meteor.Map
                     {
                         if (reader.Read())
                         {
-                            player.displayNameId = 0xFFFFFFFF;
+                            uint zoneId;
+                            string privateAreaName = null;
+                            int privateAreaType;
+                            
+
+                            player.displayNameId = -1;
                             player.customDisplayName = reader.GetString(0);
                             player.oldPositionX = player.positionX = reader.GetFloat(1);
                             player.oldPositionY = player.positionY = reader.GetFloat(2);
                             player.oldPositionZ = player.positionZ = reader.GetFloat(3);
                             player.oldRotation = player.rotation = reader.GetFloat(4);
                             player.currentMainState = reader.GetUInt16(5);
-                            player.zoneId = reader.GetUInt32(6);
-                            player.isZoning = true;
+                            player.IsZoneing = true;
                             player.gcCurrent = reader.GetByte(7);
                             player.gcRankLimsa = reader.GetByte(8);
                             player.gcRankGridania = reader.GetByte(9);
@@ -810,17 +814,14 @@ namespace Meteor.Map
                             player.destinationZone = reader.GetUInt32("destinationZoneId");
                             player.destinationSpawnType = reader.GetByte("destinationSpawnType");
 
-                            if (!reader.IsDBNull(reader.GetOrdinal("currentPrivateArea")))
-                                player.privateArea = reader.GetString("currentPrivateArea");
-                            player.privateAreaType = reader.GetUInt32("currentPrivateAreaType");
-
+                            // Get the area the player is in
+                            zoneId = reader.GetUInt32(6);
                             if (player.destinationZone != 0)
-                                player.zoneId = player.destinationZone;
-
-                            if (player.privateArea != null && !player.privateArea.Equals(""))
-                                player.zone = Server.GetWorldManager().GetPrivateArea(player.zoneId, player.privateArea, player.privateAreaType);
-                            else
-                                player.zone = Server.GetWorldManager().GetZone(player.zoneId);
+                                zoneId = player.destinationZone;
+                            if (!reader.IsDBNull(reader.GetOrdinal("currentPrivateArea")))
+                                privateAreaName = reader.GetString("currentPrivateArea");
+                            privateAreaType = reader.GetInt32("currentPrivateAreaType");
+                            player.CurrentArea = Server.GetWorldManager().GetArea(zoneId, privateAreaName, privateAreaType);
                         }
                     }
 

@@ -206,7 +206,7 @@ namespace Meteor.Map
                                 ownerActor = session.GetActor().currentSpawnedRetainer;
                             //Is it a instance actor?
                             if (ownerActor == null)
-                                ownerActor = session.GetActor().zone.FindActorInArea(eventStart.ownerActorID);
+                                ownerActor = session.GetActor().CurrentArea.FindActorInArea(eventStart.ownerActorID);
                             //Is it a Director?
                             if (ownerActor == null)
                             {

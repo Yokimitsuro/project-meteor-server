@@ -397,7 +397,7 @@ namespace Meteor.Map.Actors
                 subpackets.Add(SetCurrentMountGoobbuePacket.BuildPacket(actorId, 1));
 
             //Inn Packets (Dream, Cutscenes, Armoire)   
-            if (zone.isInn)
+            if (CurrentArea.isInn)
             {
                 SetCutsceneBookPacket cutsceneBookPacket = new SetCutsceneBookPacket();
                 for (int i = 0; i < 2048; i++)
@@ -578,7 +578,7 @@ namespace Meteor.Map.Actors
 
         public void SendSeamlessZoneInPackets()
         {
-            QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.bgmDay, SetMusicPacket.EFFECT_FADEIN));
+            QueuePacket(SetMusicPacket.BuildPacket(actorId, CurrentArea.bgmDay, SetMusicPacket.EFFECT_FADEIN));
             QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
         }
 
@@ -601,11 +601,11 @@ namespace Meteor.Map.Actors
                 }
             }
             else
-                QueuePacket(SetMusicPacket.BuildPacket(actorId, zone.bgmDay, 0x01)); //Zone
+                QueuePacket(SetMusicPacket.BuildPacket(actorId, CurrentArea.bgmDay, 0x01)); //Zone
 
             QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
 
-            QueuePacket(SetMapPacket.BuildPacket(actorId, zone.regionId, zone.actorId));
+            QueuePacket(SetMapPacket.BuildPacket(actorId, CurrentArea.RegionId, CurrentArea.ZoneId));
 
             QueuePackets(GetSpawnPackets(this, spawnType));
 
@@ -623,7 +623,7 @@ namespace Meteor.Map.Actors
 
             playerSession.QueuePacket(GetInitPackets());
 
-            List<SubPacket> areaMasterSpawn = zone.GetSpawnPackets();
+            List<SubPacket> areaMasterSpawn = CurrentArea.GetSpawnPackets();
             List<SubPacket> debugSpawn = world.GetDebugActor().GetSpawnPackets();
             List<SubPacket> worldMasterSpawn = world.GetActor().GetSpawnPackets();
 
@@ -631,9 +631,9 @@ namespace Meteor.Map.Actors
             playerSession.QueuePacket(debugSpawn);
             playerSession.QueuePacket(worldMasterSpawn);
 
-            if (zone.GetWeatherDirector() != null)
+            if (CurrentArea.GetWeatherDirector() != null)
             {
-                playerSession.QueuePacket(zone.GetWeatherDirector().GetSpawnPackets());
+                playerSession.QueuePacket(CurrentArea.GetWeatherDirector().GetSpawnPackets());
             }
 
             foreach (Director director in ownedDirectors)
@@ -758,7 +758,7 @@ namespace Meteor.Map.Actors
 
         public void ChangeAnimation(uint animId)
         {
-            Actor a = zone.FindActorInArea(currentTarget);
+            Actor a = CurrentArea.FindActorInArea(currentTarget);
             if (a is Npc)
                 ((Npc)a).animationId = animId;
         }
@@ -783,7 +783,7 @@ namespace Meteor.Map.Actors
             playerSession.LockUpdates(true);
 
             //Remove actor from zone and main server list
-            zone.RemoveActorFromZone(this);
+            CurrentArea.RemoveActorFromZone(this);
 
             //Set Destination to 0
             this.destinationZone = 0;
@@ -810,7 +810,7 @@ namespace Meteor.Map.Actors
             playerSession.LockUpdates(true);
 
             //Remove actor from zone and main server list
-            zone.RemoveActorFromZone(this);
+            CurrentArea.RemoveActorFromZone(this);
 
             //Clean up parties
             RemoveFromCurrentPartyAndCleanup();
@@ -831,11 +831,6 @@ namespace Meteor.Map.Actors
             Database.SavePlayerStatusEffects(this);
         }
 
-        public Area GetZone()
-        {
-            return zone;
-        }
-
         public void SendMessage(uint logType, string sender, string message)
         {
             QueuePacket(SendMessagePacket.BuildPacket(actorId, logType, sender, message));
@@ -844,7 +839,7 @@ namespace Meteor.Map.Actors
         //Only use at logout since it's intensive
         private byte GetInnCode()
         {
-            if (zone.isInn)
+            if (CurrentArea.isInn)
             {
                 Vector3 position = new Vector3(positionX, 0, positionZ);
                 if (Utils.Distance(position, new Vector3(0, 0, 0)) <= 20f)
@@ -989,7 +984,7 @@ namespace Meteor.Map.Actors
         public void BroadcastWorldMessage(ushort worldMasterId, params object[] msgParams)
         {
             //SubPacket worldMasterMessage = 
-            //zone.BroadcastPacketAroundActor(this, worldMasterMessage);
+            //CurrentArea.BroadcastPacketAroundActor(this, worldMasterMessage);
         }
 
         public void GraphicChange(uint slot, uint graphicId)
@@ -1677,7 +1672,7 @@ namespace Meteor.Map.Actors
         {
             Quest defaultTalk = null;
 
-            switch (npc.zone.regionId)
+            switch (npc.CurrentArea.RegionId)
             {
                 case 101:
                     defaultTalk = (Quest) Server.GetStaticActors("DftSea");
@@ -1971,8 +1966,8 @@ namespace Meteor.Map.Actors
             //Update Instance
             List<Actor> aroundMe = new List<Actor>();
 
-            if (zone != null)
-                aroundMe.AddRange(zone.GetActorsAroundActor(this, 50));
+            if (CurrentArea != null)
+                aroundMe.AddRange(CurrentArea.GetActorsAroundActor(this, 50));
             if (zone2 != null)
                 aroundMe.AddRange(zone2.GetActorsAroundActor(this, 50));
             playerSession.UpdateInstance(aroundMe, force);
@@ -2137,7 +2132,7 @@ namespace Meteor.Map.Actors
                 {
                     rentalExpireTime = 0;
                     rentalMinLeft = 0;
-                    ChangeMusic(GetZone().bgmDay);
+                    ChangeMusic(CurrentArea.bgmDay);
                     SetMountState(0);
                     ChangeSpeed(0.0f, 2.0f, 5.0f, 5.0f);
                     ChangeState(0);
@@ -2400,7 +2395,7 @@ namespace Meteor.Map.Actors
         public override void Cast(uint spellId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.Cast(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), spellId);
+                aiContainer.Cast(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), spellId);
             else if (aiContainer.IsCurrentState<MagicState>())
                 // You are already casting.
                 SendGameMessage(Server.GetWorldManager().GetActor(), 32536, 0x20);
@@ -2412,7 +2407,7 @@ namespace Meteor.Map.Actors
         public override void Ability(uint abilityId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.Ability(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), abilityId);
+                aiContainer.Ability(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), abilityId);
             else
                 // Please wait a moment and try again.
                 SendGameMessage(Server.GetWorldManager().GetActor(), 32535, 0x20);
@@ -2421,7 +2416,7 @@ namespace Meteor.Map.Actors
         public override void WeaponSkill(uint skillId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.WeaponSkill(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), skillId);
+                aiContainer.WeaponSkill(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), skillId);
             else
                 // Please wait a moment and try again.
                 SendGameMessage(Server.GetWorldManager().GetActor(), 32535, 0x20);

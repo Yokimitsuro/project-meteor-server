@@ -35,7 +35,7 @@ namespace Meteor.Map.actors.chara.npc
         private Player ownerPlayer;
 
         public Retainer(uint retainerId, ActorClass actorClass, Player player, float posX, float posY, float posZ, float rot)
-            : base(0, actorClass, "myretainer", player.GetZone(), posX, posY, posZ, rot, 0, 0, null)
+            : base(0, actorClass, "myretainer", player.CurrentArea, posX, posY, posZ, rot, 0, 0, null)
         {
             this.retainerId = retainerId;
             this.ownerPlayer = player;

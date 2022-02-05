@@ -62,7 +62,7 @@ namespace Meteor.Map.Actors
         public uint actorId;
         public string actorName;
 
-        public uint displayNameId = 0xFFFFFFFF;
+        public int displayNameId = -1;
         public string customDisplayName;
 
         public ushort currentMainState = SetActorStatePacket.MAIN_STATE_PASSIVE;
@@ -74,12 +74,10 @@ namespace Meteor.Map.Actors
         public ushort moveState, oldMoveState;
         public float[] moveSpeeds = new float[4];
 
-        public uint zoneId, zoneId2;
-        public string privateArea;
-        public uint privateAreaType;
-        public Area zone = null;
+        public Area CurrentArea { set; get; }
+        public bool IsZoneing { set; get; }
+
         public Area zone2 = null;
-        public bool isZoning = false;
 
         public bool spawnedFirstTime = false;
 
@@ -463,7 +461,7 @@ namespace Meteor.Map.Actors
                             positionY = pos.Y;
                             positionZ = pos.Z;
 
-                            zone.UpdateActorPosition(this);
+                            CurrentArea.UpdateActorPosition(this);
 
                             //Program.Server.GetInstance().mLuaEngine.OnPath(actor, position, positionUpdates)
                         }
@@ -495,7 +493,7 @@ namespace Meteor.Map.Actors
 
                 updateFlags = ActorUpdateFlags.None;
             }
-            zone.BroadcastPacketsAroundActor(this, packets);
+            CurrentArea.BroadcastPacketsAroundActor(this, packets);
         }
 
         public void GenerateActorName(int actorNumber)
@@ -511,7 +509,7 @@ namespace Meteor.Map.Actors
             className = Char.ToLowerInvariant(className[0]) + className.Substring(1);
 
             //Format Zone Name
-            string zoneName = zone.zoneName.Replace("Field", "Fld")
+            string zoneName = CurrentArea.ZoneName.Replace("Field", "Fld")
                                            .Replace("Dungeon", "Dgn")
                                            .Replace("Town", "Twn")
                                            .Replace("Battle", "Btl")
@@ -519,7 +517,7 @@ namespace Meteor.Map.Actors
                                            .Replace("Event", "Evt")
                                            .Replace("Ship", "Shp")
                                            .Replace("Office", "Ofc");
-            if (zone is PrivateArea)
+            if (CurrentArea is PrivateArea)
             {
                 //Check if "normal"
                 zoneName = zoneName.Remove(zoneName.Length - 1, 1) + "P";
@@ -537,10 +535,8 @@ namespace Meteor.Map.Actors
             string classNumber = Utils.ToStringBase63(actorNumber);
 
             //Get stuff after @
-            uint zoneId = zone.actorId;
-            uint privLevel = 0;
-            if (zone is PrivateArea)
-                privLevel = ((PrivateArea)zone).GetPrivateAreaType();
+            uint zoneId = CurrentArea.ZoneId;
+            int privLevel = CurrentArea.GetPrivateAreaType();
 
             actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }
@@ -629,13 +625,14 @@ namespace Meteor.Map.Actors
         #region positioning
         public List<float> GetPos()
         {
-            List<float> pos = new List<float>();
-
-            pos.Add(positionX);
-            pos.Add(positionY);
-            pos.Add(positionZ);
-            pos.Add(rotation);
-            pos.Add(zoneId);
+            List<float> pos = new List<float>
+            {
+                positionX,
+                positionY,
+                positionZ,
+                rotation,
+                CurrentArea.ZoneId
+            };
 
             return pos;
         }
@@ -658,17 +655,7 @@ namespace Meteor.Map.Actors
             rotation = rot;
 
             // todo: handle zone?
-            zone.BroadcastPacketAroundActor(this, MoveActorToPositionPacket.BuildPacket(actorId, x, y, z, rot, moveState));
-        }
-
-        public Area GetZone()
-        {
-            return zone;
-        }
-
-        public uint GetZoneID()
-        {
-            return zoneId;
+            CurrentArea.BroadcastPacketAroundActor(this, MoveActorToPositionPacket.BuildPacket(actorId, x, y, z, rot, moveState));
         }
 
         public void LookAt(Actor actor)
