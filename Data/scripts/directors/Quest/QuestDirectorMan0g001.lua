@@ -88,7 +88,7 @@ function onEventStarted(player, actor, triggerName)
 	wait(5);
 	
 	player:SendMessage(0x20, "", "ContentFinished");
-	player:GetZone():ContentFinished();	
+	player.CurrentArea:ContentFinished();	
 	wait(5);
 	player:SendMessage(0x20, "", "Remove from party");
 	player:RemoveFromCurrentPartyAndCleanup();
@@ -136,5 +136,5 @@ function onCommand(player, command)
 end
 
 function main(director, contentGroup)
-    onCreateContentArea(director:GetPlayerMembers(), director, director:GetZone(), contentGroup);
+    onCreateContentArea(director:GetPlayerMembers(), director, director.CurrentArea, contentGroup);
 end;

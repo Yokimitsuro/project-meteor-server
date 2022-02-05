@@ -263,7 +263,7 @@ function doExitDoor(player, quest, npc)
 		
 		quest:StartSequence(SEQ_005);
 		
-		contentArea = player:GetZone():CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "man0l01", "SimpleContent30002", "Quest/QuestDirectorMan0l001");
+		contentArea = player.CurrentArea:CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "man0l01", "SimpleContent30002", "Quest/QuestDirectorMan0l001");
 		
 		if (contentArea == nil) then
 			return;
