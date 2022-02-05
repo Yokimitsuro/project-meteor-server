@@ -15,10 +15,12 @@ function onTrigger(player, argc, appearanceId)
     local sender = "[setappearance] ";
     
     app = tonumber(appearanceId) or 0;
-    player:SendMessage(messageID, sender,  string.format("appearance %u", app));
+    --player:SendMessage(messageID, sender,  string.format("appearance %u", app));
     
-    if player and player.target then
-        player.target.ChangeNpcAppearance(app);
+    targetActor = GetWorldManager():GetActorInWorld(player.currentTarget)
+    
+    if targetActor then
+        targetActor.ChangeNpcAppearance(app);
         player:SendMessage(messageID, sender,  string.format("appearance %u", app));
     end;
            

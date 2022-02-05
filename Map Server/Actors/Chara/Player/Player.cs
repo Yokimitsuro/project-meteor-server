@@ -920,6 +920,14 @@ namespace Meteor.Map.Actors
             QueuePacket(SetMusicPacket.BuildPacket(actorId, musicId, 1));
         }
 
+        public void ChangeMusic(ushort musicId, ushort musicTrackMode)
+        {
+            QueuePacket(SetMusicPacket.BuildPacket(actorId, musicId, musicTrackMode));
+        }
+
+        
+
+
         public void SendMountAppearance()
         {
             if (mountState == 1)

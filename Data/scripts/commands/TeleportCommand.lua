@@ -49,8 +49,7 @@ teleportMenuToAetheryte = {
     [5] = {
         [1] = 1280121,
         [2] = 1280122
-    },
-
+    }
 }
 
 zoneIdToRegionChoice =
@@ -73,7 +72,7 @@ function onEventStarted(player, actor, eventType, eventName, isTeleport)
     local favoredLocation = {1280003, 1280005, 1280062};
     local currentRegion = zoneIdToRegionChoice[player:GetPos()[5]] or 0;
     local isCity = {[1280001] = true, [1280061] = true, [1280031] = true};
-    local isRegion = true;
+    local isFavoredDesination = false;
     local destination = 0;
 
 
@@ -103,7 +102,7 @@ function onEventStarted(player, actor, eventType, eventName, isTeleport)
                 elseif (regionChoice == 6) then -- Favored Destinations selected.
                     -- Dummy info.  Favored would be half price after factoring in same region cost or not.
                     animaCost = {2, 3, 3, favoredLocation[1], favoredLocation[2], favoredLocation[3]};
-                    isRegion = false;
+                    isFavoredDesination = true;
                 end
 
 
@@ -126,12 +125,12 @@ function onEventStarted(player, actor, eventType, eventName, isTeleport)
                 
                 player:PlayAnimation(0x4000FFA);
                 
-                if (isRegion == true) then
+                if (isFavoredDesination == true) then
+                    destination = aetheryteTeleportPositions[favoredLocation[aetheryteChoice]];
+                    player:SendGameMessage(worldMaster, 34101, 0x20, 2, favoredLocation[aetheryteChoice], animaCost[aetheryteChoice], currentAnima);                
+                else
                     destination = aetheryteTeleportPositions[teleportMenuToAetheryte[regionChoice][aetheryteChoice]];
                     player:SendGameMessage(worldMaster, 34101, 0x20, 2, teleportMenuToAetheryte[regionChoice][aetheryteChoice], animaCost[aetheryteChoice], currentAnima);  
-                else
-                    destination = aetheryteTeleportPositions[favoredLocation[aetheryteChoice]];
-                    player:SendGameMessage(worldMaster, 34101, 0x20, 2, favoredLocation[aetheryteChoice], animaCost[aetheryteChoice], currentAnima);
                 end
                 
                 confirmChoice = callClientFunction(player, "delegateCommand", actor, "eventConfirm", false, false, 1, 138824, false);               

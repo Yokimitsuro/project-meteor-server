@@ -6,6 +6,8 @@ Handles mounting and dismounting the Chocobo and Goobbue
 
 --]]
 
+require ("global")
+
 function onEventStarted(player, actor, triggerName, isGoobbue)
 
     if (player:GetState() == 0) then        
@@ -13,11 +15,11 @@ function onEventStarted(player, actor, triggerName, isGoobbue)
         worldMaster = GetWorldMaster();     
         
         if (isGoobbue ~= true) then
-            player:ChangeMusic(83);
+            player:ChangeMusic(83, MUSIC_FADEIN);
             player:SendGameMessage(player, worldMaster, 26001, 0x20);
             player:SetMountState(1);
         else
-            player:ChangeMusic(98);
+            player:ChangeMusic(98, MUSIC_FADEIN);
             player:SendGameMessage(player, worldMaster, 26019, 0x20);
             player:SetMountState(2);
         end
@@ -25,7 +27,7 @@ function onEventStarted(player, actor, triggerName, isGoobbue)
         player:ChangeSpeed(0.0, 3.6, 9.0, 9.0);
         player:ChangeState(15);
     else
-        player:ChangeMusic(player:GetZone().bgmDay);
+        player:ChangeMusic(player:GetZone().bgmDay, MUSIC_FADEIN);
         
         worldMaster = GetWorldMaster();
         

@@ -4,10 +4,10 @@ PopulaceCompanyWarp Script
 
 Functions:
 
-eventTalkWelcome(player) - Start Text
+eventTalkWelcome(player)        - Start Text
 eventAskMainMenu(player, index) - Shows teleport menu, hides the teleport location at index value to prevent warping to the spot you're at
 eventAfterWarpOtherZone(player) - Fades out for warp
-eventTalkStepBreak() - Ends talk
+eventTalkStepBreak()            - Holds the client up for whatever reason?
 --]]
 
 require ("global")
@@ -82,39 +82,49 @@ function onEventStarted(player, npc, triggerName)
     npcId = npc:GetActorClassId();
     city = warpNpc[npcId][2];
     
-    
-    if city == 1 then
+    if (city == 1) then
         if player:GetItemPackage(INVENTORY_KEYITEMS):HasItem(passLimsa) then
             passCheck = 1;
         else
-            if passCheck == 0 then callClientFunction(player, "eventTalkWelcome", player); end
+            if (passCheck == 0) then callClientFunction(player, "eventTalkWelcome", player); end
         end;
-    elseif city == 2 then
-        if player:GetItemPackage(INVENTORY_KEYITEMS):HasItem(passGrid) then
+    elseif (city == 2) then
+      --  if player:GetItemPackage(INVENTORY_KEYITEMS):HasItem(passGrid) then
+            passCheck = 1;
+       -- else
+         --  if passCheck == 0 then callClientFunction(player, "eventTalkWelcome", player); end
+        --end;
+    elseif (city == 3) then
+        if (player:GetItemPackage(INVENTORY_KEYITEMS):HasItem(passUldah)) then
             passCheck = 1;
         else
-           if passCheck == 0 then callClientFunction(player, "eventTalkWelcome", player); end
-        end;
-    elseif city == 3 then
-        if player:GetItemPackage(INVENTORY_KEYITEMS):HasItem(passUldah) then
-            passCheck = 1;
-        else
-            if passCheck == 0 then callClientFunction(player, "eventTalkWelcome", player); end
+            if (passCheck == 0) then callClientFunction(player, "eventTalkWelcome", player); end
         end
     end
     
-    if passCheck == 1 then
+    
+    if (passCheck == 1) then
         choice = callClientFunction(player, "eventAskMainMenu", player, warpNpc[npcId][1]);
     
-        if choice == 0 then
-            --callClientFunction(player, "playereventTalkStepBreak");
+        
+        if (choice ~= 0) then
+            
             player:EndEvent();
+           
+           callClientFunction(player, "eventAfterWarpOtherZone", player);
+           
+            local player_zone = player:GetPos()[5];
+            spawnType = 0x0A;
+            if (player_zone == aethernet[city][choice].zone) then
+                
+                GetWorldManager():DoPlayerMoveInZone(player, aethernet[city][choice].x, aethernet[city][choice].y, aethernet[city][choice].z, aethernet[city][choice].r, spawnType);    
+            else
+                GetWorldManager():DoZoneChange(player, aethernet[city][choice].zone, nil, 0, spawnType, aethernet[city][choice].x, aethernet[city][choice].y, aethernet[city][choice].z, aethernet[city][choice].r);    
+            end;
         else
-         --   callClientFunction(player, "eventAfterWarpOtherZone", player);   -- Commented out for now to prevent double fade-to-black for warp
-           player:EndEvent();
-           GetWorldManager():DoZoneChange(player, aethernet[city][choice].zone, nil, 0, 15, aethernet[city][choice].x, aethernet[city][choice].y, aethernet[city][choice].z, aethernet[city][choice].r);    
+            player:EndEvent();
         end
     end
     
-    player:EndEvent();
+    
 end
