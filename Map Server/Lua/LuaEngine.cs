@@ -65,9 +65,8 @@ namespace Meteor.Map.lua
             luaTimer = new Timer(new TimerCallback(PulseSleepingOnTime),
                            null, TimeSpan.Zero, TimeSpan.FromMilliseconds(50));
 
-            UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
-
-            /*
+            //UserData.RegistrationPolicy = InteropRegistrationPolicy.Automatic;
+            
             UserData.RegisterType<LuaEngine>();
             UserData.RegisterType<Player>();
             UserData.RegisterType<Command>();
@@ -80,8 +79,7 @@ namespace Meteor.Map.lua
             UserData.RegisterType<PrivateAreaContent>();
             UserData.RegisterType<Director>();
             UserData.RegisterType<WorldManager>();
-            UserData.RegisterType<WorldMaster>();
-            */
+            UserData.RegisterType<WorldMaster>();            
         }
 
         public static LuaEngine GetInstance()
