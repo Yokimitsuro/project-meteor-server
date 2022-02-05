@@ -133,8 +133,8 @@ function onEventStarted(player, command, triggerName)
 		return;
 	end
 	
-	if (weaponskillHandlers[command.actorId] ~= nil) then
-		weaponskillHandlers[command.actorId](player);
+	if (weaponskillHandlers[command.Id] ~= nil) then
+		weaponskillHandlers[command.Id](player);
 	else
 		player:SendMessage(0x20, "", "That weaponskill is not implemented yet.");
 	end	
