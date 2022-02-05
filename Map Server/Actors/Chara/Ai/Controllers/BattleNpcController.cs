@@ -98,7 +98,7 @@ namespace Meteor.Map.actors.chara.ai.controllers
             {
                 if (!owner.neutral && owner.IsAlive())
                 {
-                    foreach (var chara in owner.zone.GetActorsAroundActor<Character>(owner, 50))
+                    foreach (var chara in owner.CurrentArea.GetActorsAroundActor<Character>(owner, 50))
                     {
                         if (chara.allegiance == owner.allegiance)
                            continue;
@@ -276,7 +276,7 @@ namespace Meteor.Map.actors.chara.ai.controllers
                     {
                         if (owner.target is Player)
                         {
-                            foreach (var chara in owner.zone.GetActorsAroundActor<Character>(owner, 1))
+                            foreach (var chara in owner.CurrentArea.GetActorsAroundActor<Character>(owner, 1))
                             {
                                 if (chara == owner)
                                     continue;
@@ -404,7 +404,7 @@ namespace Meteor.Map.actors.chara.ai.controllers
 
         public virtual bool CanSeePoint(float x, float y, float z)
         {
-            return NavmeshUtils.CanSee((Zone)owner.zone, owner.positionX, owner.positionY, owner.positionZ, x, y, z);
+            return NavmeshUtils.CanSee((Zone)owner.CurrentArea, owner.positionX, owner.positionY, owner.positionZ, x, y, z);
         }
 
         protected virtual void HandleHate()
@@ -420,7 +420,7 @@ namespace Meteor.Map.actors.chara.ai.controllers
                 owner.currentLockedTarget = target?.actorId ?? Actor.INVALID_ACTORID;
                 owner.currentTarget = target?.actorId ?? Actor.INVALID_ACTORID;
 
-                 foreach (var player in owner.zone.GetActorsAroundActor<Player>(owner, 50))
+                 foreach (var player in owner.CurrentArea.GetActorsAroundActor<Player>(owner, 50))
                     player.QueuePacket(owner.GetHateTypePacket(player));
 
                 base.ChangeTarget(target);

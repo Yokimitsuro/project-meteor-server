@@ -215,7 +215,7 @@ namespace Meteor.Map.Actors
 
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("charaWork/currentContentGroup", this);
             propPacketUtil.AddProperty("charaWork.currentContentGroup");
-            zone.BroadcastPacketsAroundActor(this, propPacketUtil.Done());
+            CurrentArea.BroadcastPacketsAroundActor(this, propPacketUtil.Done());
         }
 
         //This logic isn't correct, order of GetStatusEffects() is not necessarily the same as the actual effects in game. Also sending every time at once isn't needed
@@ -243,17 +243,17 @@ namespace Meteor.Map.Actors
                     ((Player)this).QueuePacket(PlayAnimationOnActorPacket.BuildPacket(actorId, animId));
             }
             else
-                zone.BroadcastPacketAroundActor(this, PlayAnimationOnActorPacket.BuildPacket(actorId, animId));
+                CurrentArea.BroadcastPacketAroundActor(this, PlayAnimationOnActorPacket.BuildPacket(actorId, animId));
         }
         
         public void DoBattleAction(ushort commandId, uint animationId)
         {
-            zone.BroadcastPacketAroundActor(this, CommandResultX00Packet.BuildPacket(actorId, animationId, commandId));
+            CurrentArea.BroadcastPacketAroundActor(this, CommandResultX00Packet.BuildPacket(actorId, animationId, commandId));
         }
 
         public void DoBattleAction(ushort commandId, uint animationId, CommandResult result)
         {
-            zone.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, result));
+            CurrentArea.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, result));
         }
 
         public void DoBattleAction(ushort commandId, uint animationId, CommandResult[] results)
@@ -263,12 +263,12 @@ namespace Meteor.Map.Actors
             while (true)
             {
                 if (results.Length - currentIndex >= 10)
-                    zone.BroadcastPacketAroundActor(this, CommandResultX18Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX18Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
                 else if (results.Length - currentIndex > 1)
-                    zone.BroadcastPacketAroundActor(this, CommandResultX10Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX10Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
                 else if (results.Length - currentIndex == 1)
                 {
-                    zone.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, results[currentIndex]));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, results[currentIndex]));
                     currentIndex++;
                 }
                 else
@@ -283,12 +283,12 @@ namespace Meteor.Map.Actors
             while (true)
             {
                 if (results.Count - currentIndex >= 10)
-                    zone.BroadcastPacketAroundActor(this, CommandResultX18Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX18Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
                 else if (results.Count - currentIndex > 1)
-                    zone.BroadcastPacketAroundActor(this, CommandResultX10Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX10Packet.BuildPacket(actorId, animationId, commandId, results, ref currentIndex));
                 else if (results.Count - currentIndex == 1)
                 {
-                    zone.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, results[currentIndex]));
+                    CurrentArea.BroadcastPacketAroundActor(this, CommandResultX01Packet.BuildPacket(actorId, animationId, commandId, results[currentIndex]));
                     currentIndex++;
                 }
                 else
@@ -504,7 +504,7 @@ namespace Meteor.Map.Actors
                 }
                 //if (targid != 0)
                 {
-                    aiContainer.Engage(zone.FindActorInArea<Character>(targid));
+                    aiContainer.Engage(CurrentArea.FindActorInArea<Character>(targid));
                 }
             }
 
@@ -535,19 +535,19 @@ namespace Meteor.Map.Actors
         public virtual void Cast(uint spellId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.Cast(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), spellId);
+                aiContainer.Cast(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), spellId);
         }
 
         public virtual void Ability(uint abilityId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.Ability(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), abilityId);
+                aiContainer.Ability(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), abilityId);
         }
 
         public virtual void WeaponSkill(uint skillId, uint targetId = 0)
         {
             if (aiContainer.CanChangeState())
-                aiContainer.WeaponSkill(zone.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), skillId);
+                aiContainer.WeaponSkill(CurrentArea.FindActorInArea<Character>(targetId == 0 ? currentTarget : targetId), skillId);
         }
 
         public virtual void Spawn(DateTime tick)
@@ -806,7 +806,7 @@ namespace Meteor.Map.Actors
 
             foreach (CommandResult action in actions)
             {
-                if (zone.FindActorInArea<Character>(action.targetId) is Character)
+                if (CurrentArea.FindActorInArea<Character>(action.targetId) is Character)
                 {
                     //BattleUtils.HandleHitType(this, chara, action);
                     //BattleUtils.DoAction(this, chara, action, DamageTakenType.Magic);
@@ -822,7 +822,7 @@ namespace Meteor.Map.Actors
             foreach (CommandResult action in actions)
             {
                 //Should we just store the character insteado f having to find it again?
-                if (zone.FindActorInArea<Character>(action.targetId) is Character)
+                if (CurrentArea.FindActorInArea<Character>(action.targetId) is Character)
                 {
                     //BattleUtils.DoAction(this, chara, action, DamageTakenType.Weaponskill);
                 }
@@ -835,7 +835,7 @@ namespace Meteor.Map.Actors
         {
             foreach (var action in actions)
             {
-                if (zone.FindActorInArea<Character>(action.targetId) is Character)
+                if (CurrentArea.FindActorInArea<Character>(action.targetId) is Character)
                 {
                     //BattleUtils.DoAction(this, chara, action, DamageTakenType.Ability);
                 }

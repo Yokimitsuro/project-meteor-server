@@ -46,11 +46,10 @@ namespace Meteor.Map.actors.director
         private Coroutine currentCoroutine;
 
         public Director(uint id, Area zone, string directorPath, bool hasContentGroup, params object[] args)
-            : base((6 << 28 | zone.actorId << 19 | (uint)id))
+            : base((6 << 28 | zone.CurrentArea.ZoneId << 19 | (uint)id))
         {
             directorId = id;
-            this.zone = zone;
-            this.zoneId = zone.actorId;
+            CurrentArea = zone;
             directorScriptPath = directorPath;
 
             LoadLuaScript();
@@ -172,7 +171,7 @@ namespace Meteor.Map.actors.director
                 ((Player)player).RemoveDirector(this);
             members.Clear();
             isDeleted = true;
-            Server.GetWorldManager().GetZone(zoneId).DeleteDirector(actorId);
+            Server.GetWorldManager().GetArea(CurrentArea.ZoneId).DeleteDirector(actorId);
         }
         
         public void AddMember(Actor actor)
@@ -242,7 +241,7 @@ namespace Meteor.Map.actors.director
             className = Char.ToLowerInvariant(className[0]) + className.Substring(1);
 
             //Format Zone Name
-            string zoneName = zone.zoneName.Replace("Field", "Fld")
+            string zoneName = CurrentArea.ZoneName.Replace("Field", "Fld")
                                            .Replace("Dungeon", "Dgn")
                                            .Replace("Town", "Twn")
                                            .Replace("Battle", "Btl")
@@ -250,7 +249,7 @@ namespace Meteor.Map.actors.director
                                            .Replace("Event", "Evt")
                                            .Replace("Ship", "Shp")
                                            .Replace("Office", "Ofc");
-            if (zone is PrivateArea)
+            if (CurrentArea is PrivateArea)
             {
                 //Check if "normal"
                 zoneName = zoneName.Remove(zoneName.Length - 1, 1) + "P";
@@ -268,10 +267,8 @@ namespace Meteor.Map.actors.director
             string classNumber = Utils.ToStringBase63(actorNumber);
 
             //Get stuff after @
-            uint zoneId = zone.actorId;
-            uint privLevel = 0;
-            if (zone is PrivateArea)
-                privLevel = ((PrivateArea)zone).GetPrivateAreaType();
+            uint zoneId = CurrentArea.ZoneId;
+            int privLevel = CurrentArea.GetPrivateAreaType();
 
             actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }

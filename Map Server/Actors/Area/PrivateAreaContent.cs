@@ -37,7 +37,7 @@ namespace Meteor.Map.actors.area
             return null;
         }
 
-        public PrivateAreaContent(Zone parent, string classPath, string privateAreaName, uint privateAreaType, Director director, Player contentStarter) //TODO: Make it a list
+        public PrivateAreaContent(Zone parent, string classPath, string privateAreaName, int privateAreaType, Director director, Player contentStarter) //TODO: Make it a list
             : base(parent, classPath, privateAreaName, privateAreaType, 0, 0, 0)
         {
             currentDirector = director;
