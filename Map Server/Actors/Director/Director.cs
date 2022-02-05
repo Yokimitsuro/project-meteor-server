@@ -78,7 +78,7 @@ namespace Meteor.Map.actors.director
             for (int i = 1; i < lparams.Count; i++)
                 actualLParams.Add(lparams[i]);
 
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, actualLParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, actualLParams);
         }
 
         public override List<SubPacket> GetSpawnPackets(ushort spawnType = 1)
@@ -100,7 +100,7 @@ namespace Meteor.Map.actors.director
             List<SubPacket> subpackets = new List<SubPacket>();
             SetActorPropetyPacket initProperties = new SetActorPropetyPacket("/_init");
             initProperties.AddTarget();
-            subpackets.Add(initProperties.BuildPacket(actorId));
+            subpackets.Add(initProperties.BuildPacket(Id));
             return subpackets;
         }
 
@@ -171,7 +171,7 @@ namespace Meteor.Map.actors.director
                 ((Player)player).RemoveDirector(this);
             members.Clear();
             isDeleted = true;
-            Server.GetWorldManager().GetArea(CurrentArea.ZoneId).DeleteDirector(actorId);
+            Server.GetWorldManager().GetArea(CurrentArea.ZoneId).DeleteDirector(Id);
         }
         
         public void AddMember(Actor actor)
@@ -193,7 +193,7 @@ namespace Meteor.Map.actors.director
             if (members.Contains(actor))
                 members.Remove(actor);
             if (contentGroup != null)
-                contentGroup.RemoveMember(actor.actorId);
+                contentGroup.RemoveMember(actor.Id);
             if (GetPlayerMembers().Count == 0 && !isDeleting)
                 EndDirector();
         }
@@ -270,7 +270,7 @@ namespace Meteor.Map.actors.director
             uint zoneId = CurrentArea.ZoneId;
             int privLevel = CurrentArea.GetPrivateAreaType();
 
-            actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
+            Name = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }
 
         public string GetScriptPath()

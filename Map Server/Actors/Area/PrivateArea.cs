@@ -66,8 +66,8 @@ namespace Meteor.Map.actors.area
             string realClassName = className.Substring(className.LastIndexOf("/") + 1);
 
             lParams = LuaUtils.CreateLuaParamList(classPath, false, true, ZoneName, PrivateAreaName, PrivateAreaType, canRideChocobo ? (byte)1 : (byte)0, canStealth, isInn, false, false, false, false, false, false);
-            ActorInstantiatePacket.BuildPacket(actorId, actorName, realClassName, lParams).DebugPrintSubPacket();
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, realClassName, lParams);
+            ActorInstantiatePacket.BuildPacket(Id, Name, realClassName, lParams).DebugPrintSubPacket();
+            return ActorInstantiatePacket.BuildPacket(Id, Name, realClassName, lParams);
         }
 
 

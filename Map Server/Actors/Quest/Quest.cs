@@ -309,17 +309,17 @@ namespace Meteor.Map.Actors
         public Quest(uint actorID, string name)
             : base(actorID)
         {
-            actorName = name;            
+            Name = name;            
         }
 
         public Quest(Player owner, Quest baseQuest): this(owner, baseQuest, SEQ_NOT_STARTED, 0, 0, 0, 0)
         {}
 
         public Quest(Player owner, Quest baseQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3)
-            : base(baseQuest.actorId)
+            : base(baseQuest.Id)
         {
             Owner = owner;
-            actorName = baseQuest.actorName;
+            Name = baseQuest.Name;
             className = baseQuest.className;
             classPath = baseQuest.classPath;
             currentSequence = sequence;
@@ -333,7 +333,7 @@ namespace Meteor.Map.Actors
        
         public uint GetQuestId()
         {
-            return actorId & 0xFFFFF;
+            return Id & 0xFFFFF;
         }
 
         public void DoComplete()

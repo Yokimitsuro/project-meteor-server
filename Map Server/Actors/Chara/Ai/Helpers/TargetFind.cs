@@ -332,7 +332,7 @@ namespace Meteor.Map.actors.chara.ai
         {
             if (!(owner is BattleNpc))
             {
-                Program.Log.Error($"TargetFind.AddAllInHateList() owner [{owner.actorId}] {owner.customDisplayName} {owner.actorName} is not a BattleNpc");
+                Program.Log.Error($"TargetFind.AddAllInHateList() owner [{owner.Id}] {owner.DisplayName} {owner.Name} is not a BattleNpc");
             }
             else
             {

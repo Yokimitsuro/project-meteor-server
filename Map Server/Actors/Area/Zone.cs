@@ -95,7 +95,7 @@ namespace Meteor.Map.actors.area
 
             List<LuaParam> lParams;
             lParams = LuaUtils.CreateLuaParamList(classPath, false, true, ZoneName, "", -1, canRideChocobo ? (byte)1 : (byte)0, canStealth, isInn, false, false, false, true, isInstanceRaid, isEntranceDesion);
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, lParams);        
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, lParams);        
         }
 
         public void AddSpawnLocation(SpawnLocation spawn)

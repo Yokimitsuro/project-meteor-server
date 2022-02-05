@@ -173,7 +173,7 @@ namespace Meteor.Map.Actors
         public Player(Session cp, uint actorID) : base(actorID)
         {
             playerSession = cp;
-            actorName = String.Format("_pc{0:00000000}", actorID);
+            Name = String.Format("_pc{0:00000000}", actorID);
             className = "Player";
 
             moveSpeeds[0] = SetActorSpeedPacket.DEFAULT_STOP;
@@ -279,14 +279,14 @@ namespace Meteor.Map.Actors
         public List<SubPacket> Create0x132Packets()
         {
             List<SubPacket> packets = new List<SubPacket>();
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0xB, "commandForced"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0xA, "commandDefault"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x6, "commandWeak"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x4, "commandContent"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x6, "commandJudgeMode"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x100, "commandRequest"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x100, "widgetCreate"));
-            packets.Add(_0x132Packet.BuildPacket(actorId, 0x100, "macroRequest"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0xB, "commandForced"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0xA, "commandDefault"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x6, "commandWeak"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x4, "commandContent"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x6, "commandJudgeMode"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x100, "commandRequest"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x100, "widgetCreate"));
+            packets.Add(_0x132Packet.BuildPacket(Id, 0x100, "macroRequest"));
             return packets;
         }
 
@@ -304,7 +304,7 @@ namespace Meteor.Map.Actors
         public override SubPacket CreateScriptBindPacket(Player requestPlayer)
         {
             List<LuaParam> lParams;
-            if (IsMyPlayer(requestPlayer.actorId))
+            if (IsMyPlayer(requestPlayer.Id))
             {
                 if (loginInitDirector != null)
                     lParams = LuaUtils.CreateLuaParamList("/Chara/Player/Player_work", false, false, true, loginInitDirector, true, 0, false, timers, true);
@@ -314,29 +314,29 @@ namespace Meteor.Map.Actors
             else
                 lParams = LuaUtils.CreateLuaParamList("/Chara/Player/Player_work", false, false, false, false, false, true);
 
-            ActorInstantiatePacket.BuildPacket(actorId, actorName, className, lParams).DebugPrintSubPacket();
+            ActorInstantiatePacket.BuildPacket(Id, Name, className, lParams).DebugPrintSubPacket();
 
 
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, lParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, lParams);
         }
 
         public override List<SubPacket> GetSpawnPackets(Player requestPlayer, ushort spawnType)
         {
             List<SubPacket> subpackets = new List<SubPacket>();
             subpackets.Add(CreateAddActorPacket(8));
-            if (IsMyPlayer(requestPlayer.actorId))
+            if (IsMyPlayer(requestPlayer.Id))
                 subpackets.AddRange(Create0x132Packets());
             subpackets.Add(CreateSpeedPacket());
             subpackets.Add(CreateSpawnPositonPacket(this, spawnType));
             subpackets.Add(CreateAppearancePacket());
             subpackets.Add(CreateNamePacket());
-            subpackets.Add(_0xFPacket.BuildPacket(actorId));
+            subpackets.Add(_0xFPacket.BuildPacket(Id));
             subpackets.Add(CreateStatePacket());
             subpackets.Add(CreateSubStatePacket());
             subpackets.Add(CreateInitStatusPacket());
             subpackets.Add(CreateSetActorIconPacket());
             subpackets.Add(CreateIsZoneingPacket());
-            subpackets.AddRange(CreatePlayerRelatedPackets(requestPlayer.actorId));
+            subpackets.AddRange(CreatePlayerRelatedPackets(requestPlayer.Id));
             subpackets.Add(CreateScriptBindPacket(requestPlayer));
             return subpackets;
         }
@@ -356,7 +356,7 @@ namespace Meteor.Map.Actors
                     isMale = false;
                     break;
             }
-            return SetActorNamePacket.BuildPacket(actorId, customDisplayName != null ? 0 : displayNameId, displayNameId == 0xFFFFFFFF | displayNameId == 0x0 | customDisplayName != null ? customDisplayName : "", isMale);
+            return SetActorNamePacket.BuildPacket(Id, DisplayName != null ? 0 : LocalizedDisplayName, LocalizedDisplayName == 0xFFFFFFFF | LocalizedDisplayName == 0x0 | DisplayName != null ? DisplayName : "", isMale);
         }
 
         public List<SubPacket> CreatePlayerRelatedPackets(uint requestingPlayerActorId)
@@ -364,37 +364,37 @@ namespace Meteor.Map.Actors
             List<SubPacket> subpackets = new List<SubPacket>();
 
             if (gcCurrent != 0)
-                subpackets.Add(SetGrandCompanyPacket.BuildPacket(actorId, gcCurrent, gcRankLimsa, gcRankGridania, gcRankUldah));
+                subpackets.Add(SetGrandCompanyPacket.BuildPacket(Id, gcCurrent, gcRankLimsa, gcRankGridania, gcRankUldah));
 
             if (currentTitle != 0)
-                subpackets.Add(SetPlayerTitlePacket.BuildPacket(actorId, currentTitle));
+                subpackets.Add(SetPlayerTitlePacket.BuildPacket(Id, currentTitle));
 
             if (currentJob != 0)
-                subpackets.Add(SetCurrentJobPacket.BuildPacket(actorId, currentJob));
+                subpackets.Add(SetCurrentJobPacket.BuildPacket(Id, currentJob));
 
             if (IsMyPlayer(requestingPlayerActorId))
             {
-                subpackets.Add(SetSpecialEventWorkPacket.BuildPacket(actorId));
+                subpackets.Add(SetSpecialEventWorkPacket.BuildPacket(Id));
 
                 if (hasChocobo && chocoboName != null && !chocoboName.Equals(""))
                 {
-                    subpackets.Add(SetChocoboNamePacket.BuildPacket(actorId, chocoboName));
-                    subpackets.Add(SetHasChocoboPacket.BuildPacket(actorId, hasChocobo));
+                    subpackets.Add(SetChocoboNamePacket.BuildPacket(Id, chocoboName));
+                    subpackets.Add(SetHasChocoboPacket.BuildPacket(Id, hasChocobo));
                 }
 
                 if (hasGoobbue)
-                    subpackets.Add(SetHasGoobbuePacket.BuildPacket(actorId, hasGoobbue));
+                    subpackets.Add(SetHasGoobbuePacket.BuildPacket(Id, hasGoobbue));
 
-                subpackets.Add(SetAchievementPointsPacket.BuildPacket(actorId, achievementPoints));
+                subpackets.Add(SetAchievementPointsPacket.BuildPacket(Id, achievementPoints));
 
                 subpackets.Add(Database.GetLatestAchievements(this));
                 subpackets.Add(Database.GetAchievementsPacket(this));
             }
 
             if (mountState == 1)
-                subpackets.Add(SetCurrentMountChocoboPacket.BuildPacket(actorId, chocoboAppearance, rentalExpireTime, rentalMinLeft));
+                subpackets.Add(SetCurrentMountChocoboPacket.BuildPacket(Id, chocoboAppearance, rentalExpireTime, rentalMinLeft));
             else if (mountState == 2)
-                subpackets.Add(SetCurrentMountGoobbuePacket.BuildPacket(actorId, 1));
+                subpackets.Add(SetCurrentMountGoobbuePacket.BuildPacket(Id, 1));
 
             //Inn Packets (Dream, Cutscenes, Armoire)   
             if (CurrentArea.isInn)
@@ -402,8 +402,8 @@ namespace Meteor.Map.Actors
                 SetCutsceneBookPacket cutsceneBookPacket = new SetCutsceneBookPacket();
                 for (int i = 0; i < 2048; i++)
                     cutsceneBookPacket.cutsceneFlags[i] = true;
-                QueuePacket(cutsceneBookPacket.BuildPacket(actorId, "<Path Companion>", 11, 1, 1));
-                QueuePacket(SetPlayerDreamPacket.BuildPacket(actorId, 0x16, GetInnCode()));
+                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1));
+                QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, 0x16, GetInnCode()));
             }
 
             return subpackets;
@@ -578,39 +578,39 @@ namespace Meteor.Map.Actors
 
         public void SendSeamlessZoneInPackets()
         {
-            QueuePacket(SetMusicPacket.BuildPacket(actorId, CurrentArea.bgmDay, SetMusicPacket.EFFECT_FADEIN));
-            QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
+            QueuePacket(SetMusicPacket.BuildPacket(Id, CurrentArea.bgmDay, SetMusicPacket.EFFECT_FADEIN));
+            QueuePacket(SetWeatherPacket.BuildPacket(Id, SetWeatherPacket.WEATHER_CLEAR, 1));
         }
 
         public void SendZoneInPackets(WorldManager world, ushort spawnType)
         {
-            QueuePacket(SetActorIsZoningPacket.BuildPacket(actorId, false));
-            QueuePacket(SetDalamudPacket.BuildPacket(actorId, 0));
+            QueuePacket(SetActorIsZoningPacket.BuildPacket(Id, false));
+            QueuePacket(SetDalamudPacket.BuildPacket(Id, 0));
 
             //Music Packets
             if (currentMainState == SetActorStatePacket.MAIN_STATE_MOUNTED)
             {
                 if (rentalExpireTime != 0)
-                    QueuePacket(SetMusicPacket.BuildPacket(actorId, 64, 0x01)); //Rental
+                    QueuePacket(SetMusicPacket.BuildPacket(Id, 64, 0x01)); //Rental
                 else
                 {
                     if (mountState == 1)
-                        QueuePacket(SetMusicPacket.BuildPacket(actorId, 83, 0x01)); //Mount
+                        QueuePacket(SetMusicPacket.BuildPacket(Id, 83, 0x01)); //Mount
                     else
-                        QueuePacket(SetMusicPacket.BuildPacket(actorId, 98, 0x01)); //Goobbue
+                        QueuePacket(SetMusicPacket.BuildPacket(Id, 98, 0x01)); //Goobbue
                 }
             }
             else
-                QueuePacket(SetMusicPacket.BuildPacket(actorId, CurrentArea.bgmDay, 0x01)); //Zone
+                QueuePacket(SetMusicPacket.BuildPacket(Id, CurrentArea.bgmDay, 0x01)); //Zone
 
-            QueuePacket(SetWeatherPacket.BuildPacket(actorId, SetWeatherPacket.WEATHER_CLEAR, 1));
+            QueuePacket(SetWeatherPacket.BuildPacket(Id, SetWeatherPacket.WEATHER_CLEAR, 1));
 
-            QueuePacket(SetMapPacket.BuildPacket(actorId, CurrentArea.RegionId, CurrentArea.ZoneId));
+            QueuePacket(SetMapPacket.BuildPacket(Id, CurrentArea.RegionId, CurrentArea.ZoneId));
 
             QueuePackets(GetSpawnPackets(this, spawnType));
 
             #region Inventory & Equipment
-            QueuePacket(InventoryBeginChangePacket.BuildPacket(actorId, true));
+            QueuePacket(InventoryBeginChangePacket.BuildPacket(Id, true));
             itemPackages[ItemPackage.NORMAL].SendFullPackage(this);
             itemPackages[ItemPackage.CURRENCY_CRYSTALS].SendFullPackage(this);
             itemPackages[ItemPackage.KEYITEMS].SendFullPackage(this);
@@ -618,7 +618,7 @@ namespace Meteor.Map.Actors
             itemPackages[ItemPackage.MELDREQUEST].SendFullPackage(this);
             itemPackages[ItemPackage.LOOT].SendFullPackage(this);
             equipment.SendUpdate(this);
-            playerSession.QueuePacket(InventoryEndChangePacket.BuildPacket(actorId));
+            playerSession.QueuePacket(InventoryEndChangePacket.BuildPacket(Id));
             #endregion
 
             playerSession.QueuePacket(GetInitPackets());
@@ -658,15 +658,15 @@ namespace Meteor.Map.Actors
             while (true)
             {
                 if (slots.Count - currentIndex >= 64)
-                    QueuePacket(InventoryRemoveX64Packet.BuildPacket(actorId, slots, ref currentIndex));
+                    QueuePacket(InventoryRemoveX64Packet.BuildPacket(Id, slots, ref currentIndex));
                 else if (slots.Count - currentIndex >= 32)
-                    QueuePacket(InventoryRemoveX32Packet.BuildPacket(actorId, slots, ref currentIndex));
+                    QueuePacket(InventoryRemoveX32Packet.BuildPacket(Id, slots, ref currentIndex));
                 else if (slots.Count - currentIndex >= 16)
-                    QueuePacket(InventoryRemoveX16Packet.BuildPacket(actorId, slots, ref currentIndex));
+                    QueuePacket(InventoryRemoveX16Packet.BuildPacket(Id, slots, ref currentIndex));
                 else if (slots.Count - currentIndex >= 8)
-                    QueuePacket(InventoryRemoveX08Packet.BuildPacket(actorId, slots, ref currentIndex));
+                    QueuePacket(InventoryRemoveX08Packet.BuildPacket(Id, slots, ref currentIndex));
                 else if (slots.Count - currentIndex == 1)
-                    QueuePacket(InventoryRemoveX01Packet.BuildPacket(actorId, slots[currentIndex]));
+                    QueuePacket(InventoryRemoveX01Packet.BuildPacket(Id, slots[currentIndex]));
                 else
                     break;
             }
@@ -675,7 +675,7 @@ namespace Meteor.Map.Actors
 
         public bool IsMyPlayer(uint otherActorId)
         {
-            return actorId == otherActorId;
+            return Id == otherActorId;
         }
 
         public void QueuePacket(SubPacket packet)
@@ -695,7 +695,7 @@ namespace Meteor.Map.Actors
             {
                 BasePacket packet = new BasePacket(path);
 
-                packet.ReplaceActorID(actorId);
+                packet.ReplaceActorID(Id);
                 var packets = packet.GetSubpackets();
                 QueuePackets(packets);
             }
@@ -713,7 +713,7 @@ namespace Meteor.Map.Actors
                 if (sendToSelf)
                 {
 
-                    SubPacket clonedPacket = new SubPacket(packet, actorId);
+                    SubPacket clonedPacket = new SubPacket(packet, Id);
                     QueuePacket(clonedPacket);
                 }
 
@@ -726,7 +726,7 @@ namespace Meteor.Map.Actors
                         if (p.Equals(this))
                             continue;
 
-                        SubPacket clonedPacket = new SubPacket(packet, a.actorId);
+                        SubPacket clonedPacket = new SubPacket(packet, a.Id);
                         p.QueuePacket(clonedPacket);
                     }
                 }
@@ -737,7 +737,7 @@ namespace Meteor.Map.Actors
         {
             if (sendToSelf)
             {
-                SubPacket clonedPacket = new SubPacket(packet, actorId);
+                SubPacket clonedPacket = new SubPacket(packet, Id);
                 QueuePacket(clonedPacket);
             }
 
@@ -750,7 +750,7 @@ namespace Meteor.Map.Actors
                     if (p.Equals(this))
                         continue;
 
-                    SubPacket clonedPacket = new SubPacket(packet, a.actorId);
+                    SubPacket clonedPacket = new SubPacket(packet, a.Id);
                     p.QueuePacket(clonedPacket);
                 }
             }
@@ -767,14 +767,14 @@ namespace Meteor.Map.Actors
         {
             if (flag)
             {
-                BroadcastPacket(SetActorIconPacket.BuildPacket(actorId, SetActorIconPacket.DISCONNECTING), true);
+                BroadcastPacket(SetActorIconPacket.BuildPacket(Id, SetActorIconPacket.DISCONNECTING), true);
             }
             else
             {
                 if (isGM)
-                    BroadcastPacket(SetActorIconPacket.BuildPacket(actorId, SetActorIconPacket.ISGM), true);
+                    BroadcastPacket(SetActorIconPacket.BuildPacket(Id, SetActorIconPacket.ISGM), true);
                 else
-                    BroadcastPacket(SetActorIconPacket.BuildPacket(actorId, 0), true);
+                    BroadcastPacket(SetActorIconPacket.BuildPacket(Id, 0), true);
             }
         }
 
@@ -833,7 +833,7 @@ namespace Meteor.Map.Actors
 
         public void SendMessage(uint logType, string sender, string message)
         {
-            QueuePacket(SendMessagePacket.BuildPacket(actorId, logType, sender, message));
+            QueuePacket(SendMessagePacket.BuildPacket(Id, logType, sender, message));
         }
 
         //Only use at logout since it's intensive
@@ -881,14 +881,14 @@ namespace Meteor.Map.Actors
         public void Logout()
         {
             // todo: really this should be in CleanupAndSave but we might want logout/disconnect handled separately for some effects
-            QueuePacket(LogoutPacket.BuildPacket(actorId));
+            QueuePacket(LogoutPacket.BuildPacket(Id));
             statusEffects.RemoveStatusEffectsByFlags((uint)StatusEffectFlags.LoseOnLogout);
             CleanupAndSave();
         }
 
         public void QuitGame()
         {
-            QueuePacket(QuitPacket.BuildPacket(actorId));
+            QueuePacket(QuitPacket.BuildPacket(Id));
             statusEffects.RemoveStatusEffectsByFlags((uint)StatusEffectFlags.LoseOnLogout);
             CleanupAndSave();
         }
@@ -912,15 +912,15 @@ namespace Meteor.Map.Actors
 
         public void ChangeMusic(ushort musicId)
         {
-            QueuePacket(SetMusicPacket.BuildPacket(actorId, musicId, 1));
+            QueuePacket(SetMusicPacket.BuildPacket(Id, musicId, 1));
         }
 
         public void SendMountAppearance()
         {
             if (mountState == 1)
-                BroadcastPacket(SetCurrentMountChocoboPacket.BuildPacket(actorId, chocoboAppearance, rentalExpireTime, rentalMinLeft), true);
+                BroadcastPacket(SetCurrentMountChocoboPacket.BuildPacket(Id, chocoboAppearance, rentalExpireTime, rentalMinLeft), true);
             else if (mountState == 2)
-                BroadcastPacket(SetCurrentMountGoobbuePacket.BuildPacket(actorId, 1), true);
+                BroadcastPacket(SetCurrentMountGoobbuePacket.BuildPacket(Id, 1), true);
         }
 
         public void SetMountState(byte mountState)
@@ -936,41 +936,41 @@ namespace Meteor.Map.Actors
 
         public void DoEmote(uint targettedActor, uint animId, uint descId)
         {
-            BroadcastPacket(ActorDoEmotePacket.BuildPacket(actorId, targettedActor, animId, descId), true);
+            BroadcastPacket(ActorDoEmotePacket.BuildPacket(Id, targettedActor, animId, descId), true);
         }
 
         public void SendGameMessage(Actor sourceActor, Actor textIdOwner, ushort textId, byte log, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
             {
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, sourceActor.actorId, textIdOwner.actorId, textId, log));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, sourceActor.Id, textIdOwner.Id, textId, log));
             }
             else
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, sourceActor.actorId, textIdOwner.actorId, textId, log, LuaUtils.CreateLuaParamList(msgParams)));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, sourceActor.Id, textIdOwner.Id, textId, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
         public void SendGameMessage(Actor textIdOwner, ushort textId, byte log, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, log));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, log));
             else
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, log, LuaUtils.CreateLuaParamList(msgParams)));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
         public void SendGameMessageCustomSender(Actor textIdOwner, ushort textId, byte log, string customSender, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, customSender, log));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, customSender, log));
             else
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, customSender, log, LuaUtils.CreateLuaParamList(msgParams)));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, customSender, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
         public void SendGameMessageDisplayIDSender(Actor textIdOwner, ushort textId, byte log, uint displayId, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, displayId, log));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, displayId, log));
             else
-                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().actorId, textIdOwner.actorId, textId, displayId, log, LuaUtils.CreateLuaParamList(msgParams)));
+                QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, displayId, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
         public void BroadcastWorldMessage(ushort worldMasterId, params object[] msgParams)
@@ -1097,7 +1097,7 @@ namespace Meteor.Map.Actors
 
                 charaInfo1.AddTarget();
 
-                QueuePacket(charaInfo1.BuildPacket(actorId));
+                QueuePacket(charaInfo1.BuildPacket(Id));
             }
             else if (lastStep == 1)
             {
@@ -1128,7 +1128,7 @@ namespace Meteor.Map.Actors
 
                 charaInfo1.AddTarget();
 
-                QueuePacket(charaInfo1.BuildPacket(actorId));
+                QueuePacket(charaInfo1.BuildPacket(Id));
             }
            
         }
@@ -1316,7 +1316,7 @@ namespace Meteor.Map.Actors
         {
             foreach (Actor a in playerSession.actorInstanceList)
             {
-                if (a.actorId == actorId)
+                if (a.Id == actorId)
                     return a;
             }
 
@@ -1471,7 +1471,7 @@ namespace Meteor.Map.Actors
         public void AddQuest(uint id, bool isSilent = false)
         {
             Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            AddQuest(actor.actorName, isSilent);
+            AddQuest(actor.Name, isSilent);
         }
 
         public void AddQuest(string name, bool isSilent = false)
@@ -1486,7 +1486,7 @@ namespace Meteor.Map.Actors
             if (freeSlot == -1)
                 return;
 
-            playerWork.questScenario[freeSlot] = baseQuest.actorId;
+            playerWork.questScenario[freeSlot] = baseQuest.Id;
             questScenario[freeSlot] = new Quest(this, baseQuest);
             Database.SaveQuest(this, questScenario[freeSlot]);
             SendQuestClientUpdate(freeSlot);
@@ -1500,7 +1500,7 @@ namespace Meteor.Map.Actors
         public void CompleteQuest(uint id)
         {
             Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            CompleteQuest(actor.actorName);
+            CompleteQuest(actor.Name);
         }
 
         public void CompleteQuest(string name)
@@ -1510,7 +1510,7 @@ namespace Meteor.Map.Actors
             if (actor == null)
                 return;
 
-            uint id = actor.actorId;
+            uint id = actor.Id;
             if (HasQuest(id))
             {
                 Database.CompleteQuest(playerSession.GetActor(), id);
@@ -1538,9 +1538,9 @@ namespace Meteor.Map.Actors
             {
                 for (int i = 0; i < questScenario.Length; i++)
                 {
-                    if (questScenario[i] != null && questScenario[i].actorId == id)
+                    if (questScenario[i] != null && questScenario[i].Id == id)
                     {
-                        Database.RemoveQuest(this, questScenario[i].actorId);
+                        Database.RemoveQuest(this, questScenario[i].Id);
                         questScenario[i] = null;
                         playerWork.questScenario[i] = 0;
                         SendQuestClientUpdate(i);
@@ -1580,13 +1580,13 @@ namespace Meteor.Map.Actors
         public bool CanAcceptQuest(uint id)
         {
             Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            return CanAcceptQuest(actor.actorName);
+            return CanAcceptQuest(actor.Name);
         }
 
         public bool IsQuestCompleted(string questName)
         {
             Actor actor = Server.GetStaticActors(questName);
-            return IsQuestCompleted(actor.actorId);
+            return IsQuestCompleted(actor.Id);
         }
 
         public bool IsQuestCompleted(uint questId)
@@ -1598,7 +1598,7 @@ namespace Meteor.Map.Actors
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
-                if (questScenario[i] != null && questScenario[i].actorId == (0xA0F00000 | id))
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
                     return questScenario[i];
             }
 
@@ -1609,7 +1609,7 @@ namespace Meteor.Map.Actors
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
-                if (questScenario[i] != null && questScenario[i].actorName.ToLower().Equals(name.ToLower()))
+                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
                     return questScenario[i];
             }
 
@@ -1620,7 +1620,7 @@ namespace Meteor.Map.Actors
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
-                if (questScenario[i] != null && questScenario[i].actorName.ToLower().Equals(name.ToLower()))
+                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
                     return true;
             }
 
@@ -1631,7 +1631,7 @@ namespace Meteor.Map.Actors
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
-                if (questScenario[i] != null && questScenario[i].actorId == (0xA0F00000 | id))
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
                     return true;
             }
 
@@ -1653,7 +1653,7 @@ namespace Meteor.Map.Actors
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
-                if (questScenario[i] != null && questScenario[i].actorId == (0xA0F00000 | id))
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
                     return i;
             }
 
@@ -1826,7 +1826,7 @@ namespace Meteor.Map.Actors
         {
             if (ownedDirectors.Contains(director))
             {
-                QueuePacket(RemoveActorPacket.BuildPacket(director.actorId));
+                QueuePacket(RemoveActorPacket.BuildPacket(director.Id));
                 ownedDirectors.Remove(director);
                 director.RemoveMember(this);
             }
@@ -1858,7 +1858,7 @@ namespace Meteor.Map.Actors
         {
             foreach (Director d in ownedDirectors)
             {
-                if (d.actorId == id)
+                if (d.Id == id)
                     return d;
             }
 
@@ -1873,15 +1873,15 @@ namespace Meteor.Map.Actors
             else
                 return;
 
-            QueuePacket(InventoryBeginChangePacket.BuildPacket(toBeExamined.actorId, true));
+            QueuePacket(InventoryBeginChangePacket.BuildPacket(toBeExamined.Id, true));
             toBeExamined.GetEquipment().SendUpdateAsItemPackage(this, ItemPackage.MAXSIZE_EQUIPMENT_OTHERPLAYER, ItemPackage.EQUIPMENT_OTHERPLAYER);
-            QueuePacket(InventoryEndChangePacket.BuildPacket(toBeExamined.actorId));
+            QueuePacket(InventoryEndChangePacket.BuildPacket(toBeExamined.Id));
         }        
 
         public void SendDataPacket(params object[] parameters)
         {
             List<LuaParam> lParams = LuaUtils.CreateLuaParamList(parameters);
-            SubPacket spacket = GenericDataPacket.BuildPacket(actorId, lParams);
+            SubPacket spacket = GenericDataPacket.BuildPacket(Id, lParams);
             spacket.DebugPrintSubPacket();
             QueuePacket(spacket);
         }
@@ -1905,7 +1905,7 @@ namespace Meteor.Map.Actors
                 return;
 
             List<LuaParam> lParams = LuaUtils.CreateLuaParamList(parameters);
-            SubPacket spacket = KickEventPacket.BuildPacket(actorId, actor.actorId, eventName, 5, lParams);
+            SubPacket spacket = KickEventPacket.BuildPacket(Id, actor.Id, eventName, 5, lParams);
             spacket.DebugPrintSubPacket();
             QueuePacket(spacket);
         }
@@ -1916,27 +1916,27 @@ namespace Meteor.Map.Actors
                 return;
 
             List<LuaParam> lParams = LuaUtils.CreateLuaParamList(parameters);
-            SubPacket spacket = KickEventPacket.BuildPacket(actorId, actor.actorId, eventName, 0, lParams);
+            SubPacket spacket = KickEventPacket.BuildPacket(Id, actor.Id, eventName, 0, lParams);
             spacket.DebugPrintSubPacket();
             QueuePacket(spacket);
         }
 
         public void SetEventStatus(Actor actor, string conditionName, bool enabled, byte type)
         {
-            QueuePacket(SetEventStatusPacket.BuildPacket(actor.actorId, enabled, type, conditionName));
+            QueuePacket(SetEventStatusPacket.BuildPacket(actor.Id, enabled, type, conditionName));
         }       
 
         public void RunEventFunction(string functionName, params object[] parameters)
         {
             List<LuaParam> lParams = LuaUtils.CreateLuaParamList(parameters);
-            SubPacket spacket = RunEventFunctionPacket.BuildPacket(actorId, currentEventOwner, currentEventName, currentEventType, functionName, lParams);
+            SubPacket spacket = RunEventFunctionPacket.BuildPacket(Id, currentEventOwner, currentEventName, currentEventType, functionName, lParams);
             spacket.DebugPrintSubPacket();
             QueuePacket(spacket);
         }
 
         public void EndEvent()
         {
-            SubPacket p = EndEventPacket.BuildPacket(actorId, currentEventOwner, currentEventName, currentEventType);
+            SubPacket p = EndEventPacket.BuildPacket(Id, currentEventOwner, currentEventName, currentEventType);
             p.DebugPrintSubPacket();
             QueuePacket(p);
 
@@ -1948,7 +1948,7 @@ namespace Meteor.Map.Actors
 
         public void BroadcastCountdown(byte countdownLength, ulong syncTime)
         {
-            BroadcastPacket(StartCountdownPacket.BuildPacket(actorId, countdownLength, syncTime, "Go!"), true);
+            BroadcastPacket(StartCountdownPacket.BuildPacket(Id, countdownLength, syncTime, "Go!"), true);
         }
         
         public void SendInstanceUpdate(bool force = false)
@@ -1975,7 +1975,7 @@ namespace Meteor.Map.Actors
             if (IsInParty())
             {
                 Party party = (Party)currentParty;
-                return party.GetLeader() == actorId;
+                return party.GetLeader() == Id;
             }
             else
                 return false;
@@ -2037,7 +2037,7 @@ namespace Meteor.Map.Actors
 
             for (int i = 0; i < partyGroup.members.Count; i++)
             {
-                if (partyGroup.members[i] == actorId)
+                if (partyGroup.members[i] == Id)
                 {
                     partyGroup.members.RemoveAt(i);
                     break;
@@ -2058,8 +2058,8 @@ namespace Meteor.Map.Actors
             chocoboAppearance = appearanceId;
             chocoboName = nameResponse;
 
-            QueuePacket(SetChocoboNamePacket.BuildPacket(actorId, chocoboName));
-            QueuePacket(SetHasChocoboPacket.BuildPacket(actorId, hasChocobo));
+            QueuePacket(SetChocoboNamePacket.BuildPacket(Id, chocoboName));
+            QueuePacket(SetHasChocoboPacket.BuildPacket(Id, hasChocobo));
         }
 
         public void ChangeChocoboAppearance(byte appearanceId)
@@ -2463,7 +2463,7 @@ namespace Meteor.Map.Actors
                         if (target is BattleNpc)
                         {
                             var helpingActorId = ((BattleNpc)target).GetMobMod((uint)MobModifier.CallForHelp);
-                            partyEngaged = this.actorId == helpingActorId || (((BattleNpc)target).GetMobMod((uint)MobModifier.FreeForAll) != 0);
+                            partyEngaged = this.Id == helpingActorId || (((BattleNpc)target).GetMobMod((uint)MobModifier.FreeForAll) != 0);
                         }
 
                         if (!partyEngaged)
@@ -2478,7 +2478,7 @@ namespace Meteor.Map.Actors
                             }
                         }
                     }
-                    else if (target.currentLockedTarget == actorId)
+                    else if (target.currentLockedTarget == Id)
                     {
                         partyEngaged = true;
                     }
@@ -2650,7 +2650,7 @@ namespace Meteor.Map.Actors
 
             //You earn [exp] (+[bonusPercent]%) experience points.
             //In non-english languages there are unique messages for each language, hence the use of ClassExperienceTextIds
-            actionList.Add(new CommandResult(actorId, BattleUtils.ClassExperienceTextIds[classId], 0, (ushort)exp, bonusPercent));
+            actionList.Add(new CommandResult(Id, BattleUtils.ClassExperienceTextIds[classId], 0, (ushort)exp, bonusPercent));
 
             bool leveled = false;
             int diff = MAXEXP[GetLevel() - 1] - charaWork.battleSave.skillPoint[classId - 1];            
@@ -2706,7 +2706,7 @@ namespace Meteor.Map.Actors
                 if (actionList != null)
                 {
                     if (classId == GetCurrentClassOrJob() || jobId == GetCurrentClassOrJob())
-                        actionList.Add(new CommandResult(actorId, 33926, 0, commandId));
+                        actionList.Add(new CommandResult(Id, 33926, 0, commandId));
                 }
             }
         }
@@ -2722,7 +2722,7 @@ namespace Meteor.Map.Actors
 
                 //33909: You attain level [level].
                 if (actionList != null)
-                    actionList.Add(new CommandResult(actorId, 33909, 0, (ushort)charaWork.battleSave.skillLevel[classId - 1]));
+                    actionList.Add(new CommandResult(Id, 33909, 0, (ushort)charaWork.battleSave.skillLevel[classId - 1]));
 
                 EquipAbilitiesAtLevel(classId, GetLevel(), actionList);
             }
@@ -2755,7 +2755,7 @@ namespace Meteor.Map.Actors
         public void SetCurrentJob(byte jobId)
         {
             currentJob = jobId;
-            BroadcastPacket(SetCurrentJobPacket.BuildPacket(actorId, jobId), true);
+            BroadcastPacket(SetCurrentJobPacket.BuildPacket(Id, jobId), true);
             Database.LoadHotbar(this);
             SendCharaExpInfo();
         }
@@ -2966,14 +2966,14 @@ namespace Meteor.Map.Actors
         private void SendTradePackets()
         {
             //Send to self
-            QueuePacket(InventoryBeginChangePacket.BuildPacket(actorId, true));
+            QueuePacket(InventoryBeginChangePacket.BuildPacket(Id, true));
             myOfferings.SendUpdate(this);
-            QueuePacket(InventoryEndChangePacket.BuildPacket(actorId));
+            QueuePacket(InventoryEndChangePacket.BuildPacket(Id));
 
             //Send to other trader
-            otherTrader.QueuePacket(InventoryBeginChangePacket.BuildPacket(actorId, true));
+            otherTrader.QueuePacket(InventoryBeginChangePacket.BuildPacket(Id, true));
             myOfferings.SendUpdateAsItemPackage(otherTrader);
-            otherTrader.QueuePacket(InventoryEndChangePacket.BuildPacket(actorId));
+            otherTrader.QueuePacket(InventoryEndChangePacket.BuildPacket(Id));
         }
 
         public void AcceptTrade(bool accepted)
@@ -2995,9 +2995,9 @@ namespace Meteor.Map.Actors
                         offeredItem.SetNormal();
                 }
 
-                QueuePacket(InventoryBeginChangePacket.BuildPacket(actorId, true));
+                QueuePacket(InventoryBeginChangePacket.BuildPacket(Id, true));
                 myOfferings.SendUpdate(this);
-                QueuePacket(InventoryEndChangePacket.BuildPacket(actorId));
+                QueuePacket(InventoryEndChangePacket.BuildPacket(Id));
             }
 
             isTradeAccepted = false;

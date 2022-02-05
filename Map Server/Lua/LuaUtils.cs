@@ -439,7 +439,7 @@ namespace Meteor.Map
             }
             else if (o is Actor)
             {
-                luaParams.Add(new LuaParam(0x6, ((Actor)o).actorId));
+                luaParams.Add(new LuaParam(0x6, ((Actor)o).Id));
             }
             else if (o is ItemRefParam)
             {

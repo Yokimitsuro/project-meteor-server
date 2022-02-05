@@ -82,7 +82,7 @@ namespace Meteor.Map
                         if (!beginSessionPacket.isLogin)
                             Server.GetWorldManager().DoZoneIn(session.GetActor(), false, session.GetActor().destinationSpawnType);
 
-                        Program.Log.Info("{0} has been added to the session list.", session.GetActor().customDisplayName);
+                        Program.Log.Info("{0} has been added to the session list.", session.GetActor().DisplayName);
 
                         client.FlushQueuedSendPackets();
                         break;
@@ -96,7 +96,7 @@ namespace Meteor.Map
                             session.GetActor().CleanupAndSave(endSessionPacket.destinationZoneId, endSessionPacket.destinationSpawnType, endSessionPacket.destinationX, endSessionPacket.destinationY, endSessionPacket.destinationZ, endSessionPacket.destinationRot);
 
                         Server.GetServer().RemoveSession(session.id);
-                        Program.Log.Info("{0} has been removed from the session list.", session.GetActor().customDisplayName);
+                        Program.Log.Info("{0} has been removed from the session list.", session.GetActor().DisplayName);
 
                         session.QueuePacket(SessionEndConfirmPacket.BuildPacket(session, endSessionPacket.destinationZoneId));
                         client.FlushQueuedSendPackets();
@@ -138,7 +138,7 @@ namespace Meteor.Map
                         }
 
                         if (chatMessage.logType == SendMessagePacket.MESSAGE_TYPE_SAY || chatMessage.logType == SendMessagePacket.MESSAGE_TYPE_SHOUT)
-                            session.GetActor().BroadcastPacket(SendMessagePacket.BuildPacket(session.id, chatMessage.logType, session.GetActor().customDisplayName, chatMessage.message), false);
+                            session.GetActor().BroadcastPacket(SendMessagePacket.BuildPacket(session.id, chatMessage.logType, session.GetActor().DisplayName, chatMessage.message), false);
 
                         break;
                     //Langauge Code (Client safe to send packets to now)
@@ -202,7 +202,7 @@ namespace Meteor.Map
                         if (ownerActor == null)
                         {
                             //Is it your retainer?
-                            if (session.GetActor().currentSpawnedRetainer != null && session.GetActor().currentSpawnedRetainer.actorId == eventStart.ownerActorID)
+                            if (session.GetActor().currentSpawnedRetainer != null && session.GetActor().currentSpawnedRetainer.Id == eventStart.ownerActorID)
                                 ownerActor = session.GetActor().currentSpawnedRetainer;
                             //Is it a instance actor?
                             if (ownerActor == null)
@@ -272,7 +272,7 @@ namespace Meteor.Map
                             ((Character)Server.GetWorldManager().GetActorInWorld(packageRequest.actorID)).SendItemPackage(session.GetActor(), packageRequest.packageId);
                             break;
                         }
-                        if (session.GetActor().GetSpawnedRetainer() != null && session.GetActor().GetSpawnedRetainer().actorId == packageRequest.actorID)
+                        if (session.GetActor().GetSpawnedRetainer() != null && session.GetActor().GetSpawnedRetainer().Id == packageRequest.actorID)
                             session.GetActor().GetSpawnedRetainer().SendItemPackage(session.GetActor(), packageRequest.packageId);
                         break;
                     //Group Created Confirm

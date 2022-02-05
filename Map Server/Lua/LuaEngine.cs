@@ -107,8 +107,8 @@ namespace Meteor.Map.lua
 
         public void AddWaitEventCoroutine(Player player, Coroutine coroutine)
         {
-            if (!mSleepingOnPlayerEvent.ContainsKey(player.actorId))
-                mSleepingOnPlayerEvent.Add(player.actorId, coroutine);
+            if (!mSleepingOnPlayerEvent.ContainsKey(player.Id))
+                mSleepingOnPlayerEvent.Add(player.Id, coroutine);
         }
 
         public void PulseSleepingOnTime(object state)
@@ -149,12 +149,12 @@ namespace Meteor.Map.lua
 
         public void OnEventUpdate(Player player, List<LuaParam> args)
         {
-            if (mSleepingOnPlayerEvent.ContainsKey(player.actorId))
+            if (mSleepingOnPlayerEvent.ContainsKey(player.Id))
             {
                 try
                 {
-                    Coroutine coroutine = mSleepingOnPlayerEvent[player.actorId];
-                    mSleepingOnPlayerEvent.Remove(player.actorId);
+                    Coroutine coroutine = mSleepingOnPlayerEvent[player.Id];
+                    mSleepingOnPlayerEvent.Remove(player.Id);
                     DynValue value = coroutine.Resume(LuaUtils.CreateLuaParamObjectList(args));
                     ResolveResume(player, coroutine, value);
                 }
@@ -400,8 +400,8 @@ namespace Meteor.Map.lua
             }
             else if (target is Quest)
             {
-                string initial = ((Quest)target).actorName.Substring(0, 3);
-                string questName = ((Quest)target).actorName;
+                string initial = ((Quest)target).Name.Substring(0, 3);
+                string questName = ((Quest)target).Name;
                 return root + String.Format(FILEPATH_QUEST, initial, questName);
             }
             else
@@ -640,10 +640,10 @@ namespace Meteor.Map.lua
             lparams.AddRange(eventStart.luaParams);
             lparams.Insert(0, new LuaParam(0, eventStart.eventType));
             lparams.Insert(1, new LuaParam(2, eventStart.eventName));
-            if (mSleepingOnPlayerEvent.ContainsKey(player.actorId))
+            if (mSleepingOnPlayerEvent.ContainsKey(player.Id))
             {
-                Coroutine coroutine = mSleepingOnPlayerEvent[player.actorId];
-                mSleepingOnPlayerEvent.Remove(player.actorId);
+                Coroutine coroutine = mSleepingOnPlayerEvent[player.Id];
+                mSleepingOnPlayerEvent.Remove(player.Id);
 
                 try
                 {
@@ -777,7 +777,7 @@ namespace Meteor.Map.lua
                     {
                         if (permissions > 0 && !player.isGM)
                         {
-                            Program.Log.Info("LuaEngine.RunGMCommand: {0}'s GM level is too low to use command {1}.", player.actorName, cmd);
+                            Program.Log.Info("LuaEngine.RunGMCommand: {0}'s GM level is too low to use command {1}.", player.Name, cmd);
                             return;
                         }
                         // i hate to do this, but cant think of a better way to keep !help
@@ -902,7 +902,7 @@ namespace Meteor.Map.lua
                 return;
             List<SubPacket> SendError = new List<SubPacket>();
             player.SendMessage(SendMessagePacket.MESSAGE_TYPE_SYSTEM_ERROR, "", message);
-            player.QueuePacket(EndEventPacket.BuildPacket(player.actorId, player.currentEventOwner, player.currentEventName, 0));
+            player.QueuePacket(EndEventPacket.BuildPacket(player.Id, player.currentEventOwner, player.currentEventName, 0));
         }
 
     }

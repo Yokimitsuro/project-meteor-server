@@ -137,7 +137,7 @@ namespace Meteor.Map.actors.director
             
             if (wasCompleted)
             {
-                Npc aetheryteNode = CurrentArea.SpawnActor(1200040, String.Format("{0}:warpExit", guildleveOwner.actorName), guildleveOwner.positionX, guildleveOwner.positionY, guildleveOwner.positionZ);
+                Npc aetheryteNode = CurrentArea.SpawnActor(1200040, String.Format("{0}:warpExit", guildleveOwner.Name), guildleveOwner.positionX, guildleveOwner.positionY, guildleveOwner.positionZ);
                 AddMember(aetheryteNode);
 
                 foreach (Actor a in GetPlayerMembers())

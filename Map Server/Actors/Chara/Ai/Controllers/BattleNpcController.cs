@@ -417,8 +417,8 @@ namespace Meteor.Map.actors.chara.ai.controllers
             if (target != owner.target)
             {
                 owner.target = target;
-                owner.currentLockedTarget = target?.actorId ?? Actor.INVALID_ACTORID;
-                owner.currentTarget = target?.actorId ?? Actor.INVALID_ACTORID;
+                owner.currentLockedTarget = target?.Id ?? Actor.INVALID_ACTORID;
+                owner.currentTarget = target?.Id ?? Actor.INVALID_ACTORID;
 
                  foreach (var player in owner.CurrentArea.GetActorsAroundActor<Player>(owner, 50))
                     player.QueuePacket(owner.GetHateTypePacket(player));

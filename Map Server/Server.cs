@@ -153,7 +153,7 @@ namespace Meteor.Map
         {
             foreach (Session s in mSessionList.Values)
             {
-                if (s.GetActor().customDisplayName.ToLower().Equals(name.ToLower()))
+                if (s.GetActor().DisplayName.ToLower().Equals(name.ToLower()))
                     return s;
             }
             return null;
