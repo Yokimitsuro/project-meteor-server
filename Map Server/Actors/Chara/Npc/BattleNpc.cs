@@ -286,7 +286,7 @@ namespace Meteor.Map.Actors
                     //I think this is, or should be odne in DoBattleAction. Packet capture had the message in the same packet as an attack
                     // <actor> defeat/defeats <target>
                     if (actionContainer != null)
-                        actionContainer.AddEXPAction(new CommandResult(actorId, 30108, 0));
+                        actionContainer.AddEXPAction(new CommandResult(Id, 30108, 0));
 
                     if (lastAttacker.currentParty != null && lastAttacker.currentParty is Party)
                     {
@@ -320,7 +320,7 @@ namespace Meteor.Map.Actors
             }
             else
             {
-                var err = String.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", actorId, GetUniqueId(), positionX, positionY, positionZ, CurrentArea.GetName());
+                var err = String.Format("[{0}][{1}] {2} {3} {4} {5} tried to die ded", Id, GetUniqueId(), positionX, positionY, positionZ, CurrentArea.GetName());
                 Program.Log.Error(err);
                 //throw new Exception(err);
             }

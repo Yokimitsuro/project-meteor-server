@@ -31,7 +31,7 @@ function onTrigger(player, argc, animation, regionId, layoutId, maxLayoutId)
 		actorClassId = tonumber(actorClassId);
 		
 		if (actorClassId ~= nil) then		
-			zone = player:GetZone();
+			zone = player.CurrentArea;
 			actor = zone:SpawnActor(actorClassId, "mapobj", pos[1], pos[2], pos[3], tonumber(regionId), tonumber(layoutId));
 			
 			 print("test");

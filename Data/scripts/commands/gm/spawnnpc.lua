@@ -108,7 +108,7 @@ function onTrigger(player, argc, name,  width, height, blockCount)
 		for b = 0, blocks do
             for i = 0, w do
                 for j = 0, h do
-                    local actor = player.GetZone().SpawnActor(2104001, 'ass', x + (i * 1), y, z + (j * 1), rot, 0, 0, true);
+                    local actor = player.CurrentArea:SpawnActor(2104001, 'ass', x + (i * 1), y, z + (j * 1), rot, 0, 0, true);
                     actor.ChangeNpcAppearance(modelIds[name]);
                     actor.SetMaxHP(5000);
                     actor.SetHP(5000);

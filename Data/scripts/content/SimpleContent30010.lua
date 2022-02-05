@@ -14,8 +14,8 @@ function onCreate(starterPlayer, contentArea, director)
 	mob1 = GetWorldManager().SpawnBattleNpcById(3, contentArea);
 	mob2 = GetWorldManager().SpawnBattleNpcById(4, contentArea);
     mob3 = GetWorldManager().SpawnBattleNpcById(5, contentArea);
-	starterPlayer.currentParty:AddMember(papalymo.actorId);
-    starterPlayer.currentParty:AddMember(yda.actorId);
+	starterPlayer.currentParty:AddMember(papalymo.Id);
+    starterPlayer.currentParty:AddMember(yda.Id);
 	starterPlayer:SetMod(modifiersGlobal.MinimumHpLock, 1);
 	
 	

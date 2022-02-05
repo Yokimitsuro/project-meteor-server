@@ -133,7 +133,7 @@ namespace Meteor.Map.Actors
         {
             foreach (Actor a in mStaticActors.Values)
             {
-                if (a.actorName.Equals(name))
+                if (a.Name.Equals(name))
                     return a;
             }
 

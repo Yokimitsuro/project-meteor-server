@@ -46,13 +46,13 @@ function onTrigger(player, argc, command, var1, var2, var3)
                        q2 = GetStaticActor(var1);
                        
                         if q2 ~= nil then 
-                        q3 = q2.actorId;
+                        q3 = q2.Id;
                             message = ("removing quest "..var1);
                             printf(q3);
                             q4 = bit32.band(q3, 0xA0F00000);
                             printf(q4);
                             
-                            --player:RemoveQuest(quest.actorName);
+                            --player:RemoveQuest(quest.Name);
                         end
                     else
                         message = ("remove error: either incorrect ID or quest "..var1.." isn't active on character");

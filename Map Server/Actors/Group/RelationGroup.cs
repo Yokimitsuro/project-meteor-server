@@ -73,8 +73,8 @@ namespace Meteor.Map.actors.group
 
             uint hostId = (uint)((work._globalTemp.host >> 32) & 0xFFFFFFFF);
 
-            groupMembers.Add(new GroupMember(hostId, -1, 0, false, Server.GetServer().GetSession(hostId) != null, Server.GetWorldManager().GetActorInWorld(hostId).customDisplayName));
-            groupMembers.Add(new GroupMember(charaOther, -1, 0, false, Server.GetServer().GetSession(charaOther) != null, Server.GetWorldManager().GetActorInWorld(charaOther).customDisplayName));
+            groupMembers.Add(new GroupMember(hostId, -1, 0, false, Server.GetServer().GetSession(hostId) != null, Server.GetWorldManager().GetActorInWorld(hostId).DisplayName));
+            groupMembers.Add(new GroupMember(charaOther, -1, 0, false, Server.GetServer().GetSession(charaOther) != null, Server.GetWorldManager().GetActorInWorld(charaOther).DisplayName));
             return groupMembers;
         }
 

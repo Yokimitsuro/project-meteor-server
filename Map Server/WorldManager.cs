@@ -838,7 +838,7 @@ namespace Meteor.Map
             //This server does not contain that zoneId
             if (newArea == null)
             {
-                Program.Log.Debug("Request to change to zone not on this server by: {0}.", player.customDisplayName);
+                Program.Log.Debug("Request to change to zone not on this server by: {0}.", player.DisplayName);
                 RequestWorldServerZoneChange(player, destinationZoneId, spawnType, spawnX, spawnY, spawnZ, spawnRotation);
                 return;
             }
@@ -868,7 +868,7 @@ namespace Meteor.Map
             //Delete content if have
             if (player.currentContentGroup != null)
             {
-                player.currentContentGroup.RemoveMember(player.actorId);
+                player.currentContentGroup.RemoveMember(player.Id);
                 player.SetCurrentContentGroup(null);
 
                 if (oldArea is PrivateAreaContent)
@@ -876,8 +876,8 @@ namespace Meteor.Map
             }                 
 
             //Send packets
-            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x2));
+            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x2));
             player.SendZoneInPackets(this, spawnType);
             player.playerSession.ClearInstance();
             player.SendInstanceUpdate();
@@ -908,7 +908,7 @@ namespace Meteor.Map
                 player.rotation = spawnRotation;
 
                 //Send packets
-                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x10));
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
                 player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(spawnType));
 
                 player.playerSession.LockUpdates(false);
@@ -922,7 +922,7 @@ namespace Meteor.Map
             //Content area was null
             if (contentArea == null)
             {
-                Program.Log.Debug("Request to change to content area not on this server by: {0}.", player.customDisplayName);
+                Program.Log.Debug("Request to change to content area not on this server by: {0}.", player.DisplayName);
                 return;
             }
 
@@ -948,8 +948,8 @@ namespace Meteor.Map
             player.SendGameMessage(GetActor(), 34108, 0x20);
 
             //Send packets
-            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x10));
+            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
             player.SendZoneInPackets(this, spawnType);
             player.playerSession.ClearInstance();
             player.SendInstanceUpdate(true);
@@ -977,8 +977,8 @@ namespace Meteor.Map
             //Send packets            
             if (!isLogin)
             {
-                player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x2));
+                player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x2));
             }
 
             player.SendZoneInPackets(this, spawnType);
@@ -1021,7 +1021,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Length];
                     for (int i = 0; i < actors.Length; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x3000000000000000;
@@ -1049,7 +1049,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Count];
                     for (int i = 0; i < actors.Count; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x3000000000000000;
@@ -1077,7 +1077,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Count];
                     for (int i = 0; i < actors.Count; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x2000000000000000;
@@ -1110,11 +1110,11 @@ namespace Meteor.Map
             {                
                 groupIndexId = groupIndexId | 0x0000000000000000;
 
-                RelationGroup group = new RelationGroup(groupIndexId, inviter.actorId, invitee.actorId, 0, groupType);
+                RelationGroup group = new RelationGroup(groupIndexId, inviter.Id, invitee.Id, 0, groupType);
                 mRelationGroups.Add(groupIndexId, group);
                 groupIndexId++;
 
-                group.SendGroupPacketsAll(inviter.actorId, invitee.actorId);
+                group.SendGroupPacketsAll(inviter.Id, invitee.Id);
 
                 return group;
             }
@@ -1150,12 +1150,12 @@ namespace Meteor.Map
                 inviter.SendGameMessage(GetActor(), 25043, 0x20, (object)invitee); //You cannot trade with yourself.
                 return null;
             }
-            else if (GetTradeGroup(inviter.actorId) != null)
+            else if (GetTradeGroup(inviter.Id) != null)
             {
                 inviter.SendGameMessage(GetActor(), 25045, 0x20, (object)invitee); //You may only trade with one person at a time.
                 return null;
             }
-            else if (GetTradeGroup(invitee.actorId) != null)
+            else if (GetTradeGroup(invitee.Id) != null)
             {
                 inviter.SendGameMessage(GetActor(), 25044, 0x20, (object)invitee); //Your target is unable to trade.
                 return null;
@@ -1166,11 +1166,11 @@ namespace Meteor.Map
             {
                 groupIndexId = groupIndexId | 0x0000000000000000;
 
-                TradeGroup group = new TradeGroup(groupIndexId, inviter.actorId, invitee.actorId);
+                TradeGroup group = new TradeGroup(groupIndexId, inviter.Id, invitee.Id);
                 mTradeGroups.Add(groupIndexId, group);
                 groupIndexId++;
 
-                group.SendGroupPacketsAll(inviter.actorId, invitee.actorId);
+                group.SendGroupPacketsAll(inviter.Id, invitee.Id);
 
                 inviter.SendGameMessage(GetActor(), 25101, 0x20, (object)invitee); //You request to trade with X
                 invitee.SendGameMessage(GetActor(), 25037, 0x20, (object)inviter); //X wishes to trade with you
@@ -1212,7 +1212,7 @@ namespace Meteor.Map
 
         public void AcceptTrade(Player invitee)
         {
-            TradeGroup group = GetTradeGroup(invitee.actorId);
+            TradeGroup group = GetTradeGroup(invitee.Id);
 
             if (group == null)
             {
@@ -1233,7 +1233,7 @@ namespace Meteor.Map
 
         public void CancelTradeTooFar(Player inviter)
         {
-            TradeGroup group = GetTradeGroup(inviter.actorId);
+            TradeGroup group = GetTradeGroup(inviter.Id);
 
             if (group == null)
             {
@@ -1252,7 +1252,7 @@ namespace Meteor.Map
 
         public void CancelTrade(Player inviter)
         {
-            TradeGroup group = GetTradeGroup(inviter.actorId);
+            TradeGroup group = GetTradeGroup(inviter.Id);
 
             if (group == null)
             {
@@ -1271,7 +1271,7 @@ namespace Meteor.Map
 
         public void RefuseTrade(Player invitee)
         {
-            TradeGroup group = GetTradeGroup(invitee.actorId);
+            TradeGroup group = GetTradeGroup(invitee.Id);
 
             if (group == null)
             {
@@ -1292,7 +1292,7 @@ namespace Meteor.Map
             if (!p1.IsTradeAccepted() || !p2.IsTradeAccepted())
                 return;
 
-            TradeGroup group = GetTradeGroup(p1.actorId);
+            TradeGroup group = GetTradeGroup(p1.Id);
 
             if (group == null)
             {
@@ -1467,9 +1467,9 @@ namespace Meteor.Map
                     }
                     
                     //TODO: Refactor so that it's not a mess like V
-                    player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                    player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                     originalPackage.SendUpdate();
-                    player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));                   
+                    player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));                   
                 }
             }
             else if (bazaarMode == InventoryItem.MODE_SELL_FSTACK)
@@ -1506,9 +1506,9 @@ namespace Meteor.Map
                         reward.ChangeQuantity(-rewardAmount);
                         finalReward = splitItem;
 
-                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                         originalRewardPackage.SendUpdate();
-                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));
                     }
                     else
                         return ItemPackage.ERROR_SYSTEM;
@@ -1531,9 +1531,9 @@ namespace Meteor.Map
                         seek.ChangeQuantity(-seekAmount);
                         finalSeek = splitItem;
 
-                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                         originalSeekPackage.SendUpdate();
-                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));
                     }
                     else
                         return ItemPackage.ERROR_SYSTEM;
@@ -1545,9 +1545,9 @@ namespace Meteor.Map
                 bazaarPackage.AddItem(finalSeek);
                 finalReward.SetAsOfferTo(bazaarMode, finalSeek);
 
-                player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                 bazaarPackage.SendUpdate();
-                player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));                
+                player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));                
             }            
 
             player.CheckBazaarFlags();
@@ -1603,7 +1603,7 @@ namespace Meteor.Map
         
         public void RequestWorldLinkshellCreate(Player player, string name, ushort crest)
         {
-            SubPacket packet = CreateLinkshellPacket.BuildPacket(player.playerSession, name, crest, player.actorId);
+            SubPacket packet = CreateLinkshellPacket.BuildPacket(player.playerSession, name, crest, player.Id);
             player.QueuePacket(packet);
         }
 

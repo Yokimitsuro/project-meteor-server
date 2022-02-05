@@ -52,7 +52,7 @@ namespace Meteor.Map.actors.group
             }
 
             this.director = director;
-            contentGroupWork._globalTemp.director = (ulong)director.actorId << 32;
+            contentGroupWork._globalTemp.director = (ulong)director.Id << 32;
         }
 
         public void Start()
@@ -67,8 +67,8 @@ namespace Meteor.Map.actors.group
             if (actor == null)
                 return;
             
-            if(!members.Contains(actor.actorId))
-                members.Add(actor.actorId);
+            if(!members.Contains(actor.Id))
+                members.Add(actor.Id);
 
             if (actor is Character)            
                 ((Character)actor).SetCurrentContentGroup(this);

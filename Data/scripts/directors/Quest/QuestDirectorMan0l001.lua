@@ -73,7 +73,7 @@ function onEventStarted(player, director, triggerName)
 	]]
 	
 	man0l0Quest:StartSequence(10);	
-	player:GetZone():ContentFinished();
+	player.CurrentArea:ContentFinished();
 	GetWorldManager():DoZoneChange(player, 230, "PrivateAreaMasterPast", 1, 15, -826.868469, 6, 193.745865, -0.008368492);
 	player:EndEvent();
 end

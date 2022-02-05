@@ -12,10 +12,10 @@ function onEventStarted(player, actor, triggerName, name, arg1, arg2, arg3, acto
 
 	--ActorID Search
 	if (actorId ~= nil) then
-		otherActor = player:GetZone():FindActorInArea(actorId);
+		otherActor = player.CurrentArea):FindActorInArea(actorId);
 	--Name Search
 	elseif (name ~= nil) then
-		otherActor = player:GetZone():FindPCInZone(name);
+		otherActor = player.CurrentArea:FindPCInZone(name);
 	end
 	
 	if (otherActor ~= nil) then

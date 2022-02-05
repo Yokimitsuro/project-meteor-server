@@ -58,7 +58,7 @@ namespace Meteor.Map.Actors
         public NpcSpawnType npcSpawnType;
 
         public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, ushort actorState, uint animationId, string customDisplayName)
-            : base((4 << 28 | spawnedArea.actorId << 19 | ((uint)actorNumber + 5)))  
+            : base((4 << 28 | spawnedArea.Id << 19 | ((uint)actorNumber + 5)))  
         {
             this.positionX = posX;
             this.positionY = posY;
@@ -67,8 +67,8 @@ namespace Meteor.Map.Actors
             this.currentMainState = actorState;
             this.animationId = animationId;
 
-            this.displayNameId = actorClass.displayNameId;
-            this.customDisplayName = customDisplayName;
+            this.LocalizedDisplayName = actorClass.displayNameId;
+            this.DisplayName = customDisplayName;
 
             this.uniqueIdentifier = uniqueId;
 
@@ -119,7 +119,7 @@ namespace Meteor.Map.Actors
         }
 
         public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, uint layout, uint instance)
-            : base((4 << 28 | spawnedArea.actorId << 19 | (uint)actorNumber))
+            : base((4 << 28 | spawnedArea.Id << 19 | (uint)actorNumber))
         {
             this.positionX = posX;
             this.positionY = posY;
@@ -128,7 +128,7 @@ namespace Meteor.Map.Actors
             this.currentMainState = 0;
             this.animationId = 0;
 
-            this.displayNameId = actorClass.displayNameId;
+            this.LocalizedDisplayName = actorClass.displayNameId;
 
             this.uniqueIdentifier = uniqueId;
 
@@ -158,7 +158,7 @@ namespace Meteor.Map.Actors
 
         public SubPacket CreateAddActorPacket()
         {
-            return AddActorPacket.BuildPacket(actorId, 8);
+            return AddActorPacket.BuildPacket(Id, 8);
         }
 
         // actorClassId, [], [], numBattleCommon, [battleCommon], numEventCommon, [eventCommon], args for either initForBattle/initForEvent
@@ -183,7 +183,7 @@ namespace Meteor.Map.Actors
                 lParams = LuaUtils.CreateLuaParamList(classPathFake, false, false, false, false, false, 0xF47F6, false, false, 0, 0);
                 isStatic = true;
                 //ActorInstantiatePacket.BuildPacket(actorId, actorName, classNameFake, lParams).DebugPrintSubPacket();
-                return ActorInstantiatePacket.BuildPacket(actorId, actorName, classNameFake, lParams);
+                return ActorInstantiatePacket.BuildPacket(Id, Name, classNameFake, lParams);
             }
             else
             {
@@ -197,7 +197,7 @@ namespace Meteor.Map.Actors
             }
 
             //ActorInstantiatePacket.BuildPacket(actorId, actorName, className, lParams).DebugPrintSubPacket();
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, lParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, lParams);
         }
 
         public override List<SubPacket> GetSpawnPackets(Player player, ushort spawnType)
@@ -209,7 +209,7 @@ namespace Meteor.Map.Actors
             subpackets.Add(CreateSpawnPositonPacket(0x0));
 
             if (isMapObj)
-                subpackets.Add(SetActorBGPropertiesPacket.BuildPacket(actorId, instance, layout));
+                subpackets.Add(SetActorBGPropertiesPacket.BuildPacket(Id, instance, layout));
             else
                 subpackets.Add(CreateAppearancePacket());
 
@@ -424,7 +424,7 @@ namespace Meteor.Map.Actors
 
         public void PlayMapObjAnimation(Player player, string animationName)
         {
-            player.QueuePacket(PlayBGAnimation.BuildPacket(actorId, animationName));
+            player.QueuePacket(PlayBGAnimation.BuildPacket(Id, animationName));
         }
 
         public void Despawn()
@@ -461,7 +461,7 @@ namespace Meteor.Map.Actors
 
         public override void OnDespawn()
         {
-            CurrentArea.BroadcastPacketAroundActor(this, RemoveActorPacket.BuildPacket(this.actorId));
+            CurrentArea.BroadcastPacketAroundActor(this, RemoveActorPacket.BuildPacket(this.Id));
             QueuePositionUpdate(spawnX, spawnY, spawnZ);
             LuaEngine.CallLuaBattleFunction(this, "onDespawn", this);
         }

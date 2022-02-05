@@ -59,11 +59,11 @@ namespace Meteor.Map.Actors
     class Actor
     {
         public static uint INVALID_ACTORID = 0xC0000000;
-        public uint actorId;
-        public string actorName;
+        public uint Id;
+        public string Name;
 
-        public int displayNameId = -1;
-        public string customDisplayName;
+        public int LocalizedDisplayName = -1;
+        public string DisplayName;
 
         public ushort currentMainState = SetActorStatePacket.MAIN_STATE_PASSIVE;
 
@@ -98,13 +98,13 @@ namespace Meteor.Map.Actors
 
         public Actor(uint actorId)
         {
-            this.actorId = actorId;
+            this.Id = actorId;
         }
 
         public Actor(uint actorId, string actorName, string className, List<LuaParam> classParams)
         {
-            this.actorId = actorId;
-            this.actorName = actorName;
+            this.Id = actorId;
+            this.Name = actorName;
             this.className = className;
             this.classParams = classParams;
 
@@ -143,17 +143,17 @@ namespace Meteor.Map.Actors
 
         public SubPacket CreateAddActorPacket(byte val)
         {
-            return AddActorPacket.BuildPacket(actorId, val);
+            return AddActorPacket.BuildPacket(Id, val);
         }
 
         public SubPacket CreateNamePacket()
         {
-            return SetActorNamePacket.BuildPacket(actorId, customDisplayName != null ? 0 : displayNameId, displayNameId == 0xFFFFFFFF | displayNameId == 0x0 | customDisplayName != null ? customDisplayName : "");
+            return SetActorNamePacket.BuildPacket(Id, DisplayName != null ? 0 : LocalizedDisplayName, LocalizedDisplayName == 0xFFFFFFFF | LocalizedDisplayName == 0x0 | DisplayName != null ? DisplayName : "");
         }
 
         public SubPacket CreateSpeedPacket()
         {
-            return SetActorSpeedPacket.BuildPacket(actorId, moveSpeeds[0], moveSpeeds[1], moveSpeeds[2], moveSpeeds[3]);
+            return SetActorSpeedPacket.BuildPacket(Id, moveSpeeds[0], moveSpeeds[1], moveSpeeds[2], moveSpeeds[3]);
         }
 
         public SubPacket CreateSpawnPositonPacket(ushort spawnType)
@@ -164,18 +164,18 @@ namespace Meteor.Map.Actors
         public SubPacket CreateSpawnPositonPacket(Player player, ushort spawnType)
         {
             //TODO: FIX THIS IF
-            uint playerActorId = player == null ? 0 : player.actorId; //Get Rid
+            uint playerActorId = player == null ? 0 : player.Id; //Get Rid
             SubPacket spawnPacket;
-            if (!spawnedFirstTime && playerActorId == actorId)
-                spawnPacket = SetActorPositionPacket.BuildPacket(actorId, 0, positionX, positionY, positionZ, rotation, 0x1, false);
-            else if (playerActorId == actorId)
-                spawnPacket = SetActorPositionPacket.BuildPacket(actorId, 0xFFFFFFFF, positionX, positionY, positionZ, rotation, spawnType, true);
+            if (!spawnedFirstTime && playerActorId == Id)
+                spawnPacket = SetActorPositionPacket.BuildPacket(Id, 0, positionX, positionY, positionZ, rotation, 0x1, false);
+            else if (playerActorId == Id)
+                spawnPacket = SetActorPositionPacket.BuildPacket(Id, 0xFFFFFFFF, positionX, positionY, positionZ, rotation, spawnType, true);
             else
             {
                 if (this is Player)
-                    spawnPacket = SetActorPositionPacket.BuildPacket(actorId, 0, positionX, positionY, positionZ, rotation, spawnType, false);
+                    spawnPacket = SetActorPositionPacket.BuildPacket(Id, 0, positionX, positionY, positionZ, rotation, spawnType, false);
                 else
-                    spawnPacket = SetActorPositionPacket.BuildPacket(actorId, actorId, positionX, positionY, positionZ, rotation, spawnType, false);
+                    spawnPacket = SetActorPositionPacket.BuildPacket(Id, Id, positionX, positionY, positionZ, rotation, spawnType, false);
             }
 
             //return SetActorPositionPacket.BuildPacket(actorId, -211.895477f, 190.000000f, 29.651011f, 2.674819f, SetActorPositionPacket.SPAWNTYPE_PLAYERWAKE);
@@ -188,7 +188,7 @@ namespace Meteor.Map.Actors
         {
             SubPacket spawnPacket;
 
-            spawnPacket = SetActorPositionPacket.BuildPacket(actorId, 0xFFFFFFFF, positionX, positionY, positionZ, rotation, spawnType, false);
+            spawnPacket = SetActorPositionPacket.BuildPacket(Id, 0xFFFFFFFF, positionX, positionY, positionZ, rotation, spawnType, false);
 
             //return SetActorPositionPacket.BuildPacket(actorId, -211.895477f, 190.000000f, 29.651011f, 2.674819f, SetActorPositionPacket.SPAWNTYPE_PLAYERWAKE);
 
@@ -199,12 +199,12 @@ namespace Meteor.Map.Actors
 
         public SubPacket CreatePositionUpdatePacket()
         {
-            return MoveActorToPositionPacket.BuildPacket(actorId, positionX, positionY, positionZ, rotation, moveState);
+            return MoveActorToPositionPacket.BuildPacket(Id, positionX, positionY, positionZ, rotation, moveState);
         }
 
         public SubPacket CreateStatePacket()
         {
-            return SetActorStatePacket.BuildPacket(actorId, currentMainState, 0);
+            return SetActorStatePacket.BuildPacket(Id, currentMainState, 0);
         }
 
         public List<SubPacket> GetEventConditionPackets()
@@ -218,37 +218,37 @@ namespace Meteor.Map.Actors
             if (eventConditions.talkEventConditions != null)
             {
                 foreach (EventList.TalkEventCondition condition in eventConditions.talkEventConditions)
-                    subpackets.Add(SetTalkEventCondition.BuildPacket(actorId, condition));
+                    subpackets.Add(SetTalkEventCondition.BuildPacket(Id, condition));
             }
 
             if (eventConditions.noticeEventConditions != null)
             {
                 foreach (EventList.NoticeEventCondition condition in eventConditions.noticeEventConditions)
-                    subpackets.Add(SetNoticeEventCondition.BuildPacket(actorId, condition));
+                    subpackets.Add(SetNoticeEventCondition.BuildPacket(Id, condition));
             }
 
             if (eventConditions.emoteEventConditions != null)
             {
                 foreach (EventList.EmoteEventCondition condition in eventConditions.emoteEventConditions)
-                    subpackets.Add(SetEmoteEventCondition.BuildPacket(actorId, condition));
+                    subpackets.Add(SetEmoteEventCondition.BuildPacket(Id, condition));
             }
 
             if (eventConditions.pushWithCircleEventConditions != null)
             {
                 foreach (EventList.PushCircleEventCondition condition in eventConditions.pushWithCircleEventConditions)
-                    subpackets.Add(SetPushEventConditionWithCircle.BuildPacket(actorId, condition));
+                    subpackets.Add(SetPushEventConditionWithCircle.BuildPacket(Id, condition));
             }
 
             if (eventConditions.pushWithFanEventConditions != null)
             {
                 foreach (EventList.PushFanEventCondition condition in eventConditions.pushWithFanEventConditions)
-                    subpackets.Add(SetPushEventConditionWithFan.BuildPacket(actorId, condition));
+                    subpackets.Add(SetPushEventConditionWithFan.BuildPacket(Id, condition));
             }
 
             if (eventConditions.pushWithBoxEventConditions != null)
             {
                 foreach (EventList.PushBoxEventCondition condition in eventConditions.pushWithBoxEventConditions)
-                    subpackets.Add(SetPushEventConditionWithTriggerBox.BuildPacket(actorId, condition));
+                    subpackets.Add(SetPushEventConditionWithTriggerBox.BuildPacket(Id, condition));
             }
 
             return subpackets;
@@ -265,37 +265,37 @@ namespace Meteor.Map.Actors
             if (eventConditions.talkEventConditions != null)
             {
                 foreach (EventList.TalkEventCondition condition in eventConditions.talkEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, talkEnabled, 1, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, talkEnabled, 1, condition.conditionName));
             }
 
             if (eventConditions.noticeEventConditions != null)
             {
                 foreach (EventList.NoticeEventCondition condition in eventConditions.noticeEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, noticeEnabled, 5, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, noticeEnabled, 5, condition.conditionName));
             }
 
             if (eventConditions.emoteEventConditions != null)
             {
                 foreach (EventList.EmoteEventCondition condition in eventConditions.emoteEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, emoteEnabled, 3, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, emoteEnabled, 3, condition.conditionName));
             }
 
             if (eventConditions.pushWithCircleEventConditions != null)
             {
                 foreach (EventList.PushCircleEventCondition condition in eventConditions.pushWithCircleEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
             }
 
             if (eventConditions.pushWithFanEventConditions != null)
             {
                 foreach (EventList.PushFanEventCondition condition in eventConditions.pushWithFanEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
             }
 
             if (eventConditions.pushWithBoxEventConditions != null)
             {
                 foreach (EventList.PushBoxEventCondition condition in eventConditions.pushWithBoxEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(actorId, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
             }
 
             return subpackets;
@@ -303,17 +303,17 @@ namespace Meteor.Map.Actors
 
         public SubPacket CreateIsZoneingPacket()
         {
-            return SetActorIsZoningPacket.BuildPacket(actorId, false);
+            return SetActorIsZoningPacket.BuildPacket(Id, false);
         }
 
         public virtual SubPacket CreateScriptBindPacket(Player player)
         {
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, classParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, classParams);
         }
 
         public virtual SubPacket CreateScriptBindPacket()
         {
-            return ActorInstantiatePacket.BuildPacket(actorId, actorName, className, classParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name, className, classParams);
         }
 
         public virtual List<SubPacket> GetSpawnPackets(Player player, ushort spawnType)
@@ -357,7 +357,7 @@ namespace Meteor.Map.Actors
             initProperties.AddByte(0x2138FD71, 1);
             initProperties.AddByte(0xFBFBCFB1, 1);
             initProperties.AddTarget();
-            packets.Add(initProperties.BuildPacket(actorId));
+            packets.Add(initProperties.BuildPacket(Id));
             return packets;
         }
 
@@ -367,12 +367,12 @@ namespace Meteor.Map.Actors
             if (actorObj == null)
                 return false;
             else
-                return actorId == actorObj.actorId;
+                return Id == actorObj.Id;
         }
 
         public string GetName()
         {
-            return actorName;
+            return Name;
         }
 
         public string GetClassName()
@@ -473,22 +473,22 @@ namespace Meteor.Map.Actors
 
                 if ((updateFlags & ActorUpdateFlags.Speed) != 0)
                 {
-                    packets.Add(SetActorSpeedPacket.BuildPacket(actorId, moveSpeeds[0], moveSpeeds[1], moveSpeeds[2], moveSpeeds[3]));
+                    packets.Add(SetActorSpeedPacket.BuildPacket(Id, moveSpeeds[0], moveSpeeds[1], moveSpeeds[2], moveSpeeds[3]));
                 }
 
                 if ((updateFlags & ActorUpdateFlags.Name) != 0)
                 {
-                    packets.Add(SetActorNamePacket.BuildPacket(actorId, displayNameId, customDisplayName));
+                    packets.Add(SetActorNamePacket.BuildPacket(Id, LocalizedDisplayName, DisplayName));
                 }
 
                 if ((updateFlags & ActorUpdateFlags.State) != 0)
                 {
-                    packets.Add(SetActorStatePacket.BuildPacket(actorId, currentMainState, 0x3B));
+                    packets.Add(SetActorStatePacket.BuildPacket(Id, currentMainState, 0x3B));
                 }
 
                 if ((updateFlags & ActorUpdateFlags.SubState) != 0)
                 {
-                    packets.Add(SetActorSubStatePacket.BuildPacket(actorId, currentSubState));
+                    packets.Add(SetActorSubStatePacket.BuildPacket(Id, currentSubState));
                 }
 
                 updateFlags = ActorUpdateFlags.None;
@@ -538,7 +538,7 @@ namespace Meteor.Map.Actors
             uint zoneId = CurrentArea.ZoneId;
             int privLevel = CurrentArea.GetPrivateAreaType();
 
-            actorName = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
+            Name = String.Format("{0}_{1}_{2}@{3:X3}{4:X2}", className, zoneName, classNumber, zoneId, privLevel);
         }
 
         public bool SetWorkValue(Player player, string name, string uiFunc, object value)
@@ -594,7 +594,7 @@ namespace Meteor.Map.Actors
                         SetActorPropetyPacket changeProperty = new SetActorPropetyPacket(uiFunc);
                         changeProperty.AddProperty(this, name);
                         changeProperty.AddTarget();
-                        SubPacket subpacket = changeProperty.BuildPacket(player.actorId);
+                        SubPacket subpacket = changeProperty.BuildPacket(player.Id);
                         player.playerSession.QueuePacket(subpacket);
                         subpacket.DebugPrintSubPacket();
                         return true;
@@ -612,7 +612,7 @@ namespace Meteor.Map.Actors
                         SetActorPropetyPacket changeProperty = new SetActorPropetyPacket(uiFunc);
                         changeProperty.AddProperty(this, name);
                         changeProperty.AddTarget();
-                        SubPacket subpacket = changeProperty.BuildPacket(player.actorId);
+                        SubPacket subpacket = changeProperty.BuildPacket(player.Id);
                         player.playerSession.QueuePacket(subpacket);
                         subpacket.DebugPrintSubPacket();
                         return true;
@@ -655,7 +655,7 @@ namespace Meteor.Map.Actors
             rotation = rot;
 
             // todo: handle zone?
-            CurrentArea.BroadcastPacketAroundActor(this, MoveActorToPositionPacket.BuildPacket(actorId, x, y, z, rot, moveState));
+            CurrentArea.BroadcastPacketAroundActor(this, MoveActorToPositionPacket.BuildPacket(Id, x, y, z, rot, moveState));
         }
 
         public void LookAt(Actor actor)
@@ -666,7 +666,7 @@ namespace Meteor.Map.Actors
             }
             else
             {
-                Program.Log.Error("[{0}][{1}] Actor.LookAt() unable to find actor!", actorId, actorName);
+                Program.Log.Error("[{0}][{1}] Actor.LookAt() unable to find actor!", Id, Name);
             }
         }
 
@@ -708,7 +708,7 @@ namespace Meteor.Map.Actors
         {
             if (target == null)
             {
-                Program.Log.Error("[{0}][{1}] IsFacing no target!", actorId, actorName);
+                Program.Log.Error("[{0}][{1}] IsFacing no target!", Id, Name);
                 return false;
             }
 
@@ -746,7 +746,7 @@ namespace Meteor.Map.Actors
         {
             if (target == null)
             {
-                Program.Log.Error(String.Format("[{0} {1}] FindRandomPointAroundTarget: no target found!", this.actorId, this.customDisplayName));
+                Program.Log.Error(String.Format("[{0} {1}] FindRandomPointAroundTarget: no target found!", this.Id, this.DisplayName));
                 return GetPosAsVector3();
             }
             return FindRandomPoint(target.positionX, target.positionY, target.positionZ, minRadius, maxRadius);
@@ -762,11 +762,11 @@ namespace Meteor.Map.Actors
         {
             if (className != null)
             {
-                return string.Format("{0} [0x{1:X}]", className, actorId);
+                return string.Format("{0} [0x{1:X}]", className, Id);
             }
             else
             {
-                return string.Format("Unknown [0x{0:X}]", actorId);
+                return string.Format("Unknown [0x{0:X}]", Id);
             }
         }
     }

@@ -18,7 +18,7 @@ function onEventStarted(player, actor, triggerName, rewardItem, seekItemOrCost, 
 	
 	--Get the bazaar actor
 	if (bazaarActorId ~= nil) then
-		bazaarActor = player:GetZone():FindActorInArea(bazaarActorId);		
+		bazaarActor = player.CurrentArea:FindActorInArea(bazaarActorId);		
 	end
 	
 	--Abort if no actor

@@ -13,9 +13,9 @@ function onEventStarted(player, actor, triggerName, name, arg1, arg2, arg3, baza
 	local bazaarActor = nil;
 
 	if (name ~= nil) then
-		bazaarActor = player:GetZone():FindPCInZone(name);
+		bazaarActor = player.CurrentArea:FindPCInZone(name);
 	elseif (bazaarActorId ~= nil) then
-		bazaarActor = player:GetZone():FindActorInArea(bazaarActorId);
+		bazaarActor = player.CurrentArea:FindActorInArea(bazaarActorId);
 	end
 	
 	if (bazaarActor ~= nil) then
