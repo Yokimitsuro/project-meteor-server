@@ -917,7 +917,7 @@ namespace Meteor.Map.Actors
 
         public void ChangeMusic(ushort musicId, ushort musicTrackMode)
         {
-            QueuePacket(SetMusicPacket.BuildPacket(actorId, musicId, musicTrackMode));
+            QueuePacket(SetMusicPacket.BuildPacket(Id, musicId, musicTrackMode));
         }
 
         
