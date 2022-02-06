@@ -39,6 +39,9 @@ using Meteor.Map.actors.chara.ai;
 using Meteor.Map.actors.chara.ai.controllers;
 using Meteor.Map.DataObjects;
 using Meteor.Map.actors.chara.player;
+using Meteor.Map.Actors.Chara;
+using Meteor.Map.dataobjects.chara;
+using Meteor.Map.actors.chara;
 
 namespace Meteor.Map.lua
 {
@@ -69,12 +72,16 @@ namespace Meteor.Map.lua
             
             UserData.RegisterType<LuaEngine>();
             UserData.RegisterType<Player>();
+            UserData.RegisterType<CharaWork>();
+            UserData.RegisterType<ParameterSave>();
+            UserData.RegisterType<PlayerWork>();
             UserData.RegisterType<Command>();
             UserData.RegisterType<Npc>();
             UserData.RegisterType<Quest>();
             UserData.RegisterType<Zone>();
             UserData.RegisterType<InventoryItem>();
             UserData.RegisterType<ItemPackage>();
+            UserData.RegisterType<ReferencedItemPackage>();
             UserData.RegisterType<PrivateArea>();
             UserData.RegisterType<PrivateAreaContent>();
             UserData.RegisterType<Director>();

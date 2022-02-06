@@ -1550,23 +1550,20 @@ namespace Meteor.Map.Actors
             }
         }
 
-        public void ReplaceQuest(uint oldId, uint newId)
+        public void ReplaceQuest(Quest oldQuest, string questCode)
         {
-            if (HasQuest(oldId))
+            for (int i = 0; i < questScenario.Length; i++)
             {
-                for (int i = 0; i < questScenario.Length; i++)
+                if (questScenario[i] != null && questScenario[i].Equals(oldQuest))
                 {
-                    if (questScenario[i] != null && questScenario[i].GetQuestId() == oldId)
-                    {
-                        Quest baseQuest = (Quest) Server.GetStaticActors((0xA0F00000 | newId));
-                        playerWork.questScenario[i] = (0xA0F00000 | newId);
-                        questScenario[i] = new Quest(this, baseQuest);
-                        Database.SaveQuest(this, questScenario[i]);
-                        SendQuestClientUpdate(i);
-                        break;
-                    }
+                    Quest baseQuest = (Quest) Server.GetStaticActors(questCode);
+                    questScenario[i] = new Quest(this, baseQuest);
+                    playerWork.questScenario[i] = questScenario[i].Id;
+                    Database.SaveQuest(this, questScenario[i]);
+                    SendQuestClientUpdate(i);
+                    break;
                 }
-            }
+            }            
         }
 
         public bool CanAcceptQuest(string name)
@@ -1636,6 +1633,11 @@ namespace Meteor.Map.Actors
             }
 
             return false;
+        }
+
+        public bool HasQuest(Quest quest)
+        {
+            return HasQuest(quest.className);
         }
 
         public bool HasGuildleve(uint id)

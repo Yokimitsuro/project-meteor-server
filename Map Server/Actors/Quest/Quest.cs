@@ -51,6 +51,24 @@ namespace Meteor.Map.Actors
                 this.isEmoteEnabled = isEmoteEnabled;
                 this.isPushEnabled = isPushEnabled;
             }
+
+            public bool IsChanged(byte flagType, bool isTalkEnabled, bool isPushEnabled, bool isEmoteEnabled, bool isSpawned)
+            {
+                return flagType != this.questFlagType
+                    || isTalkEnabled != this.isTalkEnabled
+                    || isPushEnabled != this.isPushEnabled
+                    || isEmoteEnabled != this.isEmoteEnabled
+                    || isSpawned != this.isSpawned;
+            }
+
+            public void Update(byte flagType, bool isTalkEnabled, bool isPushEnabled, bool isEmoteEnabled, bool isSpawned)
+            {
+                this.questFlagType = flagType;
+                this.isSpawned = isSpawned;
+                this.isTalkEnabled = isTalkEnabled;
+                this.isEmoteEnabled = isEmoteEnabled;
+                this.isPushEnabled = isPushEnabled;
+            }
         }
 
         private struct QuestData
@@ -73,65 +91,44 @@ namespace Meteor.Map.Actors
         private Player Owner;
         private ushort currentSequence;
         private QuestData data = new QuestData();
-        private Dictionary<uint, ENpcQuestInstance> ActiveENpcs = new Dictionary<uint, ENpcQuestInstance>();
+        private bool dataDirty = false;
+        private Dictionary<uint, ENpcQuestInstance> CurrentENPCs = new Dictionary<uint, ENpcQuestInstance>();
+        private Dictionary<uint, ENpcQuestInstance> OldENPCs = new Dictionary<uint, ENpcQuestInstance>();
 
-        public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isEmoteEnabled = false, bool isPushEnabled = false, bool isSpawned = false)
+        public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isPushEnabled = false, bool isEmoteEnabled = false, bool isSpawned = false)
         {
-            if (ActiveENpcs.ContainsKey(classId))
-                return;
+            ENpcQuestInstance instanceUpdated = null; 
 
-            ENpcQuestInstance instance = new ENpcQuestInstance(classId, flagType, isSpawned, isTalkEnabled, isEmoteEnabled, isPushEnabled);
-            ActiveENpcs.Add(classId, instance);           
-            Owner.playerSession.UpdateQuestNpcInInstance(instance);
-        }
-        
-        public void ClearENpcs()
-        {
-            foreach (ENpcQuestInstance instance in ActiveENpcs.Values)            
-                Owner.playerSession.UpdateQuestNpcInInstance(instance, true);                
-            
-            ActiveENpcs.Clear();
-        }
-
-        public void UpdateENpc(uint classId, ENpcProperty property, object value)
-        {
-            if (!ActiveENpcs.ContainsKey(classId))
-                return;
-
-            ENpcQuestInstance instance = ActiveENpcs[classId];
-
-            switch (property)
+            if (OldENPCs.ContainsKey(classId))
             {
-                case ENpcProperty.QuestFlag:                    
-                    if (value is double)
-                        instance.questFlagType = (byte)(double)value;
-                    else if (value is int)
-                        instance.questFlagType = (byte)value;
-                    break;
-                case ENpcProperty.CanTalk:
-                    instance.isTalkEnabled = (bool)value;
-                    break;
-                case ENpcProperty.CanPush:
-                    instance.isPushEnabled = (bool)value;
-                    break;
-                case ENpcProperty.CanEmote:
-                    instance.isEmoteEnabled = (bool)value;
-                    break;
+                if (OldENPCs[classId].IsChanged(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned))
+                {
+                    instanceUpdated = OldENPCs[classId];
+                    instanceUpdated.Update(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned);
+                    CurrentENPCs.Add(classId, instanceUpdated);
+                }
+                OldENPCs.Remove(classId);
+            }
+            else
+            {
+                instanceUpdated = new ENpcQuestInstance(classId, flagType, isSpawned, isTalkEnabled, isEmoteEnabled, isPushEnabled);
+                CurrentENPCs.Add(classId, instanceUpdated);
             }
 
-            Owner.playerSession.UpdateQuestNpcInInstance(instance, false);
+            if (instanceUpdated != null)
+                Owner.playerSession.UpdateQuestNpcInInstance(instanceUpdated);
         }
-
+        
         public ENpcQuestInstance GetENpcInstance(uint classId)
         {
-            if (ActiveENpcs.ContainsKey(classId))
-                return ActiveENpcs[classId];
+            if (CurrentENPCs.ContainsKey(classId))
+                return CurrentENPCs[classId];
             return null;
         }
 
         public void OnTalk(Player caller, Npc npc)
         {        
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onTalk", true, npc);            
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onTalk", true, npc);
         }
 
         public void OnEmote(Player caller, Npc npc, Command command)
@@ -154,11 +151,25 @@ namespace Meteor.Map.Actors
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNpcLS", true, npcLSId);
         }
 
+        public void UpdateENPCs()
+        {
+            if (dataDirty)
+            {
+                OldENPCs = CurrentENPCs;
+                CurrentENPCs = new Dictionary<uint, ENpcQuestInstance>();
+                LuaEngine.GetInstance().CallLuaFunctionForReturn(Owner, this, "onSequence", false, currentSequence);
+                foreach (var enpc in OldENPCs)
+                    Owner.playerSession.UpdateQuestNpcInInstance(enpc.Value);
+                OldENPCs = null;
+                dataDirty = false;
+            }
+        }
+
         public bool IsQuestENPC(Player caller, Npc npc)
         {
             List<LuaParam> returned = LuaEngine.GetInstance().CallLuaFunctionForReturn(caller, this, "IsQuestENPC", true, npc, this);
             bool scriptReturned = returned != null && returned.Count != 0 && returned[0].typeID == 3;
-            return scriptReturned || ActiveENpcs.ContainsKey(npc.GetActorClassId());
+            return scriptReturned || CurrentENPCs.ContainsKey(npc.GetActorClassId());
         }
 
 
@@ -195,7 +206,8 @@ namespace Meteor.Map.Actors
                 Owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
 
             currentSequence = sequence;
-            LuaEngine.GetInstance().CallLuaFunction(Owner, this, "onSequence", false, currentSequence);
+            dataDirty = true;
+            UpdateENPCs();
         }
 
         public void ClearData()
@@ -206,70 +218,88 @@ namespace Meteor.Map.Actors
         public void SetFlag(int index)
         {
             if (index >= 0 && index < 32)
+            {
                 data.flags |= (uint)(1 << index);
+                dataDirty = true;
+            }
         }
 
         public void ClearFlag(int index)
         {
             if (index >= 0 && index < 32)
+            {
                 data.flags &= (uint)~(1 << index);
+                dataDirty = true;
+            }
         }
 
         public void IncCounter(int num)
         {
+            dataDirty = true;
+
             switch (num)
             {
                 case 0:
                     data.counter1++;
-                    break;
+                    return;
                 case 1:
                     data.counter2++;
-                    break;
+                    return;
                 case 2:
                     data.counter3++;
-                    break;
+                    return;
                 case 3:
                     data.counter4++;
-                    break;
-            }    
+                    return;
+            }
+
+            dataDirty = false;
         }
 
         public void DecCounter(int num)
         {
+            dataDirty = true;
+
             switch (num)
             {
                 case 0:
                     data.counter1--;
-                    break;
+                    return;
                 case 1:
                     data.counter2--;
-                    break;
+                    return;
                 case 2:
                     data.counter3--;
-                    break;
+                    return;
                 case 3:
                     data.counter4--;
-                    break;
+                    return;
             }
+
+            dataDirty = false;
         }
 
         public void SetCounter(int num, ushort value)
         {
+            dataDirty = true;
+
             switch (num)
             {
                 case 0:
                     data.counter1 = value;
-                    break;
+                    return;
                 case 1:
                     data.counter2 = value;
-                    break;
+                    return;
                 case 2:
                     data.counter3 = value;
-                    break;
+                    return;
                 case 3:
                     data.counter4 = value;
-                    break;
+                    return;
             }
+
+            dataDirty = false;
         }
 
         public bool GetFlag(int index)
