@@ -46,7 +46,7 @@ namespace Meteor.Map.actors.director
         private Coroutine currentCoroutine;
 
         public Director(uint id, Area zone, string directorPath, bool hasContentGroup, params object[] args)
-            : base((6 << 28 | zone.CurrentArea.ZoneId << 19 | (uint)id))
+            : base((6 << 28 | zone.ZoneId << 19 | (uint)id + 2))
         {
             directorId = id;
             CurrentArea = zone;

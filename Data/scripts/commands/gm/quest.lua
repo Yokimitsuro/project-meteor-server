@@ -18,6 +18,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
     local sender = "[quest] ";
     local message = "Error";
     
+			print(tostring(argc));
     if player then
         if argc == 2 then
             if command == "add" or command == "give" or command == "+" then
@@ -58,18 +59,44 @@ function onTrigger(player, argc, command, var1, var2, var3)
                         message = ("remove error: either incorrect ID or quest "..var1.." isn't active on character");
                     end
                 end
+			elseif command == "info" then
+				if tonumber(var1) then	
+                    if player:HasQuest(tonumber(var1)) then
+                        quest = player:GetQuest(tonumber(var1));										
+
+						local flagStr = "";
+						for i=0,31,1 do 
+							if (quest:GetFlag(i)) then
+								flagStr = flagStr .. "O";
+							else
+								flagStr = flagStr .. "X";
+							end
+							if (i == 15) then
+								flagStr = flagStr .. "\n";
+							end
+						end
+						
+						message = string.format("\nInfo for quest %s [%d]\n", quest.Name, quest:GetQuestId());
+						message = message .. string.format("Current Sequence: %d\n", quest:getSequence());
+						message = message .. string.format("Flags: \n%s\n", flagStr)
+						message = message .. string.format("Counters: %d,%d,%d,%d", quest:getCounter(1), quest:getCounter(2), quest:getCounter(3), quest:getCounter(4));
+                    else
+                        message = ("Quest not active: "..var1);
+                    end
+                else					
+                    message = ("error: invalid parameters used");
+                end
             else
                 message = ("error: command "..command.." not recognized");
-            end
-                
+            end                
         elseif argc == 3 then
-            if command == "phase" or command == "step" then
+            if command == "seq" or command == "sequence" then
                 if (tonumber(var1) and tonumber(var2)) ~= nil then
                     if player:HasQuest(tonumber(var1)) == true then
-                        player:GetQuest(tonumber(var1)):NextPhase(tonumber(var2));
-                        message = ("changing phase of quest "..var1.." to "..var2);
+                        player:GetQuest(tonumber(var1)):StartSequence(tonumber(var2));
+                        message = ("changing sequence of quest "..var1.." to "..var2);
                     else
-                        message = ("phase error: either incorrect ID or quest "..var1.." isn't active on character");
+                        message = ("sequence error: either incorrect ID or quest "..var1.." isn't active on character");
                     end
                 else
                     message = ("error: invalid parameters used");
@@ -85,13 +112,13 @@ function onTrigger(player, argc, command, var1, var2, var3)
                     flagvar = (tonumber(var2));
                     boolvar = 0;              
                     
-                    if var3 == "true" or var3 == "1" or var3 == "on" then
+                    if var3 == "true" or var3 == "1" or var3 == "on" or var3 == "O" then
                         boolvar = true;                       
-                    elseif var3 == "false" or var3 == "0" or var3 == "off" then
+                    elseif var3 == "false" or var3 == "0" or var3 == "off" or var3 == "X" then
                         boolvar = false;
                     elseif var3 == "flip" or var3 == "toggle" then
                         if player:HasQuest(questvar) == true then
-                            boolvar = not player:GetQuest(questvar):GetQuestFlag(flagvar);
+                            boolvar = not player:GetQuest(questvar):GetFlag(flagvar);
                         end
                     else
                         message = ("error: flag: boolean not recognized");
@@ -99,10 +126,15 @@ function onTrigger(player, argc, command, var1, var2, var3)
                         return;
                     end
                     
-                    var4 =  player:GetQuest(questvar):GetQuestFlag(flagvar);
+                    var4 =  player:GetQuest(questvar):GetFlag(flagvar);
                     
                     if var4 ~= boolvar then
-                        player:GetQuest(questvar):SetQuestFlag(flagvar, boolvar);
+						if (boolvar == true) then
+							player:GetQuest(questvar):SetFlag(flagvar);
+						else
+							player:GetQuest(questvar):ClearFlag(flagvar);
+						end
+                        player:GetQuest(questvar):UpdateENPCs();
                         player:GetQuest(questvar):SaveData();	
                         if boolvar == true then
                             message = ("changing flag "..tonumber(var2).." to true on quest "..questvar);
@@ -112,6 +144,18 @@ function onTrigger(player, argc, command, var1, var2, var3)
                     else
                         message = ("error: flag "..flagvar.." is already set to that state on quest "..questvar);
                     end    
+                else
+                    message = ("error: command "..command.." not recognized");
+                end
+			elseif command == "counter" then
+                if tonumber(var1) and (tonumber(var2) >= 0 and tonumber(var2) <= 4) then
+                    questvar = tonumber(var1);
+                    index = (tonumber(var2));
+                    
+					player:GetQuest(questvar):SetCounter(index, tonumber(var3));
+					player:GetQuest(questvar):UpdateENPCs();
+					player:GetQuest(questvar):SaveData();	
+					message = ("changing counter "..tonumber(var2).." to "..var3);
                 else
                     message = ("error: command "..command.." not recognized");
                 end

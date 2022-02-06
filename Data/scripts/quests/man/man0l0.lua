@@ -63,9 +63,6 @@ function onFinish(player, quest)
 end
 
 function onSequence(player, quest, sequence)
-	quest:ClearENpcs();
-	quest:ClearData();
-	
 	if (sequence == SEQ_000) then
 		-- Setup states incase we loaded in.
 		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
@@ -73,7 +70,7 @@ function onSequence(player, quest, sequence)
 		local babyfaceFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
 		local rostnsthalCanPush = not quest:GetFlag(FLAG_SEQ000_MINITUT0);
 		local exitCanPush = quest:GetFlags() == 0xF;
-		local exitFlag = quest:GetFlags() == 0xF and QFLAG_PLATE or QFLAG_NONE;		
+		local exitFlag = quest:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;		
 		
 		quest:AddENpc(WELLTRAVELED_MERCHANT);
 		quest:AddENpc(TIPSY_ADVENTURER);
@@ -90,7 +87,7 @@ function onSequence(player, quest, sequence)
 		quest:AddENpc(LANKY_TRAVELER);
 		quest:AddENpc(GRINNING_ADVENTURER);
 		quest:AddENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
-		quest:AddENpc(EXIT_TRIGGER, exitFlag, false, false, exitCanPush);
+		quest:AddENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
 	elseif (sequence == SEQ_005) then
 	elseif (sequence == SEQ_010) then		
 		quest:AddENpc(HOB);
@@ -102,7 +99,7 @@ function onSequence(player, quest, sequence)
 		quest:AddENpc(WELLTRAVELED_MERCHANT);
 		quest:AddENpc(VOLUPTUOUS_VIXEN);
 		quest:AddENpc(LANKY_TRAVELER);
-		quest:AddENpc(PRIVAREA_PAST_EXIT, QFLAG_NONE, false, false, true);
+		quest:AddENpc(PRIVAREA_PAST_EXIT, QFLAG_NONE, false, true);
 	end
 end
 
@@ -115,6 +112,8 @@ function onTalk(player, quest, npc)
 	elseif (sequence == SEQ_010) then
 		seq010_onTalk(player, quest, npc, classId);		
 	end
+	
+	quest:UpdateENPCs();
 end
 
 function onPush(player, quest, npc)
@@ -138,6 +137,8 @@ function onPush(player, quest, npc)
 			end
 		end
 	end
+	
+	quest:UpdateENPCs();
 end
 
 function onNotice(player, quest, target)
@@ -147,7 +148,8 @@ function onNotice(player, quest, target)
 		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ");		
 	end
 	
-	player:EndEvent();
+	player:EndEvent();	
+	quest:UpdateENPCs();
 end
 
 function seq000_onTalk(player, quest, npc, classId)
@@ -162,7 +164,6 @@ function seq000_onTalk(player, quest, npc, classId)
 	elseif (classId == BABYFACED_ADVENTURER) then
 		if (not quest:GetFlag(FLAG_SEQ000_MINITUT3)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini003");
-			quest:UpdateENpc(BABYFACED_ADVENTURER, ENPC_PROP_QFLAG, QFLAG_NONE);
 			quest:SetFlag(FLAG_SEQ000_MINITUT3);
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent000_8");
@@ -178,7 +179,6 @@ function seq000_onTalk(player, quest, npc, classId)
 	elseif (classId == VOLUPTUOUS_VIXEN) then
 		if (not quest:GetFlag(FLAG_SEQ000_MINITUT2)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini002");
-			quest:UpdateENpc(VOLUPTUOUS_VIXEN, ENPC_PROP_QFLAG, QFLAG_NONE);
 			quest:SetFlag(FLAG_SEQ000_MINITUT2);
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent000_13");
@@ -195,25 +195,15 @@ function seq000_onTalk(player, quest, npc, classId)
 		-- Handle the talk tutorial after the push one.
 		if (not quest:GetFlag(FLAG_SEQ000_MINITUT0)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal003");
-			quest:SetFlag(FLAG_SEQ000_MINITUT0);
-			quest:UpdateENpc(ROSTNSTHAL, ENPC_PROP_CAN_PUSH, false);
-			quest:UpdateENpc(ROSTNSTHAL, ENPC_PROP_QFLAG, QFLAG_PLATE);
-			quest:UpdateENpc(VOLUPTUOUS_VIXEN, ENPC_PROP_QFLAG, QFLAG_PLATE);
-			quest:UpdateENpc(BABYFACED_ADVENTURER, ENPC_PROP_QFLAG, QFLAG_PLATE);			
+			quest:SetFlag(FLAG_SEQ000_MINITUT0);		
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini001");
 			if (not quest:GetFlag(FLAG_SEQ000_MINITUT1)) then
-				quest:UpdateENpc(ROSTNSTHAL, ENPC_PROP_QFLAG, QFLAG_NONE);
 				quest:SetFlag(FLAG_SEQ000_MINITUT1);
 			end
 		end
 	end	
 		
-	if (quest:GetFlags() == 0xF) then
-		quest:UpdateENpc(EXIT_TRIGGER, ENPC_PROP_CAN_PUSH, true);
-		quest:UpdateENpc(EXIT_TRIGGER, ENPC_PROP_QFLAG, QFLAG_MAP);
-	end
-	
 	player:EndEvent();
 end
 
@@ -233,7 +223,7 @@ function seq010_onTalk(player, quest, npc, classId)
 	elseif (classId == HOB) then
 		local choice = callClientFunction(player, "delegateEvent", player, quest, "processEvent020_9");
 		if (choice == 1) then
-			quest:completeAndReplace(110002);
+			player:ReplaceQuest(quest, "Man0l1");
 			return;
 		end
 	elseif (classId == GERT) then
