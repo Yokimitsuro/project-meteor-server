@@ -52,6 +52,11 @@ namespace Meteor.Map.actors.area
             return PrivateAreaType;
         }
 
+        public override bool IsPublic()
+        {
+            return false;
+        }
+
         public Zone GetParentZone()
         {
             return ParentZone;

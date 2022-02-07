@@ -33,6 +33,16 @@ end
 
 function onEventStarted(player, aetheryte, triggerName)
 	
+	-- Main Scenario Intro Quests
+	if (player:HasQuest(110002) == true) then
+		require ("quests/man/man0l1");
+		local quest = player:GetQuest("Man0l1");
+		if (quest:GetSequence() == SEQ_003) then			
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent025");
+			quest:StartSequence(SEQ_005);
+		end
+	end
+	
 	if (player:GetGuildleveDirector() ~= nil) then
 		doGuildleveMenu(player, aetheryte);
 	else

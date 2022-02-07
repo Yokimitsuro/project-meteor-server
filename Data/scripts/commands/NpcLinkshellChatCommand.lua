@@ -10,37 +10,7 @@ to hit some ID, add "nils".
 
 --]]
 
-
-local function handleAdventurersGuild(player)
-	if (player:HasQuest(110006) == true) then
-		local man0g1Quest = player:GetQuest("Man0g1");		
-		player:SendGameMessage(man0g1Quest, 330, 39, 1300018, nil);
-	end
-end
-
-local function handlePathOfTheTwelve(player)
-	player:SendMessage(0x20, "", "Test");
-end
-
-local npcLsHandlers = {
-	handleAdventurersGuild,
-	nil,
-	nil,
-	nil,
-	nil,
-	handlePathOfTheTwelve	
-}
-
-function onEventStarted(player, command, triggerName, npcLsId)		
-	player:OnNpcLS(npcLsId);
-	
-	if (npcLsHandlers[npcLsId] ~= nil) then
-		npcLsHandlers[npcLsId](player);
-		player:SetNpcLS(npcLsId-1, NPCLS_ACTIVE);
-	else
-		player:SendMessage(0x20, "", "That Npc Linkshell is not implemented yet.");
-	end	
-	
-	player:endEvent();	
-	
+function onEventStarted(player, command, eventType, eventName, npcLsId)
+	player:HandleNpcLS(npcLsId);
+	player:EndEvent();
 end

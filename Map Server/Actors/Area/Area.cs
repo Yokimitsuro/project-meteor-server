@@ -109,6 +109,16 @@ namespace Meteor.Map.Actors
             return 0;
         }
 
+        public virtual bool IsPublic()
+        {
+            return true;
+        }
+
+        public virtual bool IsPrivate()
+        {
+            return !IsPublic();
+        }
+
         public override SubPacket CreateScriptBindPacket()
         {
             List<LuaParam> lParams;

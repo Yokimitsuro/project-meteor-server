@@ -582,7 +582,7 @@ namespace Meteor.Map.Actors
             QueuePacket(SetWeatherPacket.BuildPacket(Id, SetWeatherPacket.WEATHER_CLEAR, 1));
         }
 
-        public void SendZoneInPackets(WorldManager world, ushort spawnType)
+        public void SendZoneInPackets(WorldManager world, ushort spawnType, bool changeMap)
         {
             QueuePacket(SetActorIsZoningPacket.BuildPacket(Id, false));
             QueuePacket(SetDalamudPacket.BuildPacket(Id, 0));
@@ -957,7 +957,7 @@ namespace Meteor.Map.Actors
                 QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
-        public void SendGameMessageCustomSender(Actor textIdOwner, ushort textId, byte log, string customSender, params object[] msgParams)
+        public void SendGameMessageDisplayName(Actor textIdOwner, ushort textId, byte log, string customSender, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
                 QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, customSender, log));
@@ -965,7 +965,7 @@ namespace Meteor.Map.Actors
                 QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, customSender, log, LuaUtils.CreateLuaParamList(msgParams)));
         }
 
-        public void SendGameMessageDisplayIDSender(Actor textIdOwner, ushort textId, byte log, uint displayId, params object[] msgParams)
+        public void SendGameMessageLocalizedDisplayName(Actor textIdOwner, ushort textId, byte log, uint displayId, params object[] msgParams)
         {
             if (msgParams == null || msgParams.Length == 0)
                 QueuePacket(GameMessagePacket.BuildPacket(Server.GetWorldManager().GetActor().Id, textIdOwner.Id, textId, displayId, log));
@@ -1690,11 +1690,15 @@ namespace Meteor.Map.Actors
 
             if (defaultTalk != null && defaultTalk.IsQuestENPC(this, npc))
                 return defaultTalk;
+
             return null;
         }
 
         public Quest GetTutorialQuest(Npc npc)
         {
+            if (npc.CurrentArea.RegionId != 101 || npc.CurrentArea.RegionId != 103 || npc.CurrentArea.RegionId != 104)
+                return null;
+
             switch (npc.GetActorClassId())
             {
                 case 1000137:
@@ -1725,6 +1729,11 @@ namespace Meteor.Map.Actors
         {            
             bool isCalling, isExtra;
             isCalling = isExtra = false;
+
+            if (npcLSId < 1 || npcLSId > 40)
+                return;
+
+            npcLSId--;
 
             switch (state)
             {
