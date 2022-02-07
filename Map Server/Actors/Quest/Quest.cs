@@ -103,10 +103,11 @@ namespace Meteor.Map.Actors
             {
                 if (OldENPCs[classId].IsChanged(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned))
                 {
+                    OldENPCs[classId].Update(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned);
                     instanceUpdated = OldENPCs[classId];
-                    instanceUpdated.Update(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned);
-                    CurrentENPCs.Add(classId, instanceUpdated);
                 }
+
+                CurrentENPCs.Add(classId, OldENPCs[classId]);
                 OldENPCs.Remove(classId);
             }
             else
