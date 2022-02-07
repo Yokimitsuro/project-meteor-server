@@ -144,7 +144,8 @@ end
 function onNotice(player, quest, target)
 	local sequence = quest:getSequence();
 	
-	if (sequence == SEQ_000) then		
+	if (sequence == SEQ_000) then
+		quest:ClearData();
 		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ");		
 	end
 	
