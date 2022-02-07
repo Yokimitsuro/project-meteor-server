@@ -12,7 +12,7 @@ Warp player or <targetname> to a location from a list, or enter a zoneID with co
 ]],
 }
 
-function onTrigger(player, argc, p1, p2, p3, p4, privateArea, name, lastName)
+function onTrigger(player, argc, p1, p2, p3, p4, privateArea, privateAreaType, name, lastName)
 
     if name then
         if lastName then
@@ -57,7 +57,7 @@ function onTrigger(player, argc, p1, p2, p3, p4, privateArea, name, lastName)
             local z = tonumber(applyPositionOffset(p4, player_z)) or player_z;
             if privateArea == "" then privateArea = nil end;
             player:SendMessage(messageID, sender, string.format("setting coordinates X:%d Y:%d Z:%d to new zone (%d) private area:%s", x, y, z, zone, privateArea or "unspecified"));
-            worldManager:DoZoneChange(player, zone, privateArea, 0, 0x02, x, y, z, 0.00);
+            worldManager:DoZoneChange(player, zone, privateArea, tonumber(privateAreaType), 0x02, x, y, z, 0.00);
         end
   
     else
