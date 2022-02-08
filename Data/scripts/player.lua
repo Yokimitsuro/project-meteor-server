@@ -46,18 +46,17 @@ function onBeginLogin(player)
 		player:GetQuest(110005):ClearQuestData();
 		player:GetQuest(110005):ClearQuestFlags();
 	elseif (player:HasQuest(110009) == true and player.CurrentArea.ZoneId == 184) then
-		--director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
-		--player:AddDirector(director);
-		--director:StartDirector(false);		
-		--player:SetLoginDirector(director);		
-		--player:KickEvent(director, "noticeEvent", true);
-		--
+		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
+		player:AddDirector(director);
+		director:StartDirector(true);
+		player:SetLoginDirector(director);		
+		player:KickEvent(director, "noticeEvent", true);
+		
 		player.positionX = 5.364327;
 		player.positionY = 196.0;
 		player.positionZ = 133.6561;
 		player.rotation = -2.849384;
-		player:GetQuest(110009):ClearQuestData();
-		player:GetQuest(110009):ClearQuestFlags();
+		player:GetQuest(110009):ClearClearData();
 	end	
 end
 

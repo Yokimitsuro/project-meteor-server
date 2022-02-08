@@ -1686,6 +1686,7 @@ namespace Meteor.Map.Actors
                     defaultTalk = (Quest) Server.GetStaticActors("DftFst");
                     break;
                 case 104:
+                case 107:
                     defaultTalk = (Quest) Server.GetStaticActors("DftWil");
                     break;
                 case 105:

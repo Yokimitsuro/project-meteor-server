@@ -109,10 +109,11 @@ function onEventStarted(player, npc, triggerName)
         
         if (choice ~= 0) then
             
-            player:EndEvent();
+            
            
            callClientFunction(player, "eventAfterWarpOtherZone", player);
-           
+           wait(1);
+           player:EndEvent();
             local player_zone = player:GetPos()[5];
             spawnType = 0x0A;
             if (player_zone == aethernet[city][choice].zone) then

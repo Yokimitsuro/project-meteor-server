@@ -28,10 +28,10 @@ function onEventStarted(player, npc, eventType, eventName)
 	local possibleQuests = {};
 	
 	-- Create the switch table for this npc
-	if (defaultTalk ~= nil and eventType == EVENT_TALK) then
+	if (defaultTalk ~= nil and eventType == ETYPE_TALK) then
 		table.insert(possibleQuests, defaultTalk);
 	end
-	if (tutorialTalk ~= nil and eventType == EVENT_TALK) then
+	if (tutorialTalk ~= nil and eventType == ETYPE_TALK) then
 		table.insert(possibleQuests, tutorialTalk);
 	end
 	if (activeQuests ~= nil) then
