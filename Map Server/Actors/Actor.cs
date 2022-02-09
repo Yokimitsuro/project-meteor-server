@@ -254,7 +254,7 @@ namespace Meteor.Map.Actors
             return subpackets;
         }
 
-        public List<SubPacket> GetSetEventStatusPackets(bool talkEnabled = true, bool emoteEnabled = true, bool pushEnabled = true, bool noticeEnabled = true)
+        public List<SubPacket> GetSetEventStatusPackets(bool talkEnabled = true, bool emoteEnabled = true, Boolean? pushEnabled = null, bool noticeEnabled = true)
         {
             List<SubPacket> subpackets = new List<SubPacket>();
 
@@ -283,19 +283,19 @@ namespace Meteor.Map.Actors
             if (eventConditions.pushWithCircleEventConditions != null)
             {
                 foreach (EventList.PushCircleEventCondition condition in eventConditions.pushWithCircleEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled ?? condition.isEnabled, 2, condition.conditionName));
             }
 
             if (eventConditions.pushWithFanEventConditions != null)
             {
                 foreach (EventList.PushFanEventCondition condition in eventConditions.pushWithFanEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled ?? condition.isEnabled, 2, condition.conditionName));
             }
 
             if (eventConditions.pushWithBoxEventConditions != null)
             {
                 foreach (EventList.PushBoxEventCondition condition in eventConditions.pushWithBoxEventConditions)
-                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled, 2, condition.conditionName));
+                    subpackets.Add(SetEventStatusPacket.BuildPacket(Id, pushEnabled ?? condition.isEnabled, 2, condition.conditionName));
             }
 
             return subpackets;
