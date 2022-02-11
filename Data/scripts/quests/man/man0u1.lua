@@ -15,6 +15,10 @@ Vid refs -
 https://www.youtube.com/watch?v=WNRLrwZ3BJY&t=284s
 https://www.youtube.com/watch?v=eZgcq-FMpfw&t=504s
 
+Coliseum fight - https://www.youtube.com/watch?v=Jcv9I2Bk46w
+
+A LOT - https://www.youtube.com/watch?v=gySHO1Be9OM
+
 ]]
 
 
@@ -104,8 +108,8 @@ MRKR_MOMODI             = 11001001;
 MRKR_CAMP_BLACK_BRUSH   = 11001002;
 
 -- Quest Items
-VELODYNA_COSMOS = 0; -- Seq_000 : 2nd journal arg.    >=5 doesn't have.
-COLISEUM_PASS   = 0; -- Seq_015 : 3rd journal arg.    >=5 doesn't have
+ITEM_VELODYNA_COSMOS = 0; -- Seq_000 : 2nd journal arg.    >=5 doesn't have.
+ITEM_COLISEUM_PASS   = 0; -- Seq_015 : 3rd journal arg.    >=5 doesn't have
 
 -- Quest Flags
 FLAG_SEQ000     = 0; 
@@ -114,12 +118,7 @@ function onStart(player, quest)
     quest:StartSequence(SEQ_000);
     
     -- Immediately move to the Adventurer's Guild private area
-    	
 	callClientFunction(player, "delegateEvent", player, quest, "processEventMomodiStart");
-    
-	GetWorldManager():DoZoneChange(player, 175, "PrivateAreaMasterPast", 4, 15, -75.242, 195.009, 74.572, -0.046);	
-    
-    --callClientFunction(player, "delegateEvent", player, quest, "processEvent000_1"); -- Describes what an Instance is
     player:SendGameMessage(quest, 329, 0x20);
 	player:SendGameMessage(quest, 330, 0x20);
 end
@@ -167,11 +166,18 @@ function onPush(player, quest, npc)
 end
 
 
+function onNotice(player, quest, target)
+    callClientFunction(player, "delegateEvent", player, quest, "processEvent000_1"); -- Describes what an Instance is
+    player:EndEvent();
+	quest:UpdateENPCs();
+end
+
+
     
 function seq000_onTalk(player, quest, npc, classId)
     
     if (classId == MOMODI) then
-		callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
+        callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
         player:EndEvent();
         quest:StartSequence(SEQ_005);
         GetWorldManager():DoZoneChange(player, 175, nil, 0, 15, player.positionX, player.positionY, player.positionZ, player.rotation);
@@ -209,7 +215,7 @@ end
 
 
 function getJournalInformation(player, quest)
-	return 0, VELODYNA_COSMOS, COLISEUM_PASS;
+	return 0, ITEM_VELODYNA_COSMOS, ITEM_COLISEUM_PASS;
 end
 
 

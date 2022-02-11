@@ -38,6 +38,9 @@ FLAG_TALKED_NELLAURE 		= 2;
 FLAG_TALKED_KHUMA_MOSHROCA 	= 3;
 FLAG_TALKED_LEFWYNE 		= 4;
 
+-- Quest Counters
+COUNTER_TALKED              = 0;
+
 --offerQuestResult = callClientFunction(player, "delegateEvent", player, quest, "processEventOffersStart");
 
 function onStart(player, quest)	
@@ -48,33 +51,32 @@ function onFinish(player, quest)
 end
 
 function onSequence(player, quest, sequence)	
-	quest:ClearENpcs();	
-	
 	if (sequence == SEQ_000) then
-		quest:AddENpc(SYBELL, qflag(quest, FLAG_TALKED_SYBELL));
-		quest:AddENpc(KHUMA_MOSHROCA, qflag(quest, FLAG_TALKED_KHUMA_MOSHROCA));
-		quest:AddENpc(NELLAURE, qflag(quest, FLAG_TALKED_NELLAURE));
-		quest:AddENpc(MESTONNAUX, qflag(quest, FLAG_TALKED_MESTONNAUX));
-		quest:AddENpc(LEFWYNE, qflag(quest, FLAG_TALKED_LEFWYNE));
+        quest:AddENpc(KINNISON);
+		quest:AddENpc(SYBELL,           (not quest:GetFlag(FLAG_TALKED_SYBELL) and QFLAG_PLATE or QFLAG_NONE));
+		quest:AddENpc(KHUMA_MOSHROCA,   (not quest:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA) and QFLAG_PLATE or QFLAG_NONE));
+		quest:AddENpc(NELLAURE,         (not quest:GetFlag(FLAG_TALKED_NELLAURE) and QFLAG_PLATE or QFLAG_NONE));
+		quest:AddENpc(MESTONNAUX,       (not quest:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_PLATE or QFLAG_NONE));
+		quest:AddENpc(LEFWYNE,          (not quest:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_PLATE or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
-		quest:AddENpc(KINNISON);
+		quest:AddENpc(KINNISON, QFLAG_PLATE);
 	end	
 end
 
-function qflag(quest, flag)
-	return quest:GetFlag(flag) and QFLAG_ALL or QFLAG_NONE;
-end
 
 function onTalk(player, quest, npc, eventName)
 	local npcClassId = npc.GetActorClassId();
 	local seq = quest:GetSequence();
-	
+	local incCounter = false;
+    
 	if (seq == SEQ_000) then
-		if (npcClassId == SYBELL) then
+        if (npcClassId == KINNISON) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEventOffersAfter");
+		elseif (npcClassId == SYBELL) then
 			if (not quest:GetFlag(FLAG_TALKED_SYBELL)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventSybellSpeak");
 				quest:SetFlag(FLAG_TALKED_SYBELL);
-				--quest:UpdateENpc(SYBELL, QFLAG_NONE);				
+                incCounter = true;
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventSybellSpeakAfter");
 			end
@@ -82,15 +84,15 @@ function onTalk(player, quest, npc, eventName)
 			if (not quest:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventKhumaSpeak");
 				quest:SetFlag(FLAG_TALKED_KHUMA_MOSHROCA);
-				--quest:UpdateENpc(KHUMA_MOSHROCA, QFLAG_NONE);				
+               incCounter = true;
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventKhumaSpeakAfter");
 			end
 		elseif (npcClassId == NELLAURE) then
 			if (not quest:GetFlag(FLAG_TALKED_NELLAURE)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventNellaureSpeak");
-				quest:SetFlag(FLAG_TALKED_NELLAURE);
-				--quest:UpdateENpc(NELLAURE, QFLAG_NONE);				
+				quest:SetFlag(FLAG_TALKED_NELLAURE);	
+                incCounter = true;
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventNellaureSpeakAfter");
 			end
@@ -98,34 +100,47 @@ function onTalk(player, quest, npc, eventName)
 			if (not quest:GetFlag(FLAG_TALKED_MESTONNAUX)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventMestonnauxSpeak");
 				quest:SetFlag(FLAG_TALKED_MESTONNAUX);
-				--quest:UpdateENpc(MESTONNAUX, QFLAG_NONE);				
+                incCounter = true;                
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventMestonnauxSpeakAfter");
 			end
 		elseif (npcClassId == LEFWYNE) then
 			if (not quest:GetFlag(FLAG_TALKED_LEFWYNE)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventLefwyneSpeak");
-				quest:SetFlag(FLAG_TALKED_LEFWYNE);
-				--quest:UpdateENpc(LEFWYNE, QFLAG_NONE);				
+				quest:SetFlag(FLAG_TALKED_LEFWYNE);	
+                incCounter = true;
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventLefwyneSpeakAfter");
 			end
 		end
 		
-		-- Check condition to go to the next sequence
-		if (seq000_checkCondition(quest)) then
-			quest:StartSequence(SEQ_001);
-		end
+        
+		-- Increase objective counter & play relevant messages
+		if (incCounter == true) then
+            quest:IncCounter(COUNTER_TALKED);
+            local counterAmount = quest:GetCounter(COUNTER_TALKED);
+
+            attentionMessage(player, 51061, 0, counterAmount, 5); -- You have heard word of the Seedseers. (... of 5)
+            
+            if (seq000_checkCondition(quest)) then -- All Seers spoken to
+                attentionMessage(player, 25225, 110674); -- "Seeing the Seers" objectives complete!
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:StartSequence(SEQ_001);
+            end
+        end
+        
 	elseif (seq == SEQ_001) then
 		--Quest Complete
 		if (npcClassId == KINNISON) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEventClear");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
+            player:CompleteQuest(quest:GetQuestId());
 		end
 	end
-	
+	quest:UpdateENPCs();	
 	player:EndEvent();
 end
+
 
 -- Check if all seers are talked to
 function seq000_checkCondition(quest)
@@ -136,14 +151,20 @@ function seq000_checkCondition(quest)
 			quest:GetFlag(FLAG_TALKED_LEFWYNE));
 end
 
--- This is called by the RequestQuestJournalCommand when map markers are request.
--- Check quest_marker for valid values. This should return a table of map markers.
+
 function getJournalMapMarkerList(player, quest)
-	local seq = quest:GetSequence();
-	
-	if (seq == SEQ_000) then
-		return MRKR_SYBELL, MRKR_KHUMA_MOSHROCA, MRKR_NELLAURE, MRKR_MESTONNAUX, MRKR_LEFWYNE;
-	elseif (seq == SEQ_001) then
-		return MRKR_KINNISON;
-	end
+    local sequence = quest:getSequence();
+    local possibleMarkers = {};
+    
+    if (sequence == SEQ_000) then
+        if (not quest:GetFlag(FLAG_TALKED_SYBELL)) then table.insert(possibleMarkers, MRKR_SYBELL); end
+        if (not quest:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA)) then table.insert(possibleMarkers, MRKR_KHUMA_MOSHROCA); end
+        if (not quest:GetFlag(FLAG_TALKED_NELLAURE)) then table.insert(possibleMarkers, MRKR_NELLAURE); end
+        if (not quest:GetFlag(FLAG_TALKED_MESTONNAUX)) then table.insert(possibleMarkers, MRKR_MESTONNAUX); end
+        if (not quest:GetFlag(FLAG_TALKED_LEFWYNE)) then table.insert(possibleMarkers, MRKR_LEFWYNE); end
+    elseif (sequence == SEQ_001) then
+        table.insert(possibleMarkers, MRKR_KINNISON);
+    end
+    
+    return unpack(possibleMarkers)
 end
