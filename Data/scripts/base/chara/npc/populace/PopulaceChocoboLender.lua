@@ -28,7 +28,8 @@ local rentalTime = 10;
 local gcIssuances = {
 	[1500006] = 2001004,
 	[1500061] = 2001005,
-	[1000840] = 2001006
+	[1000840] = 2001006,
+	[1500059] = 0
 };
 
 local startAppearances = {

@@ -53,14 +53,24 @@ ISANDOREL				= 1000152;
 MERLZIRN				= 1000472;
 MSK_TRIGGER				= 1090001;
 
+NERVOUS_BARRACUDA		= 1000096;
+INTIMIDATING_BARRACUDA	= 1000097;
+OVEREAGER_BARRACUDA		= 1000107;
+SOPHISTICATED_BARRACUDA	= 1000108;
+SMIRKING_BARRACUDA		= 1000109;
+MANNSKOEN				= 1000142;
+TOTORUTO				= 1000161;
+ADVENTURER1				= 1000869;
+ADVENTURER2				= 1000870;
+ADVENTURER3				= 1000871;
+ECHO_EXIT_TRIGGER		= 1090003;
+
 -- Quest Markers
 MRKR_HOB				= 11000202;
 
--- Quest Flags
-FLAG_SEQ007_VISITED_CUL		= 1;
-FLAG_SEQ007_VISITED_MSK		= 2;
-FLAG_SEQ007_MSK_CUTSCENE	= 3;
-FLAG_SEQ007_MSK_CUTSCENE2	= 4;
+-- Quest Data
+CNTR_SEQ7_CUL		= 1;
+CNTR_SEQ7_MRD		= 2;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -97,17 +107,36 @@ function onSequence(player, quest, sequence)
 	elseif (sequence == SEQ_006) then
 		quest:AddENpc(BADERON, QFLAG_PLATE);
 	elseif (sequence == SEQ_007) then
-		local isandorelFlag1 = not quest:GetFlag(FLAG_SEQ007_VISITED_MSK);
-		local isandorelFlag2 = not quest:GetFlag(FLAG_SEQ007_MSK_CUTSCENE);
-	
+		local subseqCUL = quest:GetCounter(CNTR_SEQ7_CUL);
+		local subseqMRD = quest:GetCounter(CNTR_SEQ7_MRD);
+
+		-- Always active in this seqence
 		quest:AddENpc(BADERON);
-		quest:AddENpc(CHARLYS, not quest:GetFlag(FLAG_SEQ007_VISITED_CUL) and QFLAG_PLATE or QFLAG_NONE);
-		quest:AddENpc(ISANDOREL, ((isandorelFlag1) or (quest:GetFlag(FLAG_SEQ007_MSK_CUTSCENE) and isandorelFlag2)) and QFLAG_PLATE or QFLAG_NONE);
-		quest:AddENpc(MSK_TRIGGER, not quest:GetFlag(FLAG_SEQ007_MSK_CUTSCENE) and QFLAG_MAP or QFLAG_NONE, false, not quest:GetFlag(FLAG_SEQ007_MSK_CUTSCENE));
+		quest:AddENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
 		
-		quest:AddENpc(MERLZIRN);
+		-- Down and Up the MSK guild
+		quest:AddENpc(ISANDOREL, (subseqMRD == 0 or subseqMRD == 2) and QFLAG_PLATE or QFLAG_NONE);
 		
-		if (quest:GetFlag(FLAG_SEQ007_VISITED_CUL) and quest:GetFlag(FLAG_SEQ007_VISITED_MSK)) then
+		if (subseqMRD == 1) then
+			quest:AddENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
+		elseif (subseqMRD == 2) then
+			quest:AddENpc(MERLZIRN);
+		end
+		
+		-- In Echo
+		quest:AddENpc(NERVOUS_BARRACUDA);
+		quest:AddENpc(INTIMIDATING_BARRACUDA);
+		quest:AddENpc(OVEREAGER_BARRACUDA);
+		quest:AddENpc(SOPHISTICATED_BARRACUDA);
+		quest:AddENpc(SMIRKING_BARRACUDA);
+		quest:AddENpc(MANNSKOEN);
+		quest:AddENpc(TOTORUTO);
+		quest:AddENpc(ADVENTURER1);
+		quest:AddENpc(ADVENTURER2);
+		quest:AddENpc(ADVENTURER3);
+		quest:AddENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);
+						
+		if (subseqCUL == 1 and subseqMRD == 4) then
 			player:SetNpcLS(1, 1);
 		end
 	end	
@@ -174,6 +203,7 @@ function seq000_onTalk(player, quest, npc, classId)
 		player:SetLoginDirector(director);		
 		player:KickEvent(director, "noticeEvent", true);
 		
+		quest:UpdateENPCs();
 		GetWorldManager():DoZoneChange(player, 133, nil, 0, 15, player.positionX, player.positionY, player.positionZ, player.rotation);
 		return;
 	elseif (classId == MYTESYN) then
@@ -190,42 +220,61 @@ function seq000_onTalk(player, quest, npc, classId)
 end
 
 function seq007_onTalk(player, quest, npc, classId)
+	local subseqCUL = quest:GetCounter(CNTR_SEQ7_CUL);
+	local subseqMRD = quest:GetCounter(CNTR_SEQ7_MRD);
+	
 	if (classId == BADERON) then
-			if (quest:GetFlag(FLAG_SEQ007_VISITED_CUL)) then
-				callClientFunction(player, "delegateEvent", player, quest, "processEvent027_3");
-			elseif (quest:GetFlag(FLAG_SEQ007_VISITED_MSK)) then
-				callClientFunction(player, "delegateEvent", player, quest, "processEvent027_4");
-			else
-				callClientFunction(player, "delegateEvent", player, quest, "processEvent027_2");
-			end
-			player:EndEvent();
+		if (subseqCUL == 1) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_3");
+		elseif (subseqMRD == 4) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_4");
+		else
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_2");
+		end
 	elseif (classId == CHARLYS) then
-		if (not quest:GetFlag(FLAG_SEQ007_VISITED_CUL)) then
+		if (subseqCUL == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030");
-			quest:SetFlag(FLAG_SEQ007_VISITED_CUL);
-			--give 100gil
+			quest:IncCounter(CNTR_SEQ7_CUL);
+			--give 1000g
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030_2");
 		end
-		player:EndEvent();
 	elseif (classId == ISANDOREL) then
-		if (quest:GetFlag(FLAG_SEQ007_VISITED_MSK) and quest:GetFlag(FLAG_SEQ007_MSK_CUTSCENE)) then
+		if (subseqMRD == 2) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent050");
-			quest:SetFlag(FLAG_SEQ007_MSK_CUTSCENE2);
-			player:EndEvent();
-			local pos = player:GetPos();
-			GetWorldManager():DoZoneChange(player, 230, "PrivateAreaMasterPast", 3, 15, pos[1], pos[2], pos[3], pos[4]);
-		elseif (not quest:GetFlag(FLAG_SEQ007_VISITED_MSK)) then
+			quest:IncCounter(CNTR_SEQ7_MRD);
+			GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 3);
+		elseif (subseqMRD == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035");
-			quest:SetFlag(FLAG_SEQ007_VISITED_MSK);			
-		else			
+			quest:IncCounter(CNTR_SEQ7_MRD);
+		elseif (subseqMRD == 1) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035_2");
 		end
-		player:EndEvent();
 	elseif (classId == MERLZIRN) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent40_2");
-		player:EndEvent();
+	elseif (classId == INTIMIDATING_BARRACUDA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_2");
+	elseif (classId == TOTORUTO) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_4");		
+	elseif (classId == MANNSKOEN) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_6");
+	elseif (classId == NERVOUS_BARRACUDA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_7");
+	elseif (classId == OVEREAGER_BARRACUDA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_8");
+	elseif (classId == SOPHISTICATED_BARRACUDA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_9");
+	elseif (classId == SMIRKING_BARRACUDA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_10");
+	elseif (classId == ADVENTURER2) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_13");
+	elseif (classId == ADVENTURER3) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_14");
+	elseif (classId == ADVENTURER1) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent050_15");
 	end
+		
+	player:EndEvent();
 end
 
 function onPush(player, quest, npc)
@@ -235,9 +284,16 @@ function onPush(player, quest, npc)
 	if (sequence == SEQ_007) then
 		if (classId == MSK_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent040");
-			quest:SetFlag(FLAG_SEQ007_MSK_CUTSCENE);	
+			quest:IncCounter(CNTR_SEQ7_MRD);
 			player:EndEvent();
+			quest:UpdateENPCs();
 			GetWorldManager():DoZoneChange(player, 230, nil, 0, 15, -620.0, 29.476, -70.050, 0.791);
+		elseif (classId == ECHO_EXIT_TRIGGER) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent060");
+			quest:IncCounter(CNTR_SEQ7_MRD);
+			player:EndEvent();
+			quest:UpdateENPCs();
+			GetWorldManager():WarpToPublicArea(player);
 		end
 	end
 end
@@ -271,11 +327,7 @@ function onNpcLS(player, quest, npcLSId)
 end
 
 function getJournalInformation(player, quest)
-	if (quest:GetFlag(FLAG_SEQ007_VISITED_CUL) and quest:GetFlag(FLAG_SEQ007_VISITED_MSK)) then
-		return 0, 5, 20;
-	else
-		return;
-	end
+	return 0, quest:GetCounter(CNTR_SEQ7_CUL) * 5, quest:GetCounter(CNTR_SEQ7_MRD) * 5;
 end
 
 

@@ -79,7 +79,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
 						message = string.format("\nInfo for quest %s [%d]\n", quest.Name, quest:GetQuestId());
 						message = message .. string.format("Current Sequence: %d\n", quest:getSequence());
 						message = message .. string.format("Flags: \n%s\n", flagStr)
-						message = message .. string.format("Counters: %d,%d,%d,%d", quest:getCounter(1), quest:getCounter(2), quest:getCounter(3), quest:getCounter(4));
+						message = message .. string.format("Counters: %d,%d,%d,%d", quest:getCounter(0), quest:getCounter(1), quest:getCounter(2), quest:getCounter(3));
                     else
                         message = ("Quest not active: "..var1);
                     end

@@ -582,7 +582,7 @@ namespace Meteor.Map.Actors
             QueuePacket(SetWeatherPacket.BuildPacket(Id, SetWeatherPacket.WEATHER_CLEAR, 1));
         }
 
-        public void SendZoneInPackets(WorldManager world, ushort spawnType, bool changeMap)
+        public void SendZoneInPackets(WorldManager world, ushort spawnType)
         {
             QueuePacket(SetActorIsZoningPacket.BuildPacket(Id, false));
             QueuePacket(SetDalamudPacket.BuildPacket(Id, 0));
@@ -977,6 +977,16 @@ namespace Meteor.Map.Actors
         {
             //SubPacket worldMasterMessage = 
             //CurrentArea.BroadcastPacketAroundActor(this, worldMasterMessage);
+        }
+
+        public void ChangeIntoNpc(Npc npc)
+        {
+            uint[] npcAppearIds = new uint[appearanceIds.Length];
+            for (int i = 0; i < appearanceIds.Length; i++)
+                npcAppearIds[i] = npc.appearanceIds[i];
+
+            SetActorAppearancePacket setappearance = new SetActorAppearancePacket(npc.modelId, npcAppearIds);
+            BroadcastPacket(setappearance.BuildPacket(Id), true);
         }
 
         public void GraphicChange(uint slot, uint graphicId)

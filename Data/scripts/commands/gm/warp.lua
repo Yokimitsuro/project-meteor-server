@@ -39,7 +39,8 @@ function onTrigger(player, argc, p1, p2, p3, p4, privateArea, privateAreaType, n
     local player_zone = pos[5];
     
     local worldManager = GetWorldManager();
-    
+    privateAreaType = privateAreaType or 0;
+	
     if argc >= 3 then
         
         if argc == 3 then

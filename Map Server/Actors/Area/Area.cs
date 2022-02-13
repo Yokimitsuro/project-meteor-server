@@ -488,6 +488,26 @@ namespace Meteor.Map.Actors
             }            
         }
 
+        public void BroadcastPacketAroundPoint(float x, float y, SubPacket packet)
+        {
+            if (isIsolated)
+                return;
+
+            List<Actor> aroundActor = GetActorsAroundPoint(x, y, 50);
+            foreach (Actor a in aroundActor)
+            {
+                if (a is Player)
+                {
+                    if (isIsolated)
+                        continue;
+
+                    SubPacket clonedPacket = new SubPacket(packet, a.Id);
+                    Player p = (Player)a;
+                    p.QueuePacket(clonedPacket);
+                }
+            }
+        }
+
         public void SpawnActor(SpawnLocation location)
         {
             lock (mActorList)
@@ -497,15 +517,7 @@ namespace Meteor.Map.Actors
                 if (actorClass == null)
                     return;
 
-                uint zoneId;
-
-                if (this is PrivateArea)
-                    zoneId = ((PrivateArea)this).GetParentZone().Id;
-                else
-                    zoneId = Id;
-
                 Npc npc = new Npc(mActorList.Count + 1, actorClass, location.uniqueId, this, location.x, location.y, location.z, location.rot, location.state, location.animId, null);
-
 
                 npc.LoadEventConditions(actorClass.eventConditions);
 
@@ -521,12 +533,6 @@ namespace Meteor.Map.Actors
 
                 if (actorClass == null)
                     return null;
-
-                uint zoneId;
-                if (this is PrivateArea)
-                    zoneId = ((PrivateArea)this).GetParentZone().Id;
-                else
-                    zoneId = Id;
 
                 Npc npc;
                 if (isMob)
@@ -553,13 +559,6 @@ namespace Meteor.Map.Actors
 
                 if (actorClass == null)
                     return null;
-
-                uint zoneId;
-
-                if (this is PrivateArea)
-                    zoneId = ((PrivateArea)this).GetParentZone().Id;
-                else
-                    zoneId = Id;
 
                 Npc npc = new Npc(mActorList.Count + 1, actorClass, uniqueId, this, x, y, z, 0, regionId, layoutId);
 

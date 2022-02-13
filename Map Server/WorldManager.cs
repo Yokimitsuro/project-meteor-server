@@ -873,7 +873,7 @@ namespace Meteor.Map
 
                 if (oldArea is PrivateAreaContent)
                     ((PrivateAreaContent)oldArea).CheckDestroy();
-            }                 
+            }
 
             //Send packets
             player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
@@ -916,6 +916,29 @@ namespace Meteor.Map
             }            
         }
 
+        // Warp the player to a private area within the zone.
+        public void WarpToPrivateArea(Player player, String name, int type)
+        {
+            WarpToPrivateArea(player, name, type, player.positionX, player.positionY, player.positionZ, player.rotation);
+        }
+
+        // Warp the player to a private area within the zone to a specific location.
+        public void WarpToPrivateArea(Player player, String name, int type, float x, float y, float z, float rotation)
+        {
+            DoZoneChange(player, player.CurrentArea.ZoneId, name, type, 15, x, y, z, rotation);
+        }
+
+        public void WarpToPublicArea(Player player)
+        {
+            WarpToPublicArea(player, player.positionX, player.positionY, player.positionZ, player.rotation);
+        }
+
+        public void WarpToPublicArea(Player player, float x, float y, float z, float rotation)
+        {
+            if (player.CurrentArea.IsPrivate())
+                DoZoneChange(player, player.CurrentArea.ZoneId, null, 0, 15, x, y, z, rotation);
+        }
+        
         //Moves actor to new zone, and sends packets to spawn at the given coords.
         public void DoZoneChangeContent(Player player, PrivateAreaContent contentArea, float spawnX, float spawnY, float spawnZ, float spawnRotation, ushort spawnType = SetActorPositionPacket.SPAWNTYPE_WARP_DUTY)
         {
