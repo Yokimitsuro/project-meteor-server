@@ -98,7 +98,7 @@ SPRY_SALESMAN               = 1000939;
 UPBEAT_ADVENTURER           = 1000940;
 SEEMINGLY_CALM_ADVENTURER   = 1000941;
 UNKNOWN1 = 0;
-UNKNOWN2 = 0
+UNKNOWN2 = 0;
 
 THANCRED = 1000948; -- 1000010
 
@@ -119,6 +119,7 @@ function onStart(player, quest)
     
     -- Immediately move to the Adventurer's Guild private area
 	callClientFunction(player, "delegateEvent", player, quest, "processEventMomodiStart");
+    GetWorldManager():DoZoneChange(player, 175, "PrivateAreaMasterPast", 4, 15, -75.242, 195.009, 74.572, -0.046);	
     player:SendGameMessage(quest, 329, 0x20);
 	player:SendGameMessage(quest, 330, 0x20);
 end
