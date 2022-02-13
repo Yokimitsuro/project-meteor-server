@@ -915,6 +915,14 @@ namespace Meteor.Map.Actors
             QueuePacket(SetMusicPacket.BuildPacket(Id, musicId, 1));
         }
 
+        public void ChangeMusic(ushort musicId, ushort musicTrackMode)
+        {
+            QueuePacket(SetMusicPacket.BuildPacket(Id, musicId, musicTrackMode));
+        }
+
+        
+
+
         public void SendMountAppearance()
         {
             if (mountState == 1)
@@ -1688,6 +1696,7 @@ namespace Meteor.Map.Actors
                     defaultTalk = (Quest) Server.GetStaticActors("DftFst");
                     break;
                 case 104:
+                case 107:
                     defaultTalk = (Quest) Server.GetStaticActors("DftWil");
                     break;
                 case 105:

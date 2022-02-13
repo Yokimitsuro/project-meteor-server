@@ -29,7 +29,7 @@ function onTrigger(player, argc, actorClassId, width, height)
         --local x, y, z = player.GetPos();
         for i = 0, w do
             for j = 0, h do
-				actor = player.CurrentArea:SpawnActor(actorClassId, "test", pos[0] + (i - (w / 2) * 3), pos[1], pos[2] + (j - (h / 2) * 3), pos[3]);
+				actor = player.CurrentArea:SpawnActor(actorClassId, "test", x + (i - (w / 2) * 3), y, z + (j - (h / 2) * 3), rot);
 				actor.SetAppearance(1001149)
 			end
 		end

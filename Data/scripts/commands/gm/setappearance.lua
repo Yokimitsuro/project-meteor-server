@@ -22,6 +22,5 @@ function onTrigger(player, argc, actorClassId)
     if actor then
         actor:ChangeNpcAppearance(actorClassId);
         player:SendMessage(messageID, sender,  string.format("appearance %u", actorClassId));
-    end;
-           
-end;
+    end
+end

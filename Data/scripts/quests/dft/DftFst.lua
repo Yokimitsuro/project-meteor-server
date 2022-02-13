@@ -18,13 +18,22 @@ local defaultTalkFst = {
 	[1001081] = "defaultTalkWithKhumamoshroca_001",			-- Khuma Moshroca
 	[1001103] = "defaultTalkWithMestonnaux_001", 			-- Mestonnaux
 	[1001396] = "defaultTalkWithLefwyne_001",				-- Lefwyne
-	[1001430] = "defaultTalkWithKinnison_001",				-- Kinnison
-	[1001437] = "defaultTalkWithSybell_001", 				-- Sybell	
+	[1001430] = "defaultTalkWithKinnison_001",				-- Kinnison             - Two args (nil errors client).  If either >= 0, dialog mentions you've met Kan-E-Senna.
+	[1001437] = "defaultTalkWithSybell_001" 				-- Sybell	
+ --   [1000458] = "defaultTalkWithInn_Desk"
 }
 
 function onTalk(player, quest, npc, eventName)
-	local clientFunc = defaultTalkFst[npc:GetActorClassId()];
-	callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+
+    local npcId = npc:GetActorClassId();
+	local clientFunc = defaultTalkFst[npcId];
+    
+    if (npcId == 1001430) then -- Kinnison
+        callClientFunction(player, "delegateEvent", player, quest, clientFunc, -1,-1);
+    else
+        callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+    end
+    
 	player:EndEvent();
 end
 

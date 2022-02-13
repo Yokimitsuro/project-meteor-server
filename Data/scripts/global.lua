@@ -164,6 +164,14 @@ QFLAG_NONE = 0;
 QFLAG_PLATE = 2;
 QFLAG_MAP = 3;
 
+-- MUSIC
+MUSIC_IMMEDIATE = 1;
+MUSIC_CROSSFADE = 2;
+MUSIC_LAYER = 3;
+MUSIC_FADEIN = 4;
+MUSIC_NORMAL_CHANNEL = 5;
+MUSIC_BATTLE_CHANNEL = 6;
+
 -- Common Helper Functions
 function attentionMessage(player, textId, ...)
 	player:SendGameMessage(GetWorldMaster(), textId, 0x20, ...);
