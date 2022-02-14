@@ -315,7 +315,7 @@ namespace Meteor.Map
             Program.Log.Info(String.Format("Loaded {0} actor classes.", count));
         }
 
-        public void LoadSpawnLocations()
+        public void LoadENPCs()
         {
             int count = 0;
             using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
@@ -335,10 +335,8 @@ namespace Meteor.Map
                                     positionY,
                                     positionZ,
                                     rotation,
-                                    actorState,
-                                    animationId,
-                                    customDisplayName
-                                    FROM server_spawn_locations                                    
+                                    motionPack
+                                    FROM server_eventnpc_spawn_locations                                    
                                     ";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -357,9 +355,6 @@ namespace Meteor.Map
                             if (zone == null)
                                 continue;
 
-                            string customName = null;
-                            if (!reader.IsDBNull(11))
-                                customName = reader.GetString("customDisplayName");
                             string uniqueId = reader.GetString("uniqueId");                          
                             string privAreaName = reader.GetString("privateAreaName");
                             int privAreaType = reader.GetInt32("privateAreaLevel");
@@ -367,10 +362,9 @@ namespace Meteor.Map
                             float y = reader.GetFloat("positionY");
                             float z = reader.GetFloat("positionZ");
                             float rot = reader.GetFloat("rotation");
-                            ushort state = reader.GetUInt16("actorState");
-                            uint animId = reader.GetUInt32("animationId");
+                            uint motionPack = reader.GetUInt32("motionPack");
                             
-                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, state, animId);
+                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack);
 
                             zone.AddSpawnLocation(spawn);
 
@@ -387,7 +381,7 @@ namespace Meteor.Map
                 }
             }
 
-            Program.Log.Info(String.Format("Loaded {0} spawn(s).", count));
+            Program.Log.Info(String.Format("Loaded {0} ENPC(s).", count));
         }
 
         public void LoadBattleNpcs()
@@ -492,7 +486,7 @@ namespace Meteor.Map
                             }
                         }
                     }
-                    Program.Log.Info("Loaded {0} monsters.", count);
+                    Program.Log.Info("Loaded {0} BNPC(s).", count);
                 }
                 catch (MySqlException e)
                 {

@@ -517,7 +517,7 @@ namespace Meteor.Map.Actors
                 if (actorClass == null)
                     return;
 
-                Npc npc = new Npc(mActorList.Count + 1, actorClass, location.uniqueId, this, location.x, location.y, location.z, location.rot, location.state, location.animId, null);
+                Npc npc = new Npc(mActorList.Count + 1, actorClass, location.uniqueId, this, location.x, location.y, location.z, location.rot, 0, location.motionPack, null);
 
                 npc.LoadEventConditions(actorClass.eventConditions);
 

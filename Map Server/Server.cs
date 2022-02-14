@@ -71,7 +71,7 @@ namespace Meteor.Map
             mWorldManager.LoadZoneList();
             mWorldManager.LoadSeamlessBoundryList();
             mWorldManager.LoadActorClasses();
-            mWorldManager.LoadSpawnLocations();
+            mWorldManager.LoadENPCs();
             mWorldManager.LoadBattleNpcs();
             mWorldManager.LoadStatusEffects();
             mWorldManager.LoadBattleCommands();
