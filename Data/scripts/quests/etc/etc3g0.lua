@@ -41,8 +41,6 @@ FLAG_TALKED_LEFWYNE 		= 4;
 -- Quest Counters
 COUNTER_TALKED              = 0;
 
---offerQuestResult = callClientFunction(player, "delegateEvent", player, quest, "processEventOffersStart");
-
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
 end
@@ -50,25 +48,39 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, sequence)	
+function onStateChange(player, quest, sequence)
+	if (sequence == 65536) then
+		quest:SetENpc(KINNISON, QFLAG_PLATE);
+	end
+
 	if (sequence == SEQ_000) then
-        quest:AddENpc(KINNISON);
-		quest:AddENpc(SYBELL,           (not quest:GetFlag(FLAG_TALKED_SYBELL) and QFLAG_PLATE or QFLAG_NONE));
-		quest:AddENpc(KHUMA_MOSHROCA,   (not quest:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA) and QFLAG_PLATE or QFLAG_NONE));
-		quest:AddENpc(NELLAURE,         (not quest:GetFlag(FLAG_TALKED_NELLAURE) and QFLAG_PLATE or QFLAG_NONE));
-		quest:AddENpc(MESTONNAUX,       (not quest:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_PLATE or QFLAG_NONE));
-		quest:AddENpc(LEFWYNE,          (not quest:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_PLATE or QFLAG_NONE));
+        quest:SetENpc(KINNISON);
+		quest:SetENpc(SYBELL,           (not quest:GetFlag(FLAG_TALKED_SYBELL) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(KHUMA_MOSHROCA,   (not quest:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(NELLAURE,         (not quest:GetFlag(FLAG_TALKED_NELLAURE) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(MESTONNAUX,       (not quest:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(LEFWYNE,          (not quest:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_PLATE or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
-		quest:AddENpc(KINNISON, QFLAG_PLATE);
+		quest:SetENpc(KINNISON, QFLAG_PLATE);
 	end	
 end
-
 
 function onTalk(player, quest, npc, eventName)
 	local npcClassId = npc.GetActorClassId();
 	local seq = quest:GetSequence();
 	local incCounter = false;
     
+	-- Offer the quest
+	if (npcClassId == KINNISON and not player:HasQuest(quest)) then
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventOffersStart");
+		if (questAccepted) then
+			player:AddQuest(quest);
+		end
+		player:EndEvent();
+		return;
+	end
+	
+	-- Quest Progress
 	if (seq == SEQ_000) then
         if (npcClassId == KINNISON) then
             callClientFunction(player, "delegateEvent", player, quest, "processEventOffersAfter");

@@ -26,7 +26,7 @@ using Meteor.Common;
 using Meteor.Map.utils;
 
 using Meteor.Map.packets.send.player;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.Actors;
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.packets.receive.supportdesk;
@@ -70,6 +70,56 @@ namespace Meteor.Map
                 }
             }
             return id;
+        }
+
+        public static Dictionary<uint, QuestData> GetQuestGamedata()
+        {
+            using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                Dictionary<uint, QuestData> gamedataQuests = new Dictionary<uint, QuestData>();
+
+                try
+                {
+                    conn.Open();
+
+                    string query = @"
+                                SELECT
+                                id,
+                                className,
+                                questName,
+                                prerequisite,
+                                minLevel,
+                                minGCRank
+                                FROM gamedata_quests
+                                ";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            uint questId = reader.GetUInt32("id");
+                            string code = reader.GetString("className");
+                            string name = reader.GetString("questName");
+                            uint prerequisite = reader.GetUInt32("prerequisite");
+                            ushort minLevel = reader.GetUInt16("minLevel");
+                            ushort minRank = reader.GetUInt16("minGCRank");
+                            gamedataQuests.Add(questId, new QuestData(questId, code, name, prerequisite, minLevel, minRank));
+                        }
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+
+                return gamedataQuests;
+            }
         }
 
         public static Dictionary<uint, ItemData> GetItemGamedata()

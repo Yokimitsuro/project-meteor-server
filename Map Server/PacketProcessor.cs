@@ -22,7 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using Meteor.Common;
 
 using System;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.packets.receive;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.login;

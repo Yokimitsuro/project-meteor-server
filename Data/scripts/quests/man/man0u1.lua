@@ -127,17 +127,17 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, sequence)
+function onStateChange(player, quest, sequence)
 
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
 
-        --AddENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
-        quest:AddENpc(MOMODI, QFLAG_PLATE);
-        quest:AddENpc(OTOPA_POTTOPA);
+        --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
+        quest:SetENpc(MOMODI, QFLAG_PLATE);
+        quest:SetENpc(OTOPA_POTTOPA);
 
     elseif (sequence == SEQ_005) then 
-        quest:AddENpc(MOMODI);
+        quest:SetENpc(MOMODI);
     end
 end
 

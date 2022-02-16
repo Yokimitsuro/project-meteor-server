@@ -28,48 +28,8 @@ namespace Meteor.Map.Actors
 {
     class Quest : Actor
     {
-        public const ushort SEQ_NOT_STARTED = ushort.MaxValue;
-
-        public enum QuestFlag { None = 0, Map = 1, Plate = 2 }
-        public enum ENpcProperty { QuestFlag = 0, CanTalk = 1, CanPush = 2,  CanEmote = 3, CanNotice = 4}
-
-        public class ENpcQuestInstance
-        {
-            public readonly uint actorClassId;
-            public byte questFlagType { set; get; }
-            public bool isSpawned { set; get; }
-            public bool isTalkEnabled { set; get; }
-            public bool isEmoteEnabled { set; get; }
-            public bool isPushEnabled { set; get; }
-
-            public ENpcQuestInstance(uint actorClassId, byte questFlagType, bool isSpawned, bool isTalkEnabled, bool isEmoteEnabled, bool isPushEnabled)
-            {
-                this.actorClassId = actorClassId;
-                this.questFlagType = questFlagType;
-                this.isSpawned = isSpawned;
-                this.isTalkEnabled = isTalkEnabled;
-                this.isEmoteEnabled = isEmoteEnabled;
-                this.isPushEnabled = isPushEnabled;
-            }
-
-            public bool IsChanged(byte flagType, bool isTalkEnabled, bool isPushEnabled, bool isEmoteEnabled, bool isSpawned)
-            {
-                return flagType != this.questFlagType
-                    || isTalkEnabled != this.isTalkEnabled
-                    || isPushEnabled != this.isPushEnabled
-                    || isEmoteEnabled != this.isEmoteEnabled
-                    || isSpawned != this.isSpawned;
-            }
-
-            public void Update(byte flagType, bool isTalkEnabled, bool isPushEnabled, bool isEmoteEnabled, bool isSpawned)
-            {
-                this.questFlagType = flagType;
-                this.isSpawned = isSpawned;
-                this.isTalkEnabled = isTalkEnabled;
-                this.isEmoteEnabled = isEmoteEnabled;
-                this.isPushEnabled = isPushEnabled;
-            }
-        }
+        public const ushort SEQ_NOT_STARTED = 65535;
+        public const ushort SEQ_COMPLETED = 65534;
 
         private struct QuestData
         {
@@ -88,43 +48,37 @@ namespace Meteor.Map.Actors
             }
         }
 
+        // This is only set on instance quests (non static)
         private Player Owner;
         private ushort currentSequence;
-        private QuestData data = new QuestData();
+        private QuestState QuestState;
+        private QuestData Data;
         private bool dataDirty = false;
-        private Dictionary<uint, ENpcQuestInstance> CurrentENPCs = new Dictionary<uint, ENpcQuestInstance>();
-        private Dictionary<uint, ENpcQuestInstance> OldENPCs = new Dictionary<uint, ENpcQuestInstance>();
 
-        public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isPushEnabled = false, bool isEmoteEnabled = false, bool isSpawned = false)
+        public void SetENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isPushEnabled = false, bool isEmoteEnabled = false, bool isSpawned = false)
         {
-            ENpcQuestInstance instanceUpdated = null; 
-
-            if (OldENPCs.ContainsKey(classId))
-            {
-                if (OldENPCs[classId].IsChanged(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned))
-                {
-                    OldENPCs[classId].Update(flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned);
-                    instanceUpdated = OldENPCs[classId];
-                }
-
-                CurrentENPCs.Add(classId, OldENPCs[classId]);
-                OldENPCs.Remove(classId);
-            }
-            else
-            {
-                instanceUpdated = new ENpcQuestInstance(classId, flagType, isSpawned, isTalkEnabled, isEmoteEnabled, isPushEnabled);
-                CurrentENPCs.Add(classId, instanceUpdated);
-            }
-
-            if (instanceUpdated != null)
-                Owner.playerSession.UpdateQuestNpcInInstance(instanceUpdated);
+            if (QuestState != null)
+                QuestState.AddENpc(classId, flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned);
         }
-        
-        public ENpcQuestInstance GetENpcInstance(uint classId)
+
+        public void UpdateENPCs()
         {
-            if (CurrentENPCs.ContainsKey(classId))
-                return CurrentENPCs[classId];
-            return null;
+            if (dataDirty)
+            {
+                if (QuestState != null)
+                    QuestState.UpdateState();
+                dataDirty = false;
+            }
+        }
+
+        public QuestState GetQuestState()
+        {
+            return QuestState;
+        }
+
+        public bool IsInstance()
+        {
+            return Owner != null;
         }
 
         public void OnTalk(Player caller, Npc npc)
@@ -152,25 +106,11 @@ namespace Meteor.Map.Actors
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNpcLS", true, npcLSId);
         }
 
-        public void UpdateENPCs()
-        {
-            if (dataDirty)
-            {
-                OldENPCs = CurrentENPCs;
-                CurrentENPCs = new Dictionary<uint, ENpcQuestInstance>();
-                LuaEngine.GetInstance().CallLuaFunctionForReturn(Owner, this, "onSequence", false, currentSequence);
-                foreach (var enpc in OldENPCs)
-                    Owner.playerSession.UpdateQuestNpcInInstance(enpc.Value);
-                OldENPCs = null;
-                dataDirty = false;
-            }
-        }
-
         public bool IsQuestENPC(Player caller, Npc npc)
         {
             List<LuaParam> returned = LuaEngine.GetInstance().CallLuaFunctionForReturn(caller, this, "IsQuestENPC", true, npc, this);
             bool scriptReturned = returned != null && returned.Count != 0 && returned[0].typeID == 3;
-            return scriptReturned || CurrentENPCs.ContainsKey(npc.GetActorClassId());
+            return scriptReturned || QuestState.HasENpc(npc.GetActorClassId());
         }
 
 
@@ -213,14 +153,14 @@ namespace Meteor.Map.Actors
 
         public void ClearData()
         {
-            data.flags = data.counter1 = data.counter2 = data.counter3 = data.counter4 = 0;
+            Data.flags = Data.counter1 = Data.counter2 = Data.counter3 = Data.counter4 = 0;
         }
 
         public void SetFlag(int index)
         {
             if (index >= 0 && index < 32)
             {
-                data.flags |= (uint)(1 << index);
+                Data.flags |= (uint)(1 << index);
                 dataDirty = true;
             }
         }
@@ -229,7 +169,7 @@ namespace Meteor.Map.Actors
         {
             if (index >= 0 && index < 32)
             {
-                data.flags &= (uint)~(1 << index);
+                Data.flags &= (uint)~(1 << index);
                 dataDirty = true;
             }
         }
@@ -241,16 +181,16 @@ namespace Meteor.Map.Actors
             switch (num)
             {
                 case 0:
-                    data.counter1++;
+                    Data.counter1++;
                     return;
                 case 1:
-                    data.counter2++;
+                    Data.counter2++;
                     return;
                 case 2:
-                    data.counter3++;
+                    Data.counter3++;
                     return;
                 case 3:
-                    data.counter4++;
+                    Data.counter4++;
                     return;
             }
 
@@ -264,16 +204,16 @@ namespace Meteor.Map.Actors
             switch (num)
             {
                 case 0:
-                    data.counter1--;
+                    Data.counter1--;
                     return;
                 case 1:
-                    data.counter2--;
+                    Data.counter2--;
                     return;
                 case 2:
-                    data.counter3--;
+                    Data.counter3--;
                     return;
                 case 3:
-                    data.counter4--;
+                    Data.counter4--;
                     return;
             }
 
@@ -287,16 +227,16 @@ namespace Meteor.Map.Actors
             switch (num)
             {
                 case 0:
-                    data.counter1 = value;
+                    Data.counter1 = value;
                     return;
                 case 1:
-                    data.counter2 = value;
+                    Data.counter2 = value;
                     return;
                 case 2:
-                    data.counter3 = value;
+                    Data.counter3 = value;
                     return;
                 case 3:
-                    data.counter4 = value;
+                    Data.counter4 = value;
                     return;
             }
 
@@ -306,13 +246,13 @@ namespace Meteor.Map.Actors
         public bool GetFlag(int index)
         {
             if (index >= 0 && index < 32)
-                return (data.flags & (uint) (1 << index)) != 0;
+                return (Data.flags & (uint) (1 << index)) != 0;
             return false;
         }
 
         public uint GetFlags()
         {
-            return data.flags;
+            return Data.flags;
         }
 
         public ushort GetCounter(int num)
@@ -320,13 +260,13 @@ namespace Meteor.Map.Actors
             switch (num)
             {
                 case 0:
-                    return data.counter1;
+                    return Data.counter1;
                 case 1:
-                    return data.counter2;
+                    return Data.counter2;
                 case 2:
-                    return data.counter3;
+                    return Data.counter3;
                 case 3:
-                    return data.counter4;
+                    return Data.counter4;
             }
 
             return 0;
@@ -354,12 +294,8 @@ namespace Meteor.Map.Actors
             className = baseQuest.className;
             classPath = baseQuest.classPath;
             currentSequence = sequence;
-            data = new QuestData(flags, counter1, counter2, counter3);
-
-            if (currentSequence == SEQ_NOT_STARTED)
-                LuaEngine.GetInstance().CallLuaFunction(Owner, this, "onStart", false);
-            else
-                StartSequence(currentSequence);
+            QuestState = new QuestState(owner, this);
+            Data = new QuestData(flags, counter1, counter2, counter3);
         }
        
         public uint GetQuestId()
@@ -367,17 +303,34 @@ namespace Meteor.Map.Actors
             return Id & 0xFFFFF;
         }
 
+        public void DoAccept()
+        {
+            if (currentSequence == SEQ_NOT_STARTED)
+                LuaEngine.GetInstance().CallLuaFunction(Owner, this, "onStart", false);
+            else
+                StartSequence(currentSequence);
+        }
+
         public void DoComplete()
         {
             LuaEngine.GetInstance().CallLuaFunctionForReturn(Owner, this, "onFinish", true);
             Owner.SendDataPacket("attention", Server.GetWorldManager().GetActor(), "", 25225, (object)GetQuestId());
             Owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25225, 0x20, (object)GetQuestId());
+            currentSequence = SEQ_COMPLETED;
         }
 
         public void DoAbandon()
         {
             LuaEngine.GetInstance().CallLuaFunctionForReturn(Owner, this, "onFinish", false);
             Owner.SendGameMessage(Owner, Server.GetWorldManager().GetActor(), 25236, 0x20, (object)GetQuestId());
+            currentSequence = SEQ_NOT_STARTED;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is Quest quest)
+                return quest.Id == this.Id;
+            return false;
         }
     }
 }

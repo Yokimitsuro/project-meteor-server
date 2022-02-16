@@ -180,9 +180,12 @@
     <Compile Include="Actors\Group\Work\RelationWork.cs" />
     <Compile Include="Actors\Judge\Judge.cs" />
     <Compile Include="Actors\Quest\Quest.cs" />
+    <Compile Include="Actors\Quest\QuestState.cs" />
+    <Compile Include="Actors\Quest\QuestStateManager.cs" />
     <Compile Include="Actors\StaticActors.cs" />
     <Compile Include="Actors\World\WorldMaster.cs" />
     <Compile Include="DataObjects\GuildleveData.cs" />
+    <Compile Include="DataObjects\QuestData.cs" />
     <Compile Include="DataObjects\Recipe.cs" />
     <Compile Include="DataObjects\RecipeResolver.cs" />
     <Compile Include="DataObjects\TradeTransaction.cs" />
