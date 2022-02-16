@@ -23,8 +23,8 @@ using Meteor.Common;
 using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
-using Meteor.Map.dataobjects;
-using Meteor.Map.dataobjects.chara;
+using Meteor.Map.DataObjects;
+using Meteor.Map.DataObjects.chara;
 using Meteor.Map.lua;
 using Meteor.Map.packets.WorldPackets.Send.Group;
 using Meteor.Map.utils;
@@ -147,6 +147,7 @@ namespace Meteor.Map.Actors
         //Quest Actors (MUST MATCH playerWork.questScenario/questGuildleve)
         public Quest[] questScenario = new Quest[16];
         public uint[] questGuildleve = new uint[8];
+        public QuestStateManager questStateManager;
 
         //Aetheryte
         public uint homepoint = 0;
@@ -274,6 +275,9 @@ namespace Meteor.Map.Actors
             this.aiContainer = new AIContainer(this, new PlayerController(this), null, new TargetFind(this));
             allegiance = CharacterTargetingAllegiance.Player;
             CalculateBaseStats();
+
+            questStateManager = new QuestStateManager(this);
+            questStateManager.Init();
         }
 
         public List<SubPacket> Create0x132Packets()
@@ -400,9 +404,10 @@ namespace Meteor.Map.Actors
             if (CurrentArea.isInn)
             {
                 SetCutsceneBookPacket cutsceneBookPacket = new SetCutsceneBookPacket();
+                bool[] testComplete = new bool[2048]; //TODO: Change to playerwork.scenarioComplete
                 for (int i = 0; i < 2048; i++)
-                    cutsceneBookPacket.cutsceneFlags[i] = true;
-                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1));
+                    testComplete[i] = true;
+                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1, testComplete));
                 QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, 0x16, GetInnCode()));
             }
 
@@ -1730,9 +1735,14 @@ namespace Meteor.Map.Actors
             return null;
         }
 
-        public Quest[] GetQuestsForNpc(Npc npc)
+        public Quest[] GetJournalQuestsForNpc(Npc npc)
         {
             return Array.FindAll(questScenario, e => e != null && e.IsQuestENPC(this, npc));
+        }
+
+        public Quest[] GetQuestsForNpc(Npc npc)
+        {
+            return questStateManager.GetQuestsForNpc(npc);
         }
 
         public void HandleNpcLS(uint id)

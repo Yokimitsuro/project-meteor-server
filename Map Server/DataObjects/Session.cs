@@ -26,8 +26,9 @@ using Meteor.Map.packets.send.actor;
 using System.Collections.Generic;
 using Meteor.Map.actors.chara.npc;
 using static Meteor.Map.Actors.Quest;
+using static Meteor.Map.Actors.QuestState;
 
-namespace Meteor.Map.dataobjects
+namespace Meteor.Map.DataObjects
 {
     class Session
     {
@@ -167,7 +168,7 @@ namespace Meteor.Map.dataobjects
                         Quest[] quests = playerActor.GetQuestsForNpc(npc);
                         if (quests.Length != 0)
                         {
-                            ENpcQuestInstance questInstance = quests[0].GetENpcInstance(npc.GetActorClassId());
+                            QuestENpc questInstance = quests[0].GetQuestState().GetENpc(npc.GetActorClassId());
                             QueuePacket(npc.GetSetEventStatusPackets());
                             QueuePacket(SetActorQuestGraphicPacket.BuildPacket(npc.Id, questInstance.questFlagType));                            
                         }
@@ -179,7 +180,7 @@ namespace Meteor.Map.dataobjects
             }
         }
 
-        public void UpdateQuestNpcInInstance(ENpcQuestInstance questInstance, bool clearInstance = false)
+        public void UpdateQuestNpcInInstance(QuestENpc questInstance, bool clearInstance = false)
         {
             LockUpdates(true);
             Actor actor = actorInstanceList.Find(x => x is Npc npc && npc.GetActorClassId().Equals(questInstance.actorClassId));

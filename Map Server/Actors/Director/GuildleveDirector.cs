@@ -22,7 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using Meteor.Common;
 using Meteor.Map.actors.director.Work;
 using Meteor.Map.Actors;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.utils;
 using System;
 using System.Collections.Generic;

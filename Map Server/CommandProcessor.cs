@@ -22,7 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 
 using System.IO;
 using Meteor.Map.packets.send;

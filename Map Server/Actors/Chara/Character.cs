@@ -24,7 +24,7 @@ using Meteor.Common;
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.actors.group;
 using Meteor.Map.Actors.Chara;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.packets.send.actor;
 using Meteor.Map.packets.send.actor.inventory;
 using Meteor.Map.utils;
