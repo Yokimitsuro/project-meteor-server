@@ -13,7 +13,7 @@ function onBeginLogin(player)
 			--player:AddQuest(110005);
 			player:SetHomePoint(1280061);
 		elseif (initialTown == 3 and player:HasQuest(110009) == false) then
-			--player:AddQuest(110009);
+			player:AddQuest(110009);
 			player:SetHomePoint(1280031);
 		end		
 		
@@ -56,7 +56,7 @@ function onBeginLogin(player)
 		player.positionY = 196.0;
 		player.positionZ = 133.6561;
 		player.rotation = -2.849384;
-		player:GetQuest(110009):ClearClearData();
+		player:GetQuest(110009):ClearData();
 	end	
 end
 
