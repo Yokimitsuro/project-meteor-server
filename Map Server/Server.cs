@@ -50,7 +50,7 @@ namespace Meteor.Map
         private static WorldManager WorldManager;
         private static Dictionary<uint, ItemData> GamedataItems;
         private static Dictionary<uint, GuildleveData> GamedataGuildleves;
-        private static Dictionary<uint, QuestData> GamedataQuests;
+        private static Dictionary<uint, QuestGameData> GamedataQuests;
         private static StaticActors StaticActors;
 
         private PacketProcessor mProcessor;        
@@ -332,7 +332,7 @@ namespace Meteor.Map
                 return null;
         }
 
-        public static QuestData GetQuestGamedata(uint id)
+        public static QuestGameData GetQuestGamedata(uint id)
         {
             if (GamedataQuests.ContainsKey(id))
                 return GamedataQuests[id];
@@ -341,7 +341,7 @@ namespace Meteor.Map
         }
 
 
-        public static QuestData[] GetQuestGamedataByMaxLvl(int lvl, bool all = false)
+        public static QuestGameData[] GetQuestGamedataByMaxLvl(int lvl, bool all = false)
         {
             if (all)
                 return GamedataQuests.Values.Where(quest => quest.MinLevel > 0 && quest.MinLevel <= lvl).ToArray();
@@ -349,17 +349,17 @@ namespace Meteor.Map
                 return GamedataQuests.Values.Where(quest => quest.MinLevel > 0 && quest.MinLevel == lvl).ToArray();
         }
 
-        public static QuestData[] GetQuestGamedataByPrerequisite(uint questId)
+        public static QuestGameData[] GetQuestGamedataByPrerequisite(uint questId)
         {
             return GamedataQuests.Values.Where(quest => quest.PrerequisiteQuest == questId).ToArray();
         }
 
-        public static QuestData[] GetQuestGamedataAllPrerequisite()
+        public static QuestGameData[] GetQuestGamedataAllPrerequisite()
         {
             return GamedataQuests.Values.Where(quest => quest.PrerequisiteQuest != 0).ToArray();
         }
 
-        public static QuestData[] GetQuestGamedataAllGCRanked()
+        public static QuestGameData[] GetQuestGamedataAllGCRanked()
         {
             return GamedataQuests.Values.Where(quest => quest.MinGCRank != 0).ToArray();
         }

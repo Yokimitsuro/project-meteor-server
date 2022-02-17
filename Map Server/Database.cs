@@ -28,12 +28,13 @@ using Meteor.Map.utils;
 using Meteor.Map.packets.send.player;
 using Meteor.Map.DataObjects;
 using Meteor.Map.Actors;
+using Meteor.Map.Actors.QuestNS;
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.packets.receive.supportdesk;
 using Meteor.Map.actors.chara.npc;
 using Meteor.Map.actors.chara.ai;
 using Meteor.Map.packets.send.actor.battle;
-using Meteor.Map.DataObjects;
+
 using System.Security.Cryptography;
 
 namespace Meteor.Map
@@ -72,11 +73,11 @@ namespace Meteor.Map
             return id;
         }
 
-        public static Dictionary<uint, QuestData> GetQuestGamedata()
+        public static Dictionary<uint, QuestGameData> GetQuestGamedata()
         {
             using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
-                Dictionary<uint, QuestData> gamedataQuests = new Dictionary<uint, QuestData>();
+                Dictionary<uint, QuestGameData> gamedataQuests = new Dictionary<uint, QuestGameData>();
 
                 try
                 {
@@ -88,8 +89,7 @@ namespace Meteor.Map
                                 className,
                                 questName,
                                 prerequisite,
-                                minLevel,
-                                minGCRank
+                                minLevel
                                 FROM gamedata_quests
                                 ";
 
@@ -104,8 +104,8 @@ namespace Meteor.Map
                             string name = reader.GetString("questName");
                             uint prerequisite = reader.GetUInt32("prerequisite");
                             ushort minLevel = reader.GetUInt16("minLevel");
-                            ushort minRank = reader.GetUInt16("minGCRank");
-                            gamedataQuests.Add(questId, new QuestData(questId, code, name, prerequisite, minLevel, minRank));
+                            //ushort minRank = reader.GetUInt16("minGCRank");
+                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, 0));
                         }
                     }
                 }
@@ -544,6 +544,8 @@ namespace Meteor.Map
             string query;
             MySqlCommand cmd;
 
+            QuestData qData = quest.GetData();
+
             using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
                 try
@@ -564,10 +566,14 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@slot", slot);
                     cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
                     cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
-                    cmd.Parameters.AddWithValue("@flags", quest.GetFlags());
-                    cmd.Parameters.AddWithValue("@counter1", quest.GetCounter(1));
-                    cmd.Parameters.AddWithValue("@counter2", quest.GetCounter(2));
-                    cmd.Parameters.AddWithValue("@counter3", quest.GetCounter(3));
+
+                    if (qData != null)
+                    {
+                        cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
+                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
+                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
+                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                    }
 
                     cmd.ExecuteNonQuery();
                 }
@@ -1218,11 +1224,13 @@ namespace Meteor.Map
                             ushort counter1 = reader.GetUInt16("counter1");
                             ushort counter2 = reader.GetUInt16("counter2");
                             ushort counter3 = reader.GetUInt16("counter3");
+                            //ushort counter4 = reader.GetUInt16("counter4");
 
                             Quest baseQuest = (Quest) Server.GetStaticActors(questId);
 
                             player.playerWork.questScenario[index] = questId;
-                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3);
+                            player.questScenario[index] = new Quest(player, baseQuest, sequence);
+                            player.questScenario[index].SetData(flags, counter1, counter2, counter3, 0);
                         }
                     }
 

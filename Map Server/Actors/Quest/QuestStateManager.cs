@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meteor.Map.Actors
+namespace Meteor.Map.Actors.QuestNS
 {
     class QuestStateManager
     {
@@ -21,16 +21,30 @@ namespace Meteor.Map.Actors
         private readonly Bitstream GCRankBitfield = new Bitstream(SCENARIO_MAX, true);
 
         private List<Quest> ActiveQuests = new List<Quest>();
+        private Dictionary<uint, QuestState> QuestStateTable = new Dictionary<uint, QuestState>();
 
         public QuestStateManager(Player player)
         {
             this.player = player;
         }
 
-        public void Init()
+        public void Init(Quest[] questScenario)
         {
+            // Preload any quests that the player loaded
+            if (questScenario != null)
+            {
+                foreach (var quest in questScenario)
+                {
+                    if (quest != null)
+                    {
+                        ActiveQuests.Add(quest);
+                        AvailableQuestsBitfield.Set(quest.GetQuestId() - SCENARIO_START);
+                    }
+                }
+            }                
+
             // Init MinLv
-            QuestData[] minLvl = Server.GetQuestGamedataByMaxLvl(player.GetHighestLevel(), true);
+            QuestGameData[] minLvl = Server.GetQuestGamedataByMaxLvl(player.GetHighestLevel(), true);
             foreach (var questData in minLvl)
                 MinLevelBitfield.Set(questData.Id - SCENARIO_START);
 
@@ -43,28 +57,29 @@ namespace Meteor.Map.Actors
                 else
                     PrereqBitfield.Clear(questData.Id - SCENARIO_START);
             }
+
             ComputeAvailable();
         }
 
         public void UpdateLevel(int level)
         {
-            QuestData[] updated = Server.GetQuestGamedataByMaxLvl(level);
+            QuestGameData[] updated = Server.GetQuestGamedataByMaxLvl(level);
             foreach (var questData in updated)
                 MinLevelBitfield.Set(questData.Id - SCENARIO_START);
             ComputeAvailable();
         }
 
-        public void UpdateQuestComplete(Quest quest)
+        public void UpdateQuestCompleted(Quest quest)
         {
-            QuestData[] updated = Server.GetQuestGamedataByPrerequisite(quest.GetQuestId());
+            QuestGameData[] updated = Server.GetQuestGamedataByPrerequisite(quest.GetQuestId());
             foreach (var questData in updated)
                 PrereqBitfield.Set(questData.Id - SCENARIO_START);
             ComputeAvailable();
         }
 
-        public void QuestAdded(Quest quest)
+        public void UpdateQuestAbandoned()
         {
-            ActiveQuests.Remove(quest);
+            ComputeAvailable();
         }
 
         private void ComputeAvailable()
@@ -90,14 +105,47 @@ namespace Meteor.Map.Actors
                         int index = i * 8 + shift;
                         Quest quest = (Quest)Server.GetStaticActors(0xA0F00000 | (SCENARIO_START + (uint)index));
                         if (!AvailableQuestsBitfield.Get(index))
-                            ActiveQuests.Add(new Quest(player, quest));
+                            AddActiveQuest(quest);
                         else
-                            ActiveQuests.Remove(quest);
+                            RemoveActiveQuest(quest);
                     }
                 }
             }
 
             AvailableQuestsBitfield.SetTo(result);
+        }
+
+        public void ForceAddActiveQuest(Quest questInstance)
+        {
+            ActiveQuests.Add(questInstance);
+            QuestStateTable.Add(questInstance.Id, questInstance.GetQuestState());
+        }
+
+        private void AddActiveQuest(Quest staticQuest)
+        {
+            Quest instance = new Quest(player, staticQuest);
+            ActiveQuests.Add(instance);
+            QuestStateTable.Add(staticQuest.Id, instance.GetQuestState());
+        }
+
+        private void RemoveActiveQuest(Quest staticQuest)
+        {
+            // Do not remove quests in the player's journal
+            if (player.HasQuest(staticQuest.GetQuestId()))
+                return;
+
+            ActiveQuests.Remove(staticQuest);
+
+            if (QuestStateTable.ContainsKey(staticQuest.Id))
+            {
+                QuestStateTable[staticQuest.Id].DeleteState();
+                QuestStateTable.Remove(staticQuest.Id);
+            }
+        }
+
+        public Quest GetActiveQuest(uint id)
+        {
+            return ActiveQuests.Find(quest => quest.GetQuestId() == id);
         }
 
         public Quest[] GetQuestsForNpc(Npc npc)

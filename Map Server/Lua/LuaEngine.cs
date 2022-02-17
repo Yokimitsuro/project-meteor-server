@@ -27,7 +27,6 @@ using Meteor.Map.packets.receive.events;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.events;
 using MoonSharp.Interpreter;
-using MoonSharp.Interpreter.Interop;
 using MoonSharp.Interpreter.Loaders;
 using System;
 using System.Collections.Generic;
@@ -37,11 +36,11 @@ using Meteor.Map.actors.area;
 using System.Threading;
 using Meteor.Map.actors.chara.ai;
 using Meteor.Map.actors.chara.ai.controllers;
-using Meteor.Map.DataObjects;
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.Actors.Chara;
 using Meteor.Map.DataObjects.chara;
 using Meteor.Map.actors.chara;
+using Meteor.Map.Actors.QuestNS;
 
 namespace Meteor.Map.lua
 {
@@ -78,6 +77,7 @@ namespace Meteor.Map.lua
             UserData.RegisterType<Command>();
             UserData.RegisterType<Npc>();
             UserData.RegisterType<Quest>();
+            UserData.RegisterType<QuestData>();
             UserData.RegisterType<Zone>();
             UserData.RegisterType<InventoryItem>();
             UserData.RegisterType<ItemPackage>();

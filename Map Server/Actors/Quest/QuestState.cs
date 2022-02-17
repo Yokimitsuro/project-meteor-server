@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Meteor.Map.Actors
+namespace Meteor.Map.Actors.QuestNS
 {
     class QuestState
     {
@@ -49,8 +49,8 @@ namespace Meteor.Map.Actors
             }
         }
 
-        private Player Owner;
-        private Quest Parent;
+        private readonly Player Owner;
+        private readonly Quest Parent;
         private Dictionary<uint, QuestENpc> CurrentENPCs = new Dictionary<uint, QuestENpc>();
         private Dictionary<uint, QuestENpc> OldENPCs = new Dictionary<uint, QuestENpc>();
 
@@ -58,7 +58,6 @@ namespace Meteor.Map.Actors
         {
             Owner = owner;
             Parent = parent;
-            UpdateState();
         }
 
         public void AddENpc(uint classId, byte flagType = 0, bool isTalkEnabled = true, bool isPushEnabled = false, bool isEmoteEnabled = false, bool isSpawned = false)
@@ -105,8 +104,15 @@ namespace Meteor.Map.Actors
             CurrentENPCs = new Dictionary<uint, QuestENpc>();
             LuaEngine.GetInstance().CallLuaFunctionForReturn(Owner, Parent, "onStateChange", false, currentSeq);
             foreach (var enpc in OldENPCs)
-                Owner.playerSession.UpdateQuestNpcInInstance(enpc.Value);
+                Owner.playerSession.UpdateQuestNpcInInstance(enpc.Value, true);
             OldENPCs = null;
+        }
+
+        public void DeleteState()
+        {
+            foreach (var enpc in CurrentENPCs)
+                Owner.playerSession.UpdateQuestNpcInInstance(enpc.Value, true);
+            CurrentENPCs.Clear();
         }
     }
 }

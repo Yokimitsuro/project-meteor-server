@@ -24,7 +24,6 @@ end
 function onEventStarted(player, npc, eventType, eventName)
 	local defaultTalk = player:GetDefaultTalkQuest(npc);
 	local tutorialTalk = player:GetTutorialQuest(npc);
-	local journalQuests = player:GetJournalQuestsForNpc(npc);
 	local activeQuests = player:GetQuestsForNpc(npc);
 	local possibleQuests = {};
 	
@@ -34,9 +33,6 @@ function onEventStarted(player, npc, eventType, eventName)
 	end
 	if (tutorialTalk ~= nil and eventType == ETYPE_TALK) then
 		table.insert(possibleQuests, tutorialTalk);
-	end
-	if (journalQuests ~= nil) then
-		table.insert(possibleQuests, unpack(journalQuests));
 	end
 	if (activeQuests ~= nil) then
 		table.insert(possibleQuests, unpack(activeQuests));

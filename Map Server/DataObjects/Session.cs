@@ -25,8 +25,8 @@ using Meteor.Map.Actors;
 using Meteor.Map.packets.send.actor;
 using System.Collections.Generic;
 using Meteor.Map.actors.chara.npc;
-using static Meteor.Map.Actors.Quest;
-using static Meteor.Map.Actors.QuestState;
+using Meteor.Map.Actors.QuestNS;
+using static Meteor.Map.Actors.QuestNS.QuestState;
 
 namespace Meteor.Map.DataObjects
 {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Meteor.Map.DataObjects
 {
-    class QuestData
+    class QuestGameData
     {
         public uint Id { get; }
         public string ClassName { get; }
@@ -15,7 +15,7 @@ namespace Meteor.Map.DataObjects
         public int MinLevel { get; }
         public int MinGCRank { get; }
 
-        public QuestData(uint id, string className, string name, uint prereq, int minLv, int minGcRank)
+        public QuestGameData(uint id, string className, string name, uint prereq, int minLv, int minGcRank)
         {
             Id = id;
             ClassName = className;
