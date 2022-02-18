@@ -161,7 +161,7 @@ namespace Meteor.Map.Actors.QuestNS
 
         public void Save()
         {
-            Database.SaveQuest(owner, parent);
+            Database.UpdateQuest(owner, parent);
         }
     }
 }

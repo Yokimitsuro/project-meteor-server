@@ -527,18 +527,6 @@ namespace Meteor.Map
             }
         }
 
-        public static void SaveQuest(Player player, Quest quest)
-        {
-            int slot = player.GetQuestSlot(quest.Id);
-            if (slot == -1)
-            {
-                Program.Log.Error("Tried saving quest player didn't have: Player: {0:x}, QuestId: {0:x}", player.Id, quest.Id);
-                return;
-            }
-            else
-                SaveQuest(player, quest, slot);
-        }
-
         public static void SaveQuest(Player player, Quest quest, int slot)
         {
             string query;
@@ -564,6 +552,51 @@ namespace Meteor.Map
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@charaId", player.Id);
                     cmd.Parameters.AddWithValue("@slot", slot);
+                    cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
+                    cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
+
+                    if (qData != null)
+                    {
+                        cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
+                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
+                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
+                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public static void UpdateQuest(Player player, Quest quest)
+        {
+            string query;
+            MySqlCommand cmd;
+
+            QuestData qData = quest.GetData();
+
+            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                try
+                {
+                    conn.Open();
+
+                    query = @"
+                    UPDATE characters_quest_scenario 
+                    SET sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3
+                    WHERE characterId = @charaId and questId = @questId
+                    ";
+
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charaId", player.Id);
                     cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
                     cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
 

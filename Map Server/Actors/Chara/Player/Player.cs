@@ -1436,7 +1436,7 @@ namespace Meteor.Map.Actors
 
             playerWork.questScenario[freeSlot] = instance.Id;
             questScenario[freeSlot] = instance;
-            Database.SaveQuest(this, questScenario[freeSlot]);
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
             SendQuestClientUpdate(freeSlot);
 
             if (!isSilent)
@@ -1458,7 +1458,7 @@ namespace Meteor.Map.Actors
                 {
                     questScenario[i] = newQuestInstance;
                     playerWork.questScenario[i] = questScenario[i].Id;
-                    Database.SaveQuest(this, questScenario[i]);
+                    Database.SaveQuest(this, questScenario[i], i);
                     SendQuestClientUpdate(i);
                     break;
                 }
@@ -1557,7 +1557,7 @@ namespace Meteor.Map.Actors
             if (activeQuest == null)
                 questStateManager.ForceAddActiveQuest(questScenario[freeSlot]);
 
-            Database.SaveQuest(this, questScenario[freeSlot]);
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
             SendQuestClientUpdate(freeSlot);
 
             if (!isSilent)
