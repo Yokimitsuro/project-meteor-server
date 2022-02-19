@@ -74,7 +74,7 @@ function onTalk(player, quest, npc, eventName)
 	-- Offer the quest
 	if (npcClassId == KINNISON and not player:HasQuest(quest)) then
 		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventOffersStart");
-		if (questAccepted) then
+		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
 		player:EndEvent();
@@ -146,7 +146,7 @@ function onTalk(player, quest, npc, eventName)
 		if (npcClassId == KINNISON) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEventClear");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
-            player:CompleteQuest(quest:GetQuestId());
+            player:CompleteQuest(quest);
 		end
 	end
 	quest:UpdateENPCs();	

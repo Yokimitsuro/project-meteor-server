@@ -47,6 +47,7 @@ using Meteor.Map.packets.send.actor.battle;
 using Meteor.Map.packets.receive.events;
 using static Meteor.Map.LuaUtils;
 using Meteor.Map.packets.send.actor.events;
+using System.Text;
 
 namespace Meteor.Map.Actors
 {
@@ -243,8 +244,7 @@ namespace Meteor.Map.Actors
             charaWork.command[15] = 0xA0F00000 | 22015;            
 
             charaWork.commandAcquired[27150 - 26000] = true;
-
-            playerWork.questScenarioComplete[110001 - 110001] = true;
+            
             playerWork.questGuildleveComplete[120050 - 120001] = true;
 
             for (int i = 0; i < charaWork.additionalCommandAcquired.Length; i++ )
@@ -278,7 +278,7 @@ namespace Meteor.Map.Actors
             CalculateBaseStats();
 
             questStateManager = new QuestStateManager(this);
-            questStateManager.Init(questScenario);
+            questStateManager.Init(questScenario, playerWork.questScenarioComplete);
         }
 
         public List<SubPacket> Create0x132Packets()
@@ -1157,6 +1157,44 @@ namespace Meteor.Map.Actors
            
         }
 
+        private void SendAchievedAetheryte(ushort from, ushort to)
+        {
+            Bitstream fakeAetheryte = new Bitstream(512, true);
+
+            SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "work/achieveAetheryte");
+            completedQuestWorkUpdate.AddBitfield(Utils.MurmurHash2("work.event_achieve_aetheryte", 0), fakeAetheryte.GetSlice(from, to));
+            completedQuestWorkUpdate.AddTarget();
+            QueuePacket(completedQuestWorkUpdate.BuildPacket(Id));
+        }
+
+        private void SendCompletedQuests(ushort from, ushort to)
+        {
+            Bitstream completed = questStateManager.GetCompletedBitstream();
+            completed.SetAll(true);
+            byte[] data = completed.GetSlice(from, to);
+
+            SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "playerWork/journal");            
+            completedQuestWorkUpdate.AddBitfield(Utils.MurmurHash2("playerWork.questScenarioComplete", 0), data);
+            completedQuestWorkUpdate.AddTarget();
+            QueuePacket(completedQuestWorkUpdate.BuildPacket(Id));
+        }
+
+        public void OnWorkSyncRequest(string propertyName, ushort from = 0, ushort to = 0)
+        {               
+            switch (propertyName)
+            {
+                case "charaWork/exp":
+                    SendCharaExpInfo();
+                    break;
+                case "work/achieveAetheryte":
+                    SendAchievedAetheryte(from, to);
+                    break;
+                case "playerWork/questCompleteS":
+                    SendCompletedQuests(from, to);
+                    break;
+            }
+        }
+
         public int GetHighestLevel()
         {
             int max = 0;
@@ -1436,7 +1474,6 @@ namespace Meteor.Map.Actors
 
             playerWork.questScenario[freeSlot] = instance.Id;
             questScenario[freeSlot] = instance;
-            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
             SendQuestClientUpdate(freeSlot);
 
             if (!isSilent)
@@ -1445,6 +1482,8 @@ namespace Meteor.Map.Actors
             }
 
             instance.OnAccept();
+
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
 
             return true;
         }
@@ -1458,8 +1497,11 @@ namespace Meteor.Map.Actors
                 {
                     questScenario[i] = newQuestInstance;
                     playerWork.questScenario[i] = questScenario[i].Id;
-                    Database.SaveQuest(this, questScenario[i], i);
                     SendQuestClientUpdate(i);
+                    oldQuestInstance.OnComplete();
+                    questStateManager.UpdateQuestCompleted(oldQuestInstance);
+                    newQuestInstance.OnAccept();
+                    Database.SaveQuest(this, questScenario[i], i);
                     break;
                 }
             }
@@ -1472,14 +1514,14 @@ namespace Meteor.Map.Actors
             {
                 // Remove the quest from the DB and update client work values
                 playerWork.questScenarioComplete[completed.GetQuestId() - 110001] = true;
-                Database.CompleteQuest(playerSession.GetActor(), completed.Id);
-                Database.RemoveQuest(this, completed.Id);
                 questScenario[slot] = null;
                 playerWork.questScenario[slot] = 0;
                 SendQuestClientUpdate(slot);
 
                 // Reset active quest and quest state
                 completed.OnComplete();
+                Database.SaveCompletedQuests(playerSession.GetActor());
+                Database.RemoveQuest(this, completed.Id);
                 questStateManager.UpdateQuestCompleted(completed);
 
                 // Msg Player
@@ -1512,13 +1554,13 @@ namespace Meteor.Map.Actors
             }
 
             // Remove the quest from the DB and update client work values
-            Database.RemoveQuest(this, abandoned.Id);
             questScenario[slot] = null;
             playerWork.questScenario[slot] = 0;
             SendQuestClientUpdate(slot);
 
             // Reset active quest and quest state
             abandoned.OnAbandon();
+            Database.RemoveQuest(this, abandoned.Id);
             questStateManager.UpdateQuestAbandoned();
 
             // Msg Player

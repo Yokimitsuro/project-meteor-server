@@ -255,6 +255,26 @@ namespace Meteor.Common
             return data;
         }
 
+        public static bool[] ConvertBinaryStreamToBoolArray(byte[] bytes)
+        {
+            bool[] data = new bool[bytes.Length * 8];
+
+            int boolCounter = 0;
+            for (int i = 0; i < bytes.Length; i ++)
+            {
+                if (bytes[i] == 0)
+                {
+                    boolCounter += 8;
+                    continue;
+                }
+
+                for (int bitCount = 0; bitCount < 8; bitCount++)
+                    data[boolCounter++] = (bytes[i] >> bitCount & 1) == 1;                
+            }
+
+            return data;
+        }
+
         public static string ToStringBase63(int number)
         {
             var lookup = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

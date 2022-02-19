@@ -15,6 +15,7 @@ namespace Meteor.Map.Actors.QuestNS
         private const int SCENARIO_MAX = 2048;
 
         private readonly Player player;
+        private readonly Bitstream CompletedQuestsBitfield = new Bitstream(SCENARIO_MAX);
         private readonly Bitstream AvailableQuestsBitfield = new Bitstream(SCENARIO_MAX);
         private readonly Bitstream MinLevelBitfield = new Bitstream(SCENARIO_MAX);
         private readonly Bitstream PrereqBitfield = new Bitstream(SCENARIO_MAX, true);
@@ -28,12 +29,12 @@ namespace Meteor.Map.Actors.QuestNS
             this.player = player;
         }
 
-        public void Init(Quest[] questScenario)
+        public void Init(Quest[] journalQuests, bool[] completedQuests)
         {
             // Preload any quests that the player loaded
-            if (questScenario != null)
+            if (journalQuests != null)
             {
-                foreach (var quest in questScenario)
+                foreach (var quest in journalQuests)
                 {
                     if (quest != null)
                     {
@@ -49,10 +50,10 @@ namespace Meteor.Map.Actors.QuestNS
                 MinLevelBitfield.Set(questData.Id - SCENARIO_START);
 
             // Init Prereq
-            Bitstream completed = new Bitstream(player.playerWork.questScenarioComplete);
+            CompletedQuestsBitfield.SetTo(completedQuests);
             foreach (var questData in Server.GetQuestGamedataAllPrerequisite())
             {
-                if (completed.Get(((Quest)Server.GetStaticActors(0xA0F00000 | questData.PrerequisiteQuest)).GetQuestId() - SCENARIO_START))
+                if (CompletedQuestsBitfield.Get(((Quest)Server.GetStaticActors(0xA0F00000 | questData.PrerequisiteQuest)).GetQuestId() - SCENARIO_START))
                     PrereqBitfield.Set(questData.Id - SCENARIO_START);
                 else
                     PrereqBitfield.Clear(questData.Id - SCENARIO_START);
@@ -71,6 +72,7 @@ namespace Meteor.Map.Actors.QuestNS
 
         public void UpdateQuestCompleted(Quest quest)
         {
+            CompletedQuestsBitfield.Set(quest.Id - SCENARIO_START);
             QuestGameData[] updated = Server.GetQuestGamedataByPrerequisite(quest.GetQuestId());
             foreach (var questData in updated)
                 PrereqBitfield.Set(questData.Id - SCENARIO_START);
@@ -84,7 +86,8 @@ namespace Meteor.Map.Actors.QuestNS
 
         private void ComputeAvailable()
         {
-            Bitstream result = new Bitstream(player.playerWork.questScenarioComplete);
+            Bitstream result = new Bitstream(SCENARIO_MAX);
+            result.OR(CompletedQuestsBitfield);
             result.NOT();
             result.AND(MinLevelBitfield);
             result.AND(PrereqBitfield);
@@ -151,6 +154,11 @@ namespace Meteor.Map.Actors.QuestNS
         public Quest[] GetQuestsForNpc(Npc npc)
         {
             return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
+        }
+
+        public Bitstream GetCompletedBitstream()
+        {
+            return CompletedQuestsBitfield; 
         }
     }
 }

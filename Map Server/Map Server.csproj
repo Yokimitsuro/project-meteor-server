@@ -227,7 +227,7 @@
     <Compile Include="Packets\Receive\CountdownRequestPacket.cs" />
     <Compile Include="Packets\Receive\LangaugeCodePacket.cs" />
     <Compile Include="Packets\Receive\UpdateItemPackagePacket.cs" />
-    <Compile Include="Packets\Receive\ParameterDataRequestPacket.cs" />
+    <Compile Include="Packets\Receive\WorkSyncRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\RecruitmentDetailsRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\RecruitmentSearchRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\StartRecruitingRequestPacket.cs" />

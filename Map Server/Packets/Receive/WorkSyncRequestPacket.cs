@@ -26,7 +26,7 @@ using System.Text;
 
 namespace Meteor.Map.packets.receive
 {
-    class ParameterDataRequestPacket
+    class WorkSyncRequestPacket
     {
         public const ushort OPCODE = 0x012F;
         public const uint PACKET_SIZE = 0x48;
@@ -34,9 +34,11 @@ namespace Meteor.Map.packets.receive
         public bool invalidPacket = false;
 
         public uint actorID;
-        public string paramName;
+        public string propertyName;
+        public ushort from, to;
+        public bool requestingBitfield = false;
        
-        public ParameterDataRequestPacket(byte[] data)
+        public WorkSyncRequestPacket(byte[] data)
         {
             using (MemoryStream mem = new MemoryStream(data))
             {
@@ -44,13 +46,22 @@ namespace Meteor.Map.packets.receive
                 {
                     try{
                         actorID = binReader.ReadUInt32();
-                        List<byte> strList = new List<byte>();
-                        byte curByte;
-                        while ((curByte = binReader.ReadByte()) != 0 && strList.Count<=0x20)
+                        if (binReader.PeekChar() == 9)
                         {
-                            strList.Add(curByte);
+                            binReader.ReadByte();
+                            from = binReader.ReadUInt16();
+                            to = binReader.ReadUInt16();
                         }
-                        paramName = Encoding.ASCII.GetString(strList.ToArray());
+
+                        byte currentByte;
+                        int size = 0;
+                        long strPos = binReader.BaseStream.Position;
+                        while ((currentByte = binReader.ReadByte()) != 0 && size <= 0x20)
+                            size++;
+
+                        binReader.BaseStream.Seek(strPos, SeekOrigin.Begin);
+                        byte[] str = binReader.ReadBytes(size);
+                        propertyName = Encoding.ASCII.GetString(str);
                     }
                     catch (Exception){
                         invalidPacket = true;

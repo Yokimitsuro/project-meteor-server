@@ -763,7 +763,7 @@ namespace Meteor.Map
             }
         }
 
-        public static void CompleteQuest(Player player, uint questId)
+        public static void SaveCompletedQuests(Player player)
         {
             string query;
             MySqlCommand cmd;
@@ -776,15 +776,15 @@ namespace Meteor.Map
 
                     query = @"
                     INSERT INTO characters_quest_completed 
-                    (characterId, questId)
+                    (characterId, completedQuests)
                     VALUES
-                    (@charaId, @questId)
-                    ON DUPLICATE KEY UPDATE characterId=characterId
+                    (@charaId, @completedQuests)
+                    ON DUPLICATE KEY UPDATE completedQuests=completedQuests
                     ";
 
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@charaId", player.Id);
-                    cmd.Parameters.AddWithValue("@questId", 0xFFFFF & questId);
+                    cmd.Parameters.AddWithValue("@completedQuests", Utils.ConvertBoolArrayToBinaryStream(player.playerWork.questScenarioComplete));
 
                     cmd.ExecuteNonQuery();
                 }
@@ -797,31 +797,6 @@ namespace Meteor.Map
                     conn.Dispose();
                 }
             }
-        }
-
-        public static bool IsQuestCompleted(Player player, uint questId)
-        {
-            bool isCompleted = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
-            {
-                try
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM characters_quest_completed WHERE characterId = @charaId and questId = @questId", conn);
-                    cmd.Parameters.AddWithValue("@charaId", player.Id);
-                    cmd.Parameters.AddWithValue("@questId", questId);
-                    isCompleted = cmd.ExecuteScalar() != null;
-                }
-                catch (MySqlException e)
-                {
-                    Program.Log.Error(e.ToString());
-                }
-                finally
-                {
-                    conn.Dispose();
-                }
-            }
-            return isCompleted;
         }
 
         public static void LoadPlayerCharacter(Player player)
@@ -1264,6 +1239,25 @@ namespace Meteor.Map
                             player.playerWork.questScenario[index] = questId;
                             player.questScenario[index] = new Quest(player, baseQuest, sequence);
                             player.questScenario[index].SetData(flags, counter1, counter2, counter3, 0);
+                        }
+                    }
+
+                    //Load Completed Quests bitstream
+                    query = @"
+                        SELECT 
+                        completedQuests
+                        FROM characters_quest_completed WHERE characterId = @charaId";
+
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charaId", player.Id);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // Replace the bool stream or use the default empty one.
+                        if (reader.Read())
+                        {
+                            byte[] bytes = new byte[256];
+                            reader.GetBytes(reader.GetOrdinal("completedQuests"), 0, bytes, 0, 256);
+                            player.playerWork.questScenarioComplete = Utils.ConvertBinaryStreamToBoolArray(bytes);
                         }
                     }
 

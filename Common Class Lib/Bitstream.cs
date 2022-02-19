@@ -9,7 +9,7 @@ namespace Meteor.Common
 {
     public class Bitstream
     {
-        private readonly byte[] Data;
+        private byte[] Data;
 
         public Bitstream(uint numBits, bool setAllTrue = false)
         {
@@ -51,6 +51,12 @@ namespace Meteor.Common
             }
         }
 
+        public void SetTo(bool[] result)
+        {
+            Debug.Assert(Data.Length == result.Length / 8);
+            Data = Utils.ConvertBoolArrayToBinaryStream(result);
+        }
+
         public bool Get(uint at)
         {
             return Get((int)at);
@@ -60,6 +66,7 @@ namespace Meteor.Common
         {
             int bytePos = at / 8;
             int bitPos = at % 8;
+
             return (Data[bytePos] & (1 << bitPos)) != 0;
         }
 
@@ -146,5 +153,46 @@ namespace Meteor.Common
             return Data;
         }
 
+        public byte[] GetSlice(ushort from, ushort to)
+        {
+            int remainder = ((to - from) % 8 != 0) ? 1 : 0;
+            byte[] toReturn = new byte[((to - from) / 8) + remainder + 1];
+            toReturn[toReturn.Length - 1] = 0x3;
+
+
+            byte curByte = 0;
+
+            int destByteIndx = 0;
+            int destShiftIndx = 0;
+            int srcByteIndx = from / 8;
+            int srcShiftIndx = from % 8;
+
+            for (int i = from; i <= to; i++)
+            {
+                // Skip Zeros
+                if (Data[srcByteIndx] == 0)
+                {
+                    srcByteIndx++;
+                    srcShiftIndx = 0;
+                    destByteIndx++;
+                    i += 8;
+                }
+
+                bool val = (Data[srcByteIndx] & (1 << srcShiftIndx)) != 0;
+
+                curByte |= (byte)((val ? 1 : 0) << destShiftIndx++);
+                if (destShiftIndx == 8)
+                {
+                    toReturn[destByteIndx++] = curByte;
+                    destShiftIndx = 0;
+                    curByte = 0;
+                }
+            }
+
+            if (destByteIndx == toReturn.Length - 2)
+                toReturn[destByteIndx] = curByte;
+
+            return toReturn;
+        }
     }
 }
