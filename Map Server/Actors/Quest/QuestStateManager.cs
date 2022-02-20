@@ -156,9 +156,23 @@ namespace Meteor.Map.Actors.QuestNS
             return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
         }
 
-        public Bitstream GetCompletedBitstream()
+        public byte[] GetCompletionSliceBytes(ushort from, ushort to)
         {
-            return CompletedQuestsBitfield; 
+            return CompletedQuestsBitfield.GetSlice(from, to); 
+        }
+
+        public bool IsQuestComplete(uint questId)
+        {
+            return CompletedQuestsBitfield.Get(questId - SCENARIO_START);
+        }
+
+        public void ForceQuestCompleteFlag(uint questId, bool flag)
+        {
+            if (flag)
+                CompletedQuestsBitfield.Set(questId - SCENARIO_START);
+            else 
+                CompletedQuestsBitfield.Clear(questId - SCENARIO_START);
+            ComputeAvailable();
         }
     }
 }

@@ -1169,8 +1169,7 @@ namespace Meteor.Map.Actors
 
         private void SendCompletedQuests(ushort from, ushort to)
         {
-            Bitstream completed = questStateManager.GetCompletedBitstream();
-            byte[] data = completed.GetSlice(from, to);
+            byte[] data = questStateManager.GetCompletionSliceBytes(from, to);
 
             SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "playerWork/journal");            
             completedQuestWorkUpdate.AddBitfield(Utils.MurmurHash2("playerWork.questScenarioComplete", 0), data);
@@ -1659,6 +1658,25 @@ namespace Meteor.Map.Actors
             }
 
             return false;
+        }
+
+        public bool IsQuestCompleted(uint id)
+        {
+            return questStateManager.IsQuestComplete(id);
+        }
+
+        public void SetQuestComplete(uint id, bool flag)
+        {
+            if (flag)
+            {
+                Quest currentQuest = GetQuest(id);
+                if (currentQuest != null)
+                {
+                    CompleteQuest(currentQuest);
+                    return;
+                }
+            }
+            questStateManager.ForceQuestCompleteFlag(id, flag);
         }
 
         public Quest GetQuest(uint id)
