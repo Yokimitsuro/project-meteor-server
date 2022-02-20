@@ -176,11 +176,17 @@ namespace Meteor.Common
                     srcShiftIndx = 0;
                     destByteIndx++;
                     i += 8;
+                    continue;
                 }
 
-                bool val = (Data[srcByteIndx] & (1 << srcShiftIndx)) != 0;
+                bool val = (Data[srcByteIndx] & (1 << srcShiftIndx++)) != 0;
 
                 curByte |= (byte)((val ? 1 : 0) << destShiftIndx++);
+                if (srcShiftIndx == 8)
+                {
+                    srcShiftIndx = 0;
+                    srcByteIndx++;
+                }
                 if (destShiftIndx == 8)
                 {
                     toReturn[destByteIndx++] = curByte;

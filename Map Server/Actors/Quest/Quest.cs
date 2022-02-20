@@ -34,7 +34,6 @@ namespace Meteor.Map.Actors.QuestNS
         private ushort currentSequence;
         private QuestState questState = null;
         private QuestData data = null;
-        private bool dataDirty = false;
 
         // Creates a Static Quest for the StaticActors list.
         public Quest(uint actorID, string className, string classPath)
@@ -124,11 +123,11 @@ namespace Meteor.Map.Actors.QuestNS
 
         public void UpdateENPCs()
         {
-            if (dataDirty)
+            if (data.Dirty)
             {
                 if (questState != null)
                     questState.UpdateState();
-                dataDirty = false;
+                data.ClearDirty();
             }
         }
 
@@ -199,8 +198,7 @@ namespace Meteor.Map.Actors.QuestNS
             if (currentSequence != SEQ_NOT_STARTED)
                 owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
 
-            currentSequence = sequence;
-            dataDirty = true;
+            currentSequence = sequence;            
             questState.UpdateState();
         }
 

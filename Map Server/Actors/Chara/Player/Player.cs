@@ -1170,7 +1170,6 @@ namespace Meteor.Map.Actors
         private void SendCompletedQuests(ushort from, ushort to)
         {
             Bitstream completed = questStateManager.GetCompletedBitstream();
-            completed.SetAll(true);
             byte[] data = completed.GetSlice(from, to);
 
             SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "playerWork/journal");            

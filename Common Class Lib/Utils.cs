@@ -245,7 +245,7 @@ namespace Meteor.Common
             {
                 for (var bitCount = 0; bitCount < 8; bitCount++)
                 {
-                    if (i + bitCount >= array.Length)
+                    if (i + bitCount >= array.Length - 1)
                         break;
                     data[dataCounter] = (byte)(((array[i + bitCount] ? 1 : 0) << 7 - bitCount) | data[dataCounter]);
                 }

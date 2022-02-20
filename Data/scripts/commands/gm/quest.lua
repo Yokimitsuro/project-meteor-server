@@ -66,7 +66,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
 
 						local flagStr = "";
 						for i=0,31,1 do 
-							if (quest:GetFlag(i)) then
+							if (quest:GetData():GetFlag(i)) then
 								flagStr = flagStr .. "O";
 							else
 								flagStr = flagStr .. "X";
@@ -76,10 +76,12 @@ function onTrigger(player, argc, command, var1, var2, var3)
 							end
 						end
 						
+						local data = quest:GetData();
+						
 						message = string.format("\nInfo for quest %s [%d]\n", quest.Name, quest:GetQuestId());
 						message = message .. string.format("Current Sequence: %d\n", quest:getSequence());
 						message = message .. string.format("Flags: \n%s\n", flagStr)
-						message = message .. string.format("Counters: %d,%d,%d,%d", quest:getCounter(0), quest:getCounter(1), quest:getCounter(2), quest:getCounter(3));
+						message = message .. string.format("Counters: %d,%d,%d,%d", data:getCounter(0), data:getCounter(1), data:getCounter(2), data:getCounter(3));
                     else
                         message = ("Quest not active: "..var1);
                     end
@@ -118,7 +120,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
                         boolvar = false;
                     elseif var3 == "flip" or var3 == "toggle" then
                         if player:HasQuest(questvar) == true then
-                            boolvar = not player:GetQuest(questvar):GetFlag(flagvar);
+                            boolvar = not player:GetQuest(questvar):GetData():GetFlag(flagvar);
                         end
                     else
                         message = ("error: flag: boolean not recognized");
@@ -126,13 +128,13 @@ function onTrigger(player, argc, command, var1, var2, var3)
                         return;
                     end
                     
-                    var4 =  player:GetQuest(questvar):GetFlag(flagvar);
+                    var4 =  player:GetQuest(questvar):GetData():GetFlag(flagvar);
                     
                     if var4 ~= boolvar then
 						if (boolvar == true) then
-							player:GetQuest(questvar):SetFlag(flagvar);
+							player:GetQuest(questvar):GetData():SetFlag(flagvar);
 						else
-							player:GetQuest(questvar):ClearFlag(flagvar);
+							player:GetQuest(questvar):GetData():ClearFlag(flagvar);
 						end
                         player:GetQuest(questvar):UpdateENPCs();
                         player:GetQuest(questvar):SaveData();	
@@ -152,7 +154,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
                     questvar = tonumber(var1);
                     index = (tonumber(var2));
                     
-					player:GetQuest(questvar):SetCounter(index, tonumber(var3));
+					player:GetQuest(questvar):GetData():SetCounter(index, tonumber(var3));
 					player:GetQuest(questvar):UpdateENPCs();
 					player:GetQuest(questvar):SaveData();	
 					message = ("changing counter "..tonumber(var2).." to "..var3);

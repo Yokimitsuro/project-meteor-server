@@ -16,7 +16,8 @@ namespace Meteor.Map.Actors.QuestNS
         private ushort counter2;
         private ushort counter3;
         private ushort counter4;
-        private bool dataDirty = false;
+
+        public bool Dirty { get; private set; } = false;
 
         public QuestData(Player owner, Quest parent, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4)
         {
@@ -46,7 +47,7 @@ namespace Meteor.Map.Actors.QuestNS
             if (index >= 0 && index < 32)
             {
                 flags |= (uint)(1 << index);
-                dataDirty = true;
+                Dirty = true;
             }
         }
 
@@ -55,13 +56,13 @@ namespace Meteor.Map.Actors.QuestNS
             if (index >= 0 && index < 32)
             {
                 flags &= (uint)~(1 << index);
-                dataDirty = true;
+                Dirty = true;
             }
         }
 
         public ushort IncCounter(int num)
         {
-            dataDirty = true;
+            Dirty = true;
 
             switch (num)
             {
@@ -79,13 +80,13 @@ namespace Meteor.Map.Actors.QuestNS
                     return counter4;
             }
 
-            dataDirty = false;
+            Dirty = false;
             return 0;
         }
 
         public ushort DecCounter(int num)
         {
-            dataDirty = true;
+            Dirty = true;
 
             switch (num)
             {
@@ -103,13 +104,13 @@ namespace Meteor.Map.Actors.QuestNS
                     return counter4;
             }
 
-            dataDirty = false;
+            Dirty = false;
             return 0;
         }
 
         public void SetCounter(int num, ushort value)
         {
-            dataDirty = true;
+            Dirty = true;
 
             switch (num)
             {
@@ -127,7 +128,7 @@ namespace Meteor.Map.Actors.QuestNS
                     return;
             }
 
-            dataDirty = false;
+            Dirty = false;
         }
 
         public bool GetFlag(int index)
@@ -158,6 +159,11 @@ namespace Meteor.Map.Actors.QuestNS
 
             return 0;
         }
+
+        public void ClearDirty()
+        {
+            Dirty = false;
+        }        
 
         public void Save()
         {
