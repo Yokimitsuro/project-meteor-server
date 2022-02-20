@@ -57,6 +57,14 @@ function onBeginLogin(player)
 		player.positionZ = 133.6561;
 		player.rotation = -2.849384;
 		player:GetQuest(110009):ClearData();
+    
+    elseif (player:HasQuest(110009) == true and player.CurrentArea.ZoneId == 175) then
+		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
+		player:AddDirector(director);
+		director:StartDirector(true);
+		player:SetLoginDirector(director);		
+		player:KickEvent(director, "noticeEvent", true);   
+      
 	end	
 end
 
