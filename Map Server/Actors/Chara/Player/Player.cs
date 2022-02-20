@@ -23,8 +23,8 @@ using Meteor.Common;
 using System;
 using System.Collections.Generic;
 using MoonSharp.Interpreter;
-using Meteor.Map.dataobjects;
-using Meteor.Map.dataobjects.chara;
+using Meteor.Map.DataObjects;
+using Meteor.Map.DataObjects.chara;
 using Meteor.Map.lua;
 using Meteor.Map.packets.WorldPackets.Send.Group;
 using Meteor.Map.utils;
@@ -37,6 +37,7 @@ using Meteor.Map.actors.chara.ai.controllers;
 using Meteor.Map.actors.chara.ai.utils;
 using Meteor.Map.actors.chara.ai.state;
 using Meteor.Map.actors.chara;
+using Meteor.Map.Actors.QuestNS;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.actor;
 using Meteor.Map.packets.send.events;
@@ -46,6 +47,7 @@ using Meteor.Map.packets.send.actor.battle;
 using Meteor.Map.packets.receive.events;
 using static Meteor.Map.LuaUtils;
 using Meteor.Map.packets.send.actor.events;
+using System.Text;
 
 namespace Meteor.Map.Actors
 {
@@ -147,6 +149,7 @@ namespace Meteor.Map.Actors
         //Quest Actors (MUST MATCH playerWork.questScenario/questGuildleve)
         public Quest[] questScenario = new Quest[16];
         public uint[] questGuildleve = new uint[8];
+        public QuestStateManager questStateManager;
 
         //Aetheryte
         public uint homepoint = 0;
@@ -241,8 +244,7 @@ namespace Meteor.Map.Actors
             charaWork.command[15] = 0xA0F00000 | 22015;            
 
             charaWork.commandAcquired[27150 - 26000] = true;
-
-            playerWork.questScenarioComplete[110001 - 110001] = true;
+            
             playerWork.questGuildleveComplete[120050 - 120001] = true;
 
             for (int i = 0; i < charaWork.additionalCommandAcquired.Length; i++ )
@@ -274,6 +276,9 @@ namespace Meteor.Map.Actors
             this.aiContainer = new AIContainer(this, new PlayerController(this), null, new TargetFind(this));
             allegiance = CharacterTargetingAllegiance.Player;
             CalculateBaseStats();
+
+            questStateManager = new QuestStateManager(this);
+            questStateManager.Init(questScenario, playerWork.questScenarioComplete);
         }
 
         public List<SubPacket> Create0x132Packets()
@@ -400,9 +405,10 @@ namespace Meteor.Map.Actors
             if (CurrentArea.isInn)
             {
                 SetCutsceneBookPacket cutsceneBookPacket = new SetCutsceneBookPacket();
+                bool[] testComplete = new bool[2048]; //TODO: Change to playerwork.scenarioComplete
                 for (int i = 0; i < 2048; i++)
-                    cutsceneBookPacket.cutsceneFlags[i] = true;
-                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1));
+                    testComplete[i] = true;
+                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1, testComplete));
                 QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, 0x16, GetInnCode()));
             }
 
@@ -801,7 +807,7 @@ namespace Meteor.Map.Actors
             foreach (Quest quest in questScenario)
             {
                 if (quest != null)
-                    quest.SaveData();
+                    quest.GetData().Save();
             }    
         }
 
@@ -1151,6 +1157,42 @@ namespace Meteor.Map.Actors
            
         }
 
+        private void SendAchievedAetheryte(ushort from, ushort to)
+        {
+            Bitstream fakeAetheryte = new Bitstream(512, true);
+
+            SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "work/achieveAetheryte");
+            completedQuestWorkUpdate.AddBitfield(Utils.MurmurHash2("work.event_achieve_aetheryte", 0), fakeAetheryte.GetSlice(from, to));
+            completedQuestWorkUpdate.AddTarget();
+            QueuePacket(completedQuestWorkUpdate.BuildPacket(Id));
+        }
+
+        private void SendCompletedQuests(ushort from, ushort to)
+        {
+            byte[] data = questStateManager.GetCompletionSliceBytes(from, to);
+
+            SetActorPropetyPacket completedQuestWorkUpdate = new SetActorPropetyPacket(from, to, "playerWork/journal");            
+            completedQuestWorkUpdate.AddBitfield(Utils.MurmurHash2("playerWork.questScenarioComplete", 0), data);
+            completedQuestWorkUpdate.AddTarget();
+            QueuePacket(completedQuestWorkUpdate.BuildPacket(Id));
+        }
+
+        public void OnWorkSyncRequest(string propertyName, ushort from = 0, ushort to = 0)
+        {               
+            switch (propertyName)
+            {
+                case "charaWork/exp":
+                    SendCharaExpInfo();
+                    break;
+                case "work/achieveAetheryte":
+                    SendAchievedAetheryte(from, to);
+                    break;
+                case "playerWork/questCompleteS":
+                    SendCompletedQuests(from, to);
+                    break;
+            }
+        }
+
         public int GetHighestLevel()
         {
             int max = 0;
@@ -1413,33 +1455,276 @@ namespace Meteor.Map.Actors
             return -1;
         }
 
-        //For Lua calls, cause MoonSharp goes retard with uint
-        public void AddQuest(int id, bool isSilent = false)
+        #region Quests - Script Related
+        // Add quest from an active quest in the player's quest state. Quest scripts will use this to add a quest.
+        public bool AcceptQuest(Quest instance, bool isSilent = false)
         {
-            AddQuest((uint)id, isSilent);
-        }       
-        public void CompleteQuest(int id)
-        {
-            CompleteQuest((uint)id);
-        }
-        public bool HasQuest(int id)
-        {
-            return HasQuest((uint)id);
-        }
-        public Quest GetQuest(int id)
-        {
-            return GetQuest((uint)id);
-        }
-        public bool IsQuestCompleted(int id)
-        {
-            return IsQuestCompleted((uint)id);
-        }
-        public bool CanAcceptQuest(int id)
-        {
-            return CanAcceptQuest((uint)id);
-        }
-        //For Lua calls, cause MoonSharp goes retard with uint
+            if (instance == null)
+                return false;
 
+            int freeSlot = GetFreeQuestSlot();
+
+            if (freeSlot == -1)
+            {
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25234, 0x20); // "You cannot accept any more quests at this time."
+                return false;
+            }
+
+            playerWork.questScenario[freeSlot] = instance.Id;
+            questScenario[freeSlot] = instance;
+            SendQuestClientUpdate(freeSlot);
+
+            if (!isSilent)
+            {
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
+            }
+
+            instance.OnAccept();
+
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
+
+            return true;
+        }
+
+        // Replace a quest with another quest in the player's quest state.
+        public void ReplaceQuest(Quest oldQuestInstance, Quest newQuestInstance)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Equals(oldQuestInstance))
+                {
+                    questScenario[i] = newQuestInstance;
+                    playerWork.questScenario[i] = questScenario[i].Id;
+                    SendQuestClientUpdate(i);
+                    oldQuestInstance.OnComplete();
+                    questStateManager.UpdateQuestCompleted(oldQuestInstance);
+                    newQuestInstance.OnAccept();
+                    Database.SaveQuest(this, questScenario[i], i);
+                    break;
+                }
+            }
+        }
+
+        public void CompleteQuest(Quest completed)
+        {
+            int slot = GetQuestSlot(completed);
+            if (slot >= 0)
+            {
+                // Remove the quest from the DB and update client work values
+                playerWork.questScenarioComplete[completed.GetQuestId() - 110001] = true;
+                questScenario[slot] = null;
+                playerWork.questScenario[slot] = 0;
+                SendQuestClientUpdate(slot);
+
+                // Reset active quest and quest state
+                completed.OnComplete();
+                Database.SaveCompletedQuests(playerSession.GetActor());
+                Database.RemoveQuest(this, completed.Id);
+                questStateManager.UpdateQuestCompleted(completed);
+
+                // Msg Player
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25086, 0x20, (object)completed.GetQuestId()); // "<Quest> complete!"
+            }
+
+        }
+
+        public bool AbandonQuest(uint questId)
+        {
+            // Check if in an instance
+            if (CurrentArea.IsPrivate())
+            {
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25235, 0x20); // "Quests cannot be abandoned while from within an instance."
+                return false;
+            }
+
+            // Get the quest object
+            int slot = GetQuestSlot(questId);
+            Quest abandoned = questScenario[slot];
+
+            if (abandoned == null)
+                return false;
+
+            // Check if Main Scenario
+            if (abandoned.IsMainScenario())
+            {
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25233, 0x20); // "Main scenario quests cannot be abandoned."
+                return false;
+            }
+
+            // Remove the quest from the DB and update client work values
+            questScenario[slot] = null;
+            playerWork.questScenario[slot] = 0;
+            SendQuestClientUpdate(slot);
+
+            // Reset active quest and quest state
+            abandoned.OnAbandon();
+            Database.RemoveQuest(this, abandoned.Id);
+            questStateManager.UpdateQuestAbandoned();
+
+            // Msg Player
+            SendGameMessage(this, Server.GetWorldManager().GetActor(), 25236, 0x20, (object)abandoned.GetQuestId()); // "<Quest> abandoned."
+            return true;
+        }
+
+        public bool HasQuest(Quest questInstance)
+        {
+            return GetQuestSlot(questInstance) != -1;
+        }
+        #endregion
+
+        #region Quests - Debug/Misc Related
+        // Force-Add a quest by Id. Called be debug scripts.
+        public void AddQuest(uint id, bool isSilent = false)
+        {
+            Actor actor = Server.GetStaticActors((0xA0F00000 | id));
+            AddQuest(actor.Name, isSilent);
+        }
+
+        // Force-Add a quest by Name. Called be debug scripts. Will try to use an active quest, otherwise adds a new instance.
+        public void AddQuest(string name, bool isSilent = false)
+        {
+            Quest baseQuest = (Quest)Server.GetStaticActors(name);
+            Quest activeQuest = questStateManager.GetActiveQuest(baseQuest.GetQuestId());
+
+            int freeSlot = GetFreeQuestSlot();
+
+            if (freeSlot == -1)
+                return;
+
+            playerWork.questScenario[freeSlot] = baseQuest.Id;
+            questScenario[freeSlot] = activeQuest ?? new Quest(this, baseQuest);
+
+            if (activeQuest == null)
+                questStateManager.ForceAddActiveQuest(questScenario[freeSlot]);
+
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
+            SendQuestClientUpdate(freeSlot);
+
+            if (!isSilent)
+            {
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId());
+            }
+
+            questScenario[freeSlot].OnAccept();
+        }
+
+        public void RemoveQuest(uint id)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
+                {
+                    Database.RemoveQuest(this, questScenario[i].Id);
+                    questScenario[i] = null;
+                    playerWork.questScenario[i] = 0;
+                    SendQuestClientUpdate(i);
+                    break;
+                }
+            }
+        }
+
+        public void RemoveQuest(string name)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
+                {
+                    Database.RemoveQuest(this, questScenario[i].Id);
+                    questScenario[i] = null;
+                    playerWork.questScenario[i] = 0;
+                    SendQuestClientUpdate(i);
+                    break;
+                }
+            }
+        }
+
+        public bool HasQuest(string name)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool HasQuest(uint id)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool IsQuestCompleted(uint id)
+        {
+            return questStateManager.IsQuestComplete(id);
+        }
+
+        public void SetQuestComplete(uint id, bool flag)
+        {
+            if (flag)
+            {
+                Quest currentQuest = GetQuest(id);
+                if (currentQuest != null)
+                {
+                    CompleteQuest(currentQuest);
+                    return;
+                }
+            }
+            questStateManager.ForceQuestCompleteFlag(id, flag);
+        }
+
+        public Quest GetQuest(uint id)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
+                    return questScenario[i];
+            }
+
+            return null;
+        }
+
+        public Quest GetQuest(string name)
+        {
+            for (int i = 0; i < questScenario.Length; i++)
+            {
+                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
+                    return questScenario[i];
+            }
+
+            return null;
+        }
+
+        public int GetQuestSlot(Quest quest)
+        {
+            for (int slot = 0; slot < questScenario.Length; slot++)
+            {
+                if (questScenario[slot] != null && questScenario[slot].Id == quest.Id)
+                    return slot;
+            }
+
+            return -1;
+        }
+
+        public int GetQuestSlot(uint id)
+        {
+            for (int slot = 0; slot < questScenario.Length; slot++)
+            {
+                if (questScenario[slot] != null && questScenario[slot].GetQuestId() == id)
+                    return slot;
+            }
+
+            return -1;
+        }
+        #endregion
+
+        #region Guildleves
         public void AddGuildleve(uint id)
         {
             int freeSlot = GetFreeGuildleveSlot();
@@ -1484,179 +1769,7 @@ namespace Meteor.Map.Actors
                     }
                 }
             }
-        }
-
-        public void AddQuest(uint id, bool isSilent = false)
-        {
-            Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            AddQuest(actor.Name, isSilent);
-        }
-
-        public void AddQuest(string name, bool isSilent = false)
-        {
-            Quest baseQuest = (Quest) Server.GetStaticActors(name);
-
-            if (baseQuest == null)
-                return;
-
-            int freeSlot = GetFreeQuestSlot();
-
-            if (freeSlot == -1)
-                return;
-
-            playerWork.questScenario[freeSlot] = baseQuest.Id;
-            questScenario[freeSlot] = new Quest(this, baseQuest);
-            Database.SaveQuest(this, questScenario[freeSlot]);
-            SendQuestClientUpdate(freeSlot);
-
-            if (!isSilent)
-            {
-                SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId());
-            }
-        }        
-
-        public void CompleteQuest(uint id)
-        {
-            Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            CompleteQuest(actor.Name);
-        }
-
-        public void CompleteQuest(string name)
-        {
-            Actor actor = Server.GetStaticActors(name);
-
-            if (actor == null)
-                return;
-
-            uint id = actor.Id;
-            if (HasQuest(id))
-            {
-                Database.CompleteQuest(playerSession.GetActor(), id);
-                SendGameMessage(Server.GetWorldManager().GetActor(), 25086, 0x20, (object)GetQuest(id).GetQuestId());
-                RemoveQuest(id);
-            }
-        }
-
-        //TODO: Add checks for you being in an instance or main scenario
-        public void AbandonQuest(uint id)
-        {
-            Quest quest = GetQuest(id);
-            RemoveQuestByQuestId(id);
-            quest.DoAbandon();       
-        }
-
-        public void RemoveQuestByQuestId(uint id)
-        {
-            RemoveQuest((0xA0F00000 | id));
-        }
-
-        public void RemoveQuest(uint id)
-        {
-            if (HasQuest(id))
-            {
-                for (int i = 0; i < questScenario.Length; i++)
-                {
-                    if (questScenario[i] != null && questScenario[i].Id == id)
-                    {
-                        Database.RemoveQuest(this, questScenario[i].Id);
-                        questScenario[i] = null;
-                        playerWork.questScenario[i] = 0;
-                        SendQuestClientUpdate(i);
-                        break;
-                    }
-                }
-            }
-        }
-
-        public void ReplaceQuest(Quest oldQuest, string questCode)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Equals(oldQuest))
-                {
-                    Quest baseQuest = (Quest) Server.GetStaticActors(questCode);
-                    questScenario[i] = new Quest(this, baseQuest);
-                    playerWork.questScenario[i] = questScenario[i].Id;
-                    Database.SaveQuest(this, questScenario[i]);
-                    SendQuestClientUpdate(i);
-                    break;
-                }
-            }            
-        }
-
-        public bool CanAcceptQuest(string name)
-        {
-            if (!IsQuestCompleted(name) && !HasQuest(name))
-                return true;
-            else
-                return false;
-        }
-
-        public bool CanAcceptQuest(uint id)
-        {
-            Actor actor = Server.GetStaticActors((0xA0F00000 | id));
-            return CanAcceptQuest(actor.Name);
-        }
-
-        public bool IsQuestCompleted(string questName)
-        {
-            Actor actor = Server.GetStaticActors(questName);
-            return IsQuestCompleted(actor.Id);
-        }
-
-        public bool IsQuestCompleted(uint questId)
-        {
-            return Database.IsQuestCompleted(this, 0xFFFFF & questId);
-        }
-
-        public Quest GetQuest(uint id)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
-                    return questScenario[i];
-            }
-
-            return null;
-        }
-
-        public Quest GetQuest(string name)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
-                    return questScenario[i];
-            }
-
-            return null;
-        }
-
-        public bool HasQuest(string name)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Name.ToLower().Equals(name.ToLower()))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool HasQuest(uint id)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
-                    return true;
-            }
-
-            return false;
-        }
-
-        public bool HasQuest(Quest quest)
-        {
-            return HasQuest(quest.className);
-        }
+        }      
 
         public bool HasGuildleve(uint id)
         {
@@ -1668,17 +1781,7 @@ namespace Meteor.Map.Actors
 
             return false;
         }
-
-        public int GetQuestSlot(uint id)
-        {
-            for (int i = 0; i < questScenario.Length; i++)
-            {
-                if (questScenario[i] != null && questScenario[i].Id == (0xA0F00000 | id))
-                    return i;
-            }
-
-            return -1;
-        }
+        #endregion
 
         public Quest GetDefaultTalkQuest(Npc npc)
         {
@@ -1732,7 +1835,9 @@ namespace Meteor.Map.Actors
 
         public Quest[] GetQuestsForNpc(Npc npc)
         {
-            return Array.FindAll(questScenario, e => e != null && e.IsQuestENPC(this, npc));
+            Quest[] quests = questStateManager.GetQuestsForNpc(npc);
+            Array.Sort(quests, (q1, q2) => (q1.HasData() ? 1 : 0) - (q2.HasData() ? 1 : 0));
+            return quests;
         }
 
         public void HandleNpcLS(uint id)
@@ -2755,6 +2860,7 @@ namespace Meteor.Map.Actors
                     actionList.Add(new CommandResult(Id, 33909, 0, (ushort)charaWork.battleSave.skillLevel[classId - 1]));
 
                 EquipAbilitiesAtLevel(classId, GetLevel(), actionList);
+                questStateManager.UpdateLevel(GetHighestLevel());
             }
         }
         

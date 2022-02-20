@@ -245,11 +245,31 @@ namespace Meteor.Common
             {
                 for (var bitCount = 0; bitCount < 8; bitCount++)
                 {
-                    if (i + bitCount >= array.Length)
+                    if (i + bitCount >= array.Length - 1)
                         break;
                     data[dataCounter] = (byte)(((array[i + bitCount] ? 1 : 0) << 7 - bitCount) | data[dataCounter]);
                 }
                 dataCounter++;
+            }
+
+            return data;
+        }
+
+        public static bool[] ConvertBinaryStreamToBoolArray(byte[] bytes)
+        {
+            bool[] data = new bool[bytes.Length * 8];
+
+            int boolCounter = 0;
+            for (int i = 0; i < bytes.Length; i ++)
+            {
+                if (bytes[i] == 0)
+                {
+                    boolCounter += 8;
+                    continue;
+                }
+
+                for (int bitCount = 0; bitCount < 8; bitCount++)
+                    data[boolCounter++] = (bytes[i] >> bitCount & 1) == 1;                
             }
 
             return data;

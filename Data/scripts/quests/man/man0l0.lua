@@ -62,7 +62,7 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, sequence)
+function onStateChange(player, quest, sequence)
 	if (sequence == SEQ_000) then
 		-- Setup states incase we loaded in.
 		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
@@ -72,34 +72,34 @@ function onSequence(player, quest, sequence)
 		local exitCanPush = quest:GetFlags() == 0xF;
 		local exitFlag = quest:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;		
 		
-		quest:AddENpc(WELLTRAVELED_MERCHANT);
-		quest:AddENpc(TIPSY_ADVENTURER);
-		quest:AddENpc(CULTIVATED_TENDER);
-		quest:AddENpc(ANXIOUS_ADVENTURER);
-		quest:AddENpc(BABYFACED_ADVENTURER, babyfaceFlag);
-		quest:AddENpc(AUSTERE_ADVENTURER);
-		quest:AddENpc(UNDIGNIFIED_ADVENTURER);
-		quest:AddENpc(SHADOWY_TRAVELER);
-		quest:AddENpc(ASTUTE_MERCHANT);
-		quest:AddENpc(VOLUPTUOUS_VIXEN, vixenFlag);
-		quest:AddENpc(INDIFFERENT_PASSERBY);
-		quest:AddENpc(PRATTLING_ADVENTURER);
-		quest:AddENpc(LANKY_TRAVELER);
-		quest:AddENpc(GRINNING_ADVENTURER);
-		quest:AddENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
-		quest:AddENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
+		quest:SetENpc(WELLTRAVELED_MERCHANT);
+		quest:SetENpc(TIPSY_ADVENTURER);
+		quest:SetENpc(CULTIVATED_TENDER);
+		quest:SetENpc(ANXIOUS_ADVENTURER);
+		quest:SetENpc(BABYFACED_ADVENTURER, babyfaceFlag);
+		quest:SetENpc(AUSTERE_ADVENTURER);
+		quest:SetENpc(UNDIGNIFIED_ADVENTURER);
+		quest:SetENpc(SHADOWY_TRAVELER);
+		quest:SetENpc(ASTUTE_MERCHANT);
+		quest:SetENpc(VOLUPTUOUS_VIXEN, vixenFlag);
+		quest:SetENpc(INDIFFERENT_PASSERBY);
+		quest:SetENpc(PRATTLING_ADVENTURER);
+		quest:SetENpc(LANKY_TRAVELER);
+		quest:SetENpc(GRINNING_ADVENTURER);
+		quest:SetENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
+		quest:SetENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
 	elseif (sequence == SEQ_005) then
 	elseif (sequence == SEQ_010) then		
-		quest:AddENpc(HOB);
-		quest:AddENpc(GERT);
-		quest:AddENpc(LORHZANT);
-		quest:AddENpc(MUSCLEBOUND_DECKHAND);
-		quest:AddENpc(PEARLYTOOTHED_PORTER);
-		quest:AddENpc(UNDIGNIFIED_ADVENTURER);
-		quest:AddENpc(WELLTRAVELED_MERCHANT);
-		quest:AddENpc(VOLUPTUOUS_VIXEN);
-		quest:AddENpc(LANKY_TRAVELER);
-		quest:AddENpc(PRIVAREA_PAST_EXIT, QFLAG_NONE, false, true);
+		quest:SetENpc(HOB);
+		quest:SetENpc(GERT);
+		quest:SetENpc(LORHZANT);
+		quest:SetENpc(MUSCLEBOUND_DECKHAND);
+		quest:SetENpc(PEARLYTOOTHED_PORTER);
+		quest:SetENpc(UNDIGNIFIED_ADVENTURER);
+		quest:SetENpc(WELLTRAVELED_MERCHANT);
+		quest:SetENpc(VOLUPTUOUS_VIXEN);
+		quest:SetENpc(LANKY_TRAVELER);
+		quest:SetENpc(PRIVAREA_PAST_EXIT, QFLAG_NONE, false, true);
 	end
 end
 

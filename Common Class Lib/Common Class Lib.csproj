@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="BasePacket.cs" />
     <Compile Include="Bitfield.cs" />
+    <Compile Include="Bitstream.cs" />
     <Compile Include="Blowfish.cs" />
     <Compile Include="EfficientHashTables.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

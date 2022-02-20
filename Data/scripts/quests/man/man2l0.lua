@@ -7,7 +7,7 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, seqNum)
+function onStateChange(player, quest, seqNum)
 	quest:ClearENpcs();	
 end
 

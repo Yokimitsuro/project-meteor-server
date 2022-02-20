@@ -21,7 +21,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 
 using Meteor.Common;
 using Meteor.Map.actors.group.Work;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.packets.send.group;
 using Meteor.Map.packets.send.groups;
 using System.Collections.Generic;

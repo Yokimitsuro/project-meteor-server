@@ -40,13 +40,13 @@ end
 
 
 
-function onSequence(player, quest, sequence)
+function onStateChange(player, quest, sequence)
     if (sequence == SEQ_000) then
-        quest:AddENpc(VKOROLON);
-        quest:AddENpc(PFARAHR, QFLAG_PLATE);
+        quest:SetENpc(VKOROLON);
+        quest:SetENpc(PFARAHR, QFLAG_PLATE);
     elseif (sequence == SEQ_001) then 
-        quest:AddENpc(VKOROLON, QFLAG_PLATE);
-        quest:AddENpc(PFARAHR);
+        quest:SetENpc(VKOROLON, QFLAG_PLATE);
+        quest:SetENpc(PFARAHR);
     end
 end
 

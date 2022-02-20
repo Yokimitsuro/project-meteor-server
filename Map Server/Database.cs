@@ -26,14 +26,15 @@ using Meteor.Common;
 using Meteor.Map.utils;
 
 using Meteor.Map.packets.send.player;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.Actors;
+using Meteor.Map.Actors.QuestNS;
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.packets.receive.supportdesk;
 using Meteor.Map.actors.chara.npc;
 using Meteor.Map.actors.chara.ai;
 using Meteor.Map.packets.send.actor.battle;
-using Meteor.Map.DataObjects;
+
 using System.Security.Cryptography;
 
 namespace Meteor.Map
@@ -70,6 +71,55 @@ namespace Meteor.Map
                 }
             }
             return id;
+        }
+
+        public static Dictionary<uint, QuestGameData> GetQuestGamedata()
+        {
+            using (var conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                Dictionary<uint, QuestGameData> gamedataQuests = new Dictionary<uint, QuestGameData>();
+
+                try
+                {
+                    conn.Open();
+
+                    string query = @"
+                                SELECT
+                                id,
+                                className,
+                                questName,
+                                prerequisite,
+                                minLevel
+                                FROM gamedata_quests
+                                ";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            uint questId = reader.GetUInt32("id");
+                            string code = reader.GetString("className");
+                            string name = reader.GetString("questName");
+                            uint prerequisite = reader.GetUInt32("prerequisite");
+                            ushort minLevel = reader.GetUInt16("minLevel");
+                            //ushort minRank = reader.GetUInt16("minGCRank");
+                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, 0));
+                        }
+                    }
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+
+                return gamedataQuests;
+            }
         }
 
         public static Dictionary<uint, ItemData> GetItemGamedata()
@@ -477,22 +527,12 @@ namespace Meteor.Map
             }
         }
 
-        public static void SaveQuest(Player player, Quest quest)
-        {
-            int slot = player.GetQuestSlot(quest.Id);
-            if (slot == -1)
-            {
-                Program.Log.Error("Tried saving quest player didn't have: Player: {0:x}, QuestId: {0:x}", player.Id, quest.Id);
-                return;
-            }
-            else
-                SaveQuest(player, quest, slot);
-        }
-
         public static void SaveQuest(Player player, Quest quest, int slot)
         {
             string query;
             MySqlCommand cmd;
+
+            QuestData qData = quest.GetData();
 
             using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
             {
@@ -514,10 +554,59 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@slot", slot);
                     cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
                     cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
-                    cmd.Parameters.AddWithValue("@flags", quest.GetFlags());
-                    cmd.Parameters.AddWithValue("@counter1", quest.GetCounter(1));
-                    cmd.Parameters.AddWithValue("@counter2", quest.GetCounter(2));
-                    cmd.Parameters.AddWithValue("@counter3", quest.GetCounter(3));
+
+                    if (qData != null)
+                    {
+                        cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
+                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
+                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
+                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                    }
+
+                    cmd.ExecuteNonQuery();
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public static void UpdateQuest(Player player, Quest quest)
+        {
+            string query;
+            MySqlCommand cmd;
+
+            QuestData qData = quest.GetData();
+
+            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                try
+                {
+                    conn.Open();
+
+                    query = @"
+                    UPDATE characters_quest_scenario 
+                    SET sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3
+                    WHERE characterId = @charaId and questId = @questId
+                    ";
+
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charaId", player.Id);
+                    cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
+                    cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
+
+                    if (qData != null)
+                    {
+                        cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
+                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
+                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
+                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                    }
 
                     cmd.ExecuteNonQuery();
                 }
@@ -674,7 +763,7 @@ namespace Meteor.Map
             }
         }
 
-        public static void CompleteQuest(Player player, uint questId)
+        public static void SaveCompletedQuests(Player player)
         {
             string query;
             MySqlCommand cmd;
@@ -687,15 +776,15 @@ namespace Meteor.Map
 
                     query = @"
                     INSERT INTO characters_quest_completed 
-                    (characterId, questId)
+                    (characterId, completedQuests)
                     VALUES
-                    (@charaId, @questId)
-                    ON DUPLICATE KEY UPDATE characterId=characterId
+                    (@charaId, @completedQuests)
+                    ON DUPLICATE KEY UPDATE completedQuests=completedQuests
                     ";
 
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@charaId", player.Id);
-                    cmd.Parameters.AddWithValue("@questId", 0xFFFFF & questId);
+                    cmd.Parameters.AddWithValue("@completedQuests", Utils.ConvertBoolArrayToBinaryStream(player.playerWork.questScenarioComplete));
 
                     cmd.ExecuteNonQuery();
                 }
@@ -708,31 +797,6 @@ namespace Meteor.Map
                     conn.Dispose();
                 }
             }
-        }
-
-        public static bool IsQuestCompleted(Player player, uint questId)
-        {
-            bool isCompleted = false;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
-            {
-                try
-                {
-                    conn.Open();
-                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM characters_quest_completed WHERE characterId = @charaId and questId = @questId", conn);
-                    cmd.Parameters.AddWithValue("@charaId", player.Id);
-                    cmd.Parameters.AddWithValue("@questId", questId);
-                    isCompleted = cmd.ExecuteScalar() != null;
-                }
-                catch (MySqlException e)
-                {
-                    Program.Log.Error(e.ToString());
-                }
-                finally
-                {
-                    conn.Dispose();
-                }
-            }
-            return isCompleted;
         }
 
         public static void LoadPlayerCharacter(Player player)
@@ -1168,11 +1232,32 @@ namespace Meteor.Map
                             ushort counter1 = reader.GetUInt16("counter1");
                             ushort counter2 = reader.GetUInt16("counter2");
                             ushort counter3 = reader.GetUInt16("counter3");
+                            //ushort counter4 = reader.GetUInt16("counter4");
 
                             Quest baseQuest = (Quest) Server.GetStaticActors(questId);
 
                             player.playerWork.questScenario[index] = questId;
-                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3);
+                            player.questScenario[index] = new Quest(player, baseQuest, sequence);
+                            player.questScenario[index].SetData(flags, counter1, counter2, counter3, 0);
+                        }
+                    }
+
+                    //Load Completed Quests bitstream
+                    query = @"
+                        SELECT 
+                        completedQuests
+                        FROM characters_quest_completed WHERE characterId = @charaId";
+
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charaId", player.Id);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        // Replace the bool stream or use the default empty one.
+                        if (reader.Read())
+                        {
+                            byte[] bytes = new byte[256];
+                            reader.GetBytes(reader.GetOrdinal("completedQuests"), 0, bytes, 0, 256);
+                            player.playerWork.questScenarioComplete = Utils.ConvertBinaryStreamToBoolArray(bytes);
                         }
                     }
 

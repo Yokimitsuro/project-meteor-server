@@ -180,9 +180,13 @@
     <Compile Include="Actors\Group\Work\RelationWork.cs" />
     <Compile Include="Actors\Judge\Judge.cs" />
     <Compile Include="Actors\Quest\Quest.cs" />
+    <Compile Include="Actors\Quest\QuestData.cs" />
+    <Compile Include="Actors\Quest\QuestState.cs" />
+    <Compile Include="Actors\Quest\QuestStateManager.cs" />
     <Compile Include="Actors\StaticActors.cs" />
     <Compile Include="Actors\World\WorldMaster.cs" />
     <Compile Include="DataObjects\GuildleveData.cs" />
+    <Compile Include="DataObjects\QuestGameData.cs" />
     <Compile Include="DataObjects\Recipe.cs" />
     <Compile Include="DataObjects\RecipeResolver.cs" />
     <Compile Include="DataObjects\TradeTransaction.cs" />
@@ -223,7 +227,7 @@
     <Compile Include="Packets\Receive\CountdownRequestPacket.cs" />
     <Compile Include="Packets\Receive\LangaugeCodePacket.cs" />
     <Compile Include="Packets\Receive\UpdateItemPackagePacket.cs" />
-    <Compile Include="Packets\Receive\ParameterDataRequestPacket.cs" />
+    <Compile Include="Packets\Receive\WorkSyncRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\RecruitmentDetailsRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\RecruitmentSearchRequestPacket.cs" />
     <Compile Include="Packets\Receive\Recruitment\StartRecruitingRequestPacket.cs" />

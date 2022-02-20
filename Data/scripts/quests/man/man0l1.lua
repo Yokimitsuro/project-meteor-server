@@ -85,56 +85,56 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, sequence)
+function onStateChange(player, quest, sequence)
 
 	if (sequence == SEQ_000) then
-		quest:AddENpc(YSHTOLA);
-		quest:AddENpc(CRAPULOUS_ADVENTURER);
-		quest:AddENpc(DUPLICITOUS_TRADER);
-		quest:AddENpc(DEBONAIR_PIRATE);
-		quest:AddENpc(ONYXHAIRED_ADVENTURER);
-		quest:AddENpc(SKITTISH_ADVENTURER);
-		quest:AddENpc(RELAXING_ADVENTURER);
-		quest:AddENpc(BADERON, QFLAG_PLATE);
-		quest:AddENpc(MYTESYN);
-		quest:AddENpc(COCKAHOOP_COCKSWAIN);
-		quest:AddENpc(SENTENIOUS_SELLSWORD);
-		quest:AddENpc(SOLICITOUS_SELLSWORD);
+		quest:SetENpc(YSHTOLA);
+		quest:SetENpc(CRAPULOUS_ADVENTURER);
+		quest:SetENpc(DUPLICITOUS_TRADER);
+		quest:SetENpc(DEBONAIR_PIRATE);
+		quest:SetENpc(ONYXHAIRED_ADVENTURER);
+		quest:SetENpc(SKITTISH_ADVENTURER);
+		quest:SetENpc(RELAXING_ADVENTURER);
+		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(MYTESYN);
+		quest:SetENpc(COCKAHOOP_COCKSWAIN);
+		quest:SetENpc(SENTENIOUS_SELLSWORD);
+		quest:SetENpc(SOLICITOUS_SELLSWORD);
 	elseif (sequence == SEQ_003) then
-		quest:AddENpc(BADERON);
+		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_005) then
-		quest:AddENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_PLATE);
 	elseif (sequence == SEQ_006) then
-		quest:AddENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_PLATE);
 	elseif (sequence == SEQ_007) then
 		local subseqCUL = quest:GetCounter(CNTR_SEQ7_CUL);
 		local subseqMRD = quest:GetCounter(CNTR_SEQ7_MRD);
 
 		-- Always active in this seqence
-		quest:AddENpc(BADERON);
-		quest:AddENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
+		quest:SetENpc(BADERON);
+		quest:SetENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
 		
 		-- Down and Up the MSK guild
-		quest:AddENpc(ISANDOREL, (subseqMRD == 0 or subseqMRD == 2) and QFLAG_PLATE or QFLAG_NONE);
+		quest:SetENpc(ISANDOREL, (subseqMRD == 0 or subseqMRD == 2) and QFLAG_PLATE or QFLAG_NONE);
 		
 		if (subseqMRD == 1) then
-			quest:AddENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
+			quest:SetENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
 		elseif (subseqMRD == 2) then
-			quest:AddENpc(MERLZIRN);
+			quest:SetENpc(MERLZIRN);
 		end
 		
 		-- In Echo
-		quest:AddENpc(NERVOUS_BARRACUDA);
-		quest:AddENpc(INTIMIDATING_BARRACUDA);
-		quest:AddENpc(OVEREAGER_BARRACUDA);
-		quest:AddENpc(SOPHISTICATED_BARRACUDA);
-		quest:AddENpc(SMIRKING_BARRACUDA);
-		quest:AddENpc(MANNSKOEN);
-		quest:AddENpc(TOTORUTO);
-		quest:AddENpc(ADVENTURER1);
-		quest:AddENpc(ADVENTURER2);
-		quest:AddENpc(ADVENTURER3);
-		quest:AddENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);
+		quest:SetENpc(NERVOUS_BARRACUDA);
+		quest:SetENpc(INTIMIDATING_BARRACUDA);
+		quest:SetENpc(OVEREAGER_BARRACUDA);
+		quest:SetENpc(SOPHISTICATED_BARRACUDA);
+		quest:SetENpc(SMIRKING_BARRACUDA);
+		quest:SetENpc(MANNSKOEN);
+		quest:SetENpc(TOTORUTO);
+		quest:SetENpc(ADVENTURER1);
+		quest:SetENpc(ADVENTURER2);
+		quest:SetENpc(ADVENTURER3);
+		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);
 						
 		if (subseqCUL == 1 and subseqMRD == 4) then
 			player:SetNpcLS(1, 1);

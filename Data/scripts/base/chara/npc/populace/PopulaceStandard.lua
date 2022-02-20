@@ -23,7 +23,7 @@ end
 
 function onEventStarted(player, npc, eventType, eventName)
 	local defaultTalk = player:GetDefaultTalkQuest(npc);
-	local tutorialTalk = player:GetTutorialQuest(npc);		
+	local tutorialTalk = player:GetTutorialQuest(npc);
 	local activeQuests = player:GetQuestsForNpc(npc);
 	local possibleQuests = {};
 	

@@ -103,7 +103,7 @@ end
 function onFinish(player, quest)
 end
 
-function onSequence(player, quest, sequence)
+function onStateChange(player, quest, sequence)
 
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
@@ -119,34 +119,34 @@ function onSequence(player, quest, sequence)
             gildiggingmistressFlag = QFLAG_NONE;
         end
 
-        --AddENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
-        quest:AddENpc(ASCILIA, asciliaFlag, true, asciliaCanPush);
-        quest:AddENpc(WARBURTON);
-        quest:AddENpc(RURURAJI);
-        quest:AddENpc(BIG_BELLIED_BARKER);
-        quest:AddENpc(FRETFUL_FARMHAND, fretfulfarmhandFlag);
-        quest:AddENpc(DEBAUCHED_DEMONESS);
-        quest:AddENpc(DAPPER_DAN);
-        quest:AddENpc(LOUTISH_LAD);
-        quest:AddENpc(GIL_DIGGING_MISTRESS, gildiggingmistressFlag);
-        quest:AddENpc(TWITTERING_TOMBOY);
-        quest:AddENpc(STOCKY_STRANGER);
-        quest:AddENpc(EXIT_TRIGGER, exitFlag, false, true);
-        quest:AddENpc(OPENING_STOPER_ULDAH, QFLAG_NONE, false, false, true);
+        --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
+        quest:SetENpc(ASCILIA, asciliaFlag, true, asciliaCanPush);
+        quest:SetENpc(WARBURTON);
+        quest:SetENpc(RURURAJI);
+        quest:SetENpc(BIG_BELLIED_BARKER);
+        quest:SetENpc(FRETFUL_FARMHAND, fretfulfarmhandFlag);
+        quest:SetENpc(DEBAUCHED_DEMONESS);
+        quest:SetENpc(DAPPER_DAN);
+        quest:SetENpc(LOUTISH_LAD);
+        quest:SetENpc(GIL_DIGGING_MISTRESS, gildiggingmistressFlag);
+        quest:SetENpc(TWITTERING_TOMBOY);
+        quest:SetENpc(STOCKY_STRANGER);
+        quest:SetENpc(EXIT_TRIGGER, exitFlag, false, true);
+        quest:SetENpc(OPENING_STOPER_ULDAH, QFLAG_NONE, false, false, true);
 
     elseif (sequence == SEQ_010) then
         local yayatokiFlag = quest:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_PLATE;
         local uldahopeningexitFlag = QFLAG_MAP;
-        quest:AddENpc(KEEN_EYED_MERCHANT);
-        quest:AddENpc(HIGH_SPIRITED_FELLOW);
-        quest:AddENpc(DISREPUTABLE_MIDLANDER);
-        quest:AddENpc(LONG_LEGGED_LADY);
-        quest:AddENpc(LARGE_LUNGED_LABORER);
-        quest:AddENpc(TOOTH_GRINDING_TRAVELER);
-        quest:AddENpc(FULL_LIPPED_FILLE);
-        quest:AddENpc(YAYATOKI, yayatokiFlag);
-        quest:AddENpc(BLOCKER, QFLAG_NONE, false, true);
-        quest:AddENpc(ULDAH_OPENING_EXIT, uldahopeningexitFlag, false, true);
+        quest:SetENpc(KEEN_EYED_MERCHANT);
+        quest:SetENpc(HIGH_SPIRITED_FELLOW);
+        quest:SetENpc(DISREPUTABLE_MIDLANDER);
+        quest:SetENpc(LONG_LEGGED_LADY);
+        quest:SetENpc(LARGE_LUNGED_LABORER);
+        quest:SetENpc(TOOTH_GRINDING_TRAVELER);
+        quest:SetENpc(FULL_LIPPED_FILLE);
+        quest:SetENpc(YAYATOKI, yayatokiFlag);
+        quest:SetENpc(BLOCKER, QFLAG_NONE, false, true);
+        quest:SetENpc(ULDAH_OPENING_EXIT, uldahopeningexitFlag, false, true);
     end
 end
 

@@ -23,7 +23,7 @@ using Meteor.Common;
 using Meteor.Map.actors.area;
 using Meteor.Map.actors.chara.npc;
 using Meteor.Map.Actors;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.lua;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.actor;

@@ -23,7 +23,7 @@ using Meteor.Common;
 using Meteor.Map.actors.director;
 using Meteor.Map.actors.group.Work;
 using Meteor.Map.Actors;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.packets.send.group;
 using Meteor.Map.packets.send.groups;
 using System.Collections.Generic;
