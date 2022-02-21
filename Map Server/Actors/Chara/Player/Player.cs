@@ -1820,17 +1820,17 @@ namespace Meteor.Map.Actors
 
         public Quest GetTutorialQuest(Npc npc)
         {
-            if (npc.CurrentArea.RegionId != 101 || npc.CurrentArea.RegionId != 103 || npc.CurrentArea.RegionId != 104)
-                return null;
-
-            switch (npc.GetActorClassId())
+            if (npc.CurrentArea.RegionId == 101 || npc.CurrentArea.RegionId == 103 || npc.CurrentArea.RegionId == 104)
             {
-                case 1000137:
-                    return (Quest)Server.GetStaticActors("Trl0l1");
-                case 1000230:
-                    return (Quest)Server.GetStaticActors("Trl0g1");
-                case 1000841:
-                    return (Quest)Server.GetStaticActors("Trl0u1");
+                switch (npc.GetActorClassId())
+                {
+                    case 1000137:
+                        return (Quest)Server.GetStaticActors("Trl0l1");
+                    case 1000230:
+                        return (Quest)Server.GetStaticActors("Trl0g1");
+                    case 1000841:
+                        return (Quest)Server.GetStaticActors("Trl0u1");
+                }
             }
             return null;
         }
