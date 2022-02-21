@@ -274,9 +274,7 @@ namespace Meteor.Map.packets.send.actor
             
             CloseStreams();
 
-            SubPacket packet = new SubPacket(OPCODE, sourceActorId, data);
-            packet.DebugPrintSubPacket();
-            return packet;
+            return new SubPacket(OPCODE, sourceActorId, data);
         }       
     
     }

@@ -40,7 +40,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
                 
             elseif command == "remove" or command == "delete" or command == "-" then
                 if tonumber(var1) and player:HasQuest(tonumber(var1)) == true then
-                    player:RemoveQuestByQuestId(tonumber(var1));
+                    player:RemoveQuest(tonumber(var1));
                     message = ("removing quest "..var1);
                 else
                     if player:HasQuest(var1) == true then  
@@ -53,7 +53,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
                             q4 = bit32.band(q3, 0xA0F00000);
                             printf(q4);
                             
-                            --player:RemoveQuest(quest.Name);
+                            player:RemoveQuest(quest.Name);
                         end
                     else
                         message = ("remove error: either incorrect ID or quest "..var1.." isn't active on character");
@@ -137,7 +137,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
 							player:GetQuest(questvar):GetData():ClearFlag(flagvar);
 						end
                         player:GetQuest(questvar):UpdateENPCs();
-                        player:GetQuest(questvar):SaveData();	
+                        player:GetQuest(questvar):GetData():Save();	
                         if boolvar == true then
                             message = ("changing flag "..tonumber(var2).." to true on quest "..questvar);
                         else
@@ -156,7 +156,7 @@ function onTrigger(player, argc, command, var1, var2, var3)
                     
 					player:GetQuest(questvar):GetData():SetCounter(index, tonumber(var3));
 					player:GetQuest(questvar):UpdateENPCs();
-					player:GetQuest(questvar):SaveData();	
+					player:GetQuest(questvar):GetData():Save();	
 					message = ("changing counter "..tonumber(var2).." to "..var3);
                 else
                     message = ("error: command "..command.." not recognized");
