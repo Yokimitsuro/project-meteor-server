@@ -15,6 +15,7 @@ Contains all default lines for talkable npcs in the Forest Region (aka Black Shr
 -- [ActorClassId] = "client_function_name"
 local defaultTalkFst = {
     [1000071] = "defaultTalkWithBertennant_001",            -- Bertennant           (Gridania: Blue Badger Gate)
+    [1000230] = "defaultTalkWithMiounne_001",               -- Miounne              (Gridania: Adv. Guild)
     [1000427] = "defaultTalkWithAnene_001",                 -- Anene                (Gridania: Adv. Guild) defaultTalkWithAnene_002 / 003 (PGL informant)
     [1000433] = "defaultTalkWithDrividot_001",              -- Drividot             (Gridania: Adv. Guild) defaultTalkWithDrividot_002 / 003 (FSH informant)
 	[1000435] = "defaultTalkWithBasewin_001",               -- Basewin              (Gridania: Adv. Guild) defaultTalkWithBasewin_002 / 003 (BSM informant)
@@ -22,10 +23,13 @@ local defaultTalkFst = {
     [1000821] = "defaultTalkWithNellaure_001",				-- Nellaure
 	[1001081] = "defaultTalkWithKhumamoshroca_001",			-- Khuma Moshroca
 	[1001103] = "defaultTalkWithMestonnaux_001", 			-- Mestonnaux
+    --[1001183] = "",                 -- Emoni                (Gridania: Adv. Guild) - Will not fire, not PplStd.
 	[1001396] = "defaultTalkWithLefwyne_001",				-- Lefwyne
 	[1001430] = "defaultTalkWithKinnison_001",				-- Kinnison             - Two args (nil errors client).  If either >= 0, dialog mentions you've met Kan-E-Senna.
 	[1001437] = "defaultTalkWithSybell_001",				-- Sybell	
+    [1001459] = "defaultTalkWithFlavielle_001",             -- Flavielle            (Gridania: Adv. Guild) defaultTalkWithFlavielle_002 / 003 (ARM informant)
     [1001708] = "defaultTalkWithBeaudonet_001",             -- Beaudonet            (Gridania: Adv. Guild)
+    [1001709] = "defaultTalkWithFryswyde_001",              -- Fryswyde             (Gridania: Adv. Guild)
     [1001951] = "defaultTalkWithAnselm_001",                -- Anselm               (Gridania: Adv. Guild)
     
     --[1600092] = "",                -- Aeduin               - Will not fire since it isn't PplStd.
@@ -36,7 +40,6 @@ local defaultTalkFst = {
 
 defaultTalkWithVkorolon_001(A0_1, A1_2, A2_3)
 defaultTalkWithPenelope_001(A0_4, A1_5, A2_6)
-defaultTalkWithMiounne_001(A0_7, A1_8, A2_9)
 defaultTalkWithSylbyrt_001(A0_19, A1_20, A2_21)
 defaultTalkWithSylbyrt_002(A0_22, A1_23, A2_24)
 defaultTalkWithSylbyrt_003(A0_25, A1_26, A2_27)
@@ -58,9 +61,6 @@ defaultTalkWithPofufu_003(A0_89, A1_90, A2_91)
 defaultTalkWithOdilie_001(A0_101, A1_102, A2_103)
 defaultTalkWithOdilie_002(A0_104, A1_105, A2_106)
 defaultTalkWithOdilie_003(A0_107, A1_108, A2_109)
-defaultTalkWithFlavielle_001(A0_110, A1_111, A2_112)
-defaultTalkWithFlavielle_002(A0_113, A1_114, A2_115)
-defaultTalkWithFlavielle_003(A0_116, A1_117, A2_118)
 defaultTalkWithHereward_001(A0_119, A1_120, A2_121)
 defaultTalkWithBeli_001(A0_122, A1_123, A2_124)
 defaultTalkWithMaddeline_001(A0_125, A1_126, A2_127)
@@ -191,7 +191,6 @@ defaultTalkWithAilith_001(A0_525, A1_526, A2_527)
 defaultTalkWithMemama_001(A0_528, A1_529, A2_530)
 defaultTalkWithPfarahr_001(A0_531, A1_532, A2_533)
 
-defaultTalkWithFryswyde_001(A0_537, A1_538, A2_539)
 defaultTalkWithWillielmus_001(A0_540, A1_541, A2_542)
 defaultTalkWithQZamqo_001(A0_543, A1_544, A2_545)
 defaultTalkLouisoix_001(A0_546, A1_547, A2_548)
