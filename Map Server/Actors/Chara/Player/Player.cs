@@ -1574,9 +1574,9 @@ namespace Meteor.Map.Actors
 
         #region Quests - Debug/Misc Related
         // Force-Add a quest by Id. Called be debug scripts.
-        public void AddQuest(uint id, bool isSilent = false)
+        public void AddQuest(int id, bool isSilent = false)
         {
-            Actor actor = Server.GetStaticActors((0xA0F00000 | id));
+            Actor actor = Server.GetStaticActors((0xA0F00000 | (uint)id));
             AddQuest(actor.Name, isSilent);
         }
 
@@ -1596,8 +1596,7 @@ namespace Meteor.Map.Actors
 
             if (activeQuest == null)
                 questStateManager.ForceAddActiveQuest(questScenario[freeSlot]);
-
-            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
+            
             SendQuestClientUpdate(freeSlot);
 
             if (!isSilent)
@@ -1606,9 +1605,11 @@ namespace Meteor.Map.Actors
             }
 
             questScenario[freeSlot].OnAccept();
+
+            Database.SaveQuest(this, questScenario[freeSlot], freeSlot);
         }
 
-        public void RemoveQuest(uint id)
+        public void RemoveQuest(int id)
         {
             for (int i = 0; i < questScenario.Length; i++)
             {

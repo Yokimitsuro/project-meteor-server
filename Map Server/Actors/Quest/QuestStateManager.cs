@@ -72,7 +72,7 @@ namespace Meteor.Map.Actors.QuestNS
 
         public void UpdateQuestCompleted(Quest quest)
         {
-            CompletedQuestsBitfield.Set(quest.Id - SCENARIO_START);
+            CompletedQuestsBitfield.Set(quest.GetQuestId() - SCENARIO_START);
             QuestGameData[] updated = Server.GetQuestGamedataByPrerequisite(quest.GetQuestId());
             foreach (var questData in updated)
                 PrereqBitfield.Set(questData.Id - SCENARIO_START);
