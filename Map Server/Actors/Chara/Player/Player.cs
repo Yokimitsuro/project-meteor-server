@@ -1495,6 +1495,7 @@ namespace Meteor.Map.Actors
                 {                    
                     SendQuestClientUpdate(i);
                     oldQuestInstance.OnComplete();
+                    Database.SaveCompletedQuests(playerSession.GetActor());
                     questStateManager.UpdateQuestCompleted(oldQuestInstance);
                     Quest newQuestInstance = questStateManager.GetActiveQuest(((Quest)Server.GetStaticActors(questName)).GetQuestId());
                     questScenario[i] = newQuestInstance;
