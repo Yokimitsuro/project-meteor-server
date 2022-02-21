@@ -1487,17 +1487,18 @@ namespace Meteor.Map.Actors
         }
 
         // Replace a quest with another quest in the player's quest state.
-        public void ReplaceQuest(Quest oldQuestInstance, Quest newQuestInstance)
+        public void ReplaceQuest(Quest oldQuestInstance, string questName)
         {
             for (int i = 0; i < questScenario.Length; i++)
             {
                 if (questScenario[i] != null && questScenario[i].Equals(oldQuestInstance))
-                {
-                    questScenario[i] = newQuestInstance;
-                    playerWork.questScenario[i] = questScenario[i].Id;
+                {                    
                     SendQuestClientUpdate(i);
                     oldQuestInstance.OnComplete();
                     questStateManager.UpdateQuestCompleted(oldQuestInstance);
+                    Quest newQuestInstance = questStateManager.GetActiveQuest(((Quest)Server.GetStaticActors(questName)).GetQuestId());
+                    questScenario[i] = newQuestInstance;
+                    playerWork.questScenario[i] = questScenario[i].Id;
                     newQuestInstance.OnAccept();
                     Database.SaveQuest(this, questScenario[i], i);
                     break;

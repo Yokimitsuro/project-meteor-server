@@ -8,7 +8,6 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, seqNum)
-	quest:ClearENpcs();	
 end
 
 function onTalk(player, quest, npc)

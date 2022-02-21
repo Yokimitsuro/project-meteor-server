@@ -86,6 +86,7 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)
+	local data = quest:GetData();
 
 	if (sequence == SEQ_000) then
 		quest:SetENpc(YSHTOLA);
@@ -107,8 +108,8 @@ function onStateChange(player, quest, sequence)
 	elseif (sequence == SEQ_006) then
 		quest:SetENpc(BADERON, QFLAG_PLATE);
 	elseif (sequence == SEQ_007) then
-		local subseqCUL = quest:GetCounter(CNTR_SEQ7_CUL);
-		local subseqMRD = quest:GetCounter(CNTR_SEQ7_MRD);
+		local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
+		local subseqMRD = data:GetCounter(CNTR_SEQ7_MRD);
 
 		-- Always active in this seqence
 		quest:SetENpc(BADERON);
@@ -220,8 +221,9 @@ function seq000_onTalk(player, quest, npc, classId)
 end
 
 function seq007_onTalk(player, quest, npc, classId)
-	local subseqCUL = quest:GetCounter(CNTR_SEQ7_CUL);
-	local subseqMRD = quest:GetCounter(CNTR_SEQ7_MRD);
+	local data = quest:GetData();
+	local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
+	local subseqMRD = data:GetCounter(CNTR_SEQ7_MRD);
 	
 	if (classId == BADERON) then
 		if (subseqCUL == 1) then
@@ -234,7 +236,7 @@ function seq007_onTalk(player, quest, npc, classId)
 	elseif (classId == CHARLYS) then
 		if (subseqCUL == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030");
-			quest:IncCounter(CNTR_SEQ7_CUL);
+			data:IncCounter(CNTR_SEQ7_CUL);
 			--give 1000g
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030_2");
@@ -242,11 +244,11 @@ function seq007_onTalk(player, quest, npc, classId)
 	elseif (classId == ISANDOREL) then
 		if (subseqMRD == 2) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent050");
-			quest:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MRD);
 			GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 3);
 		elseif (subseqMRD == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035");
-			quest:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MRD);
 		elseif (subseqMRD == 1) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035_2");
 		end
@@ -278,19 +280,20 @@ function seq007_onTalk(player, quest, npc, classId)
 end
 
 function onPush(player, quest, npc)
+	local data = quest:GetData();
 	local sequence = quest:getSequence();
 	local classId = npc:GetActorClassId();
 	
 	if (sequence == SEQ_007) then
 		if (classId == MSK_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent040");
-			quest:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MRD);
 			player:EndEvent();
 			quest:UpdateENPCs();
 			GetWorldManager():DoZoneChange(player, 230, nil, 0, 15, -620.0, 29.476, -70.050, 0.791);
 		elseif (classId == ECHO_EXIT_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent060");
-			quest:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MRD);
 			player:EndEvent();
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
@@ -327,7 +330,7 @@ function onNpcLS(player, quest, npcLSId)
 end
 
 function getJournalInformation(player, quest)
-	return 0, quest:GetCounter(CNTR_SEQ7_CUL) * 5, quest:GetCounter(CNTR_SEQ7_MRD) * 5;
+	return 0, quest:GetData():GetCounter(CNTR_SEQ7_CUL) * 5, quest:GetData():GetCounter(CNTR_SEQ7_MRD) * 5;
 end
 
 

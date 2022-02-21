@@ -1235,10 +1235,8 @@ namespace Meteor.Map
                             //ushort counter4 = reader.GetUInt16("counter4");
 
                             Quest baseQuest = (Quest) Server.GetStaticActors(questId);
-
                             player.playerWork.questScenario[index] = questId;
-                            player.questScenario[index] = new Quest(player, baseQuest, sequence);
-                            player.questScenario[index].SetData(flags, counter1, counter2, counter3, 0);
+                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3, 0);
                         }
                     }
 
