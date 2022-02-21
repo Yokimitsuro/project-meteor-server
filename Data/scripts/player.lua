@@ -7,7 +7,7 @@ function onBeginLogin(player)
 	if (player:GetPlayTime(false) == 0) then
 		initialTown = player:GetInitialTown();
 		if (initialTown == 1 and player:HasQuest(110001) == false) then
-			--player:AddQuest(110001);
+			player:AddQuest(110001);
 			player:SetHomePoint(1280001);
 		elseif (initialTown == 2 and player:HasQuest(110005) == false) then
 			--player:AddQuest(110005);
@@ -31,7 +31,7 @@ function onBeginLogin(player)
 		player.positionY = 10.35;
 		player.positionZ = -36.91;
 		player.rotation = 0.025;
-		player:GetQuest(110001):ClearData();
+		player:GetQuest(110001):GetData():ClearData();
 	elseif (player:HasQuest(110005) == true and player.CurrentArea.ZoneId == 166) then 
 		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
 		player:AddDirector(director);
@@ -43,8 +43,7 @@ function onBeginLogin(player)
 		player.positionY = 4.21;
 		player.positionZ = -706.1074;
 		player.rotation = -1.26721;
-		player:GetQuest(110005):ClearQuestData();
-		player:GetQuest(110005):ClearQuestFlags();
+		player:GetQuest(110005):GetData():ClearData();
 	elseif (player:HasQuest(110009) == true and player.CurrentArea.ZoneId == 184) then
 		director = player.CurrentArea:CreateDirector("OpeningDirector", false);		
 		player:AddDirector(director);
@@ -56,7 +55,7 @@ function onBeginLogin(player)
 		player.positionY = 196.0;
 		player.positionZ = 133.6561;
 		player.rotation = -2.849384;
-		player:GetQuest(110009):ClearClearData();
+		player:GetQuest(110009):GetData():ClearData();
 	end	
 end
 

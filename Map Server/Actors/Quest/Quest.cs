@@ -58,6 +58,16 @@ namespace Meteor.Map.Actors.QuestNS
             questState.UpdateState();
         }
 
+        // Creates a Instance Quest that has been started with data.
+        public Quest(Player owner, Quest staticQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4) : this(staticQuest)
+        {
+            this.owner = owner;
+            currentSequence = sequence;
+            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4);
+            questState = new QuestState(owner, this);
+            questState.UpdateState();
+        }
+
         // Creates a Instance Quest that has not been started.
         public Quest(Player owner, Quest staticQuest) : this(owner, staticQuest, SEQ_NOT_STARTED)
         { }
@@ -98,10 +108,6 @@ namespace Meteor.Map.Actors.QuestNS
         #endregion
 
         #region Quest Data
-        public void SetData(uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4)
-        {
-            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4);
-        }
 
         public QuestData GetData()
         {

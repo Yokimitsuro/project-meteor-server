@@ -63,14 +63,16 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)
-	if (sequence == SEQ_000) then
+	if (sequence == SEQ_000) then		
 		-- Setup states incase we loaded in.
-		local rostnsthalFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
-		local vixenFlag = quest:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
-		local babyfaceFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
-		local rostnsthalCanPush = not quest:GetFlag(FLAG_SEQ000_MINITUT0);
-		local exitCanPush = quest:GetFlags() == 0xF;
-		local exitFlag = quest:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;		
+		local data = quest:GetData();
+		
+		local rostnsthalFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
+		local vixenFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
+		local babyfaceFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
+		local rostnsthalCanPush = not data:GetFlag(FLAG_SEQ000_MINITUT0);
+		local exitCanPush = data:GetFlags() == 0xF;
+		local exitFlag = data:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;		
 		
 		quest:SetENpc(WELLTRAVELED_MERCHANT);
 		quest:SetENpc(TIPSY_ADVENTURER);
@@ -88,9 +90,10 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(GRINNING_ADVENTURER);
 		quest:SetENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
 		quest:SetENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
+		print(tostring(exitCanPush));
 	elseif (sequence == SEQ_005) then
 	elseif (sequence == SEQ_010) then		
-		quest:SetENpc(HOB);
+		quest:SetENpc(HOB, QFLAG_PLATE);
 		quest:SetENpc(GERT);
 		quest:SetENpc(LORHZANT);
 		quest:SetENpc(MUSCLEBOUND_DECKHAND);
@@ -144,8 +147,7 @@ end
 function onNotice(player, quest, target)
 	local sequence = quest:getSequence();
 	
-	if (sequence == SEQ_000) then
-		quest:ClearData();
+	if (sequence == SEQ_000) then		
 		callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal001withHQ");		
 	end
 	
@@ -153,7 +155,9 @@ function onNotice(player, quest, target)
 	quest:UpdateENPCs();
 end
 
-function seq000_onTalk(player, quest, npc, classId)
+function seq000_onTalk(player, quest, npc, classId)	
+	local data = quest:GetData();
+
 	if (classId == WELLTRAVELED_MERCHANT) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_4");
 	elseif (classId == TIPSY_ADVENTURER) then
@@ -163,9 +167,9 @@ function seq000_onTalk(player, quest, npc, classId)
 	elseif (classId == ANXIOUS_ADVENTURER) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_7");
 	elseif (classId == BABYFACED_ADVENTURER) then
-		if (not quest:GetFlag(FLAG_SEQ000_MINITUT3)) then
+		if (not data:GetFlag(FLAG_SEQ000_MINITUT3)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini003");
-			quest:SetFlag(FLAG_SEQ000_MINITUT3);
+			data:SetFlag(FLAG_SEQ000_MINITUT3);
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent000_8");
 		end
@@ -178,9 +182,9 @@ function seq000_onTalk(player, quest, npc, classId)
 	elseif (classId == ASTUTE_MERCHANT) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_12");
 	elseif (classId == VOLUPTUOUS_VIXEN) then
-		if (not quest:GetFlag(FLAG_SEQ000_MINITUT2)) then
+		if (not data:GetFlag(FLAG_SEQ000_MINITUT2)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini002");
-			quest:SetFlag(FLAG_SEQ000_MINITUT2);
+			data:SetFlag(FLAG_SEQ000_MINITUT2);
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent000_13");
 		end
@@ -194,13 +198,13 @@ function seq000_onTalk(player, quest, npc, classId)
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent000_17");
 	elseif (classId == ROSTNSTHAL) then
 		-- Handle the talk tutorial after the push one.
-		if (not quest:GetFlag(FLAG_SEQ000_MINITUT0)) then
+		if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) then
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal003");
-			quest:SetFlag(FLAG_SEQ000_MINITUT0);		
+			data:SetFlag(FLAG_SEQ000_MINITUT0);		
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processTtrMini001");
-			if (not quest:GetFlag(FLAG_SEQ000_MINITUT1)) then
-				quest:SetFlag(FLAG_SEQ000_MINITUT1);
+			if (not data:GetFlag(FLAG_SEQ000_MINITUT1)) then
+				data:SetFlag(FLAG_SEQ000_MINITUT1);
 			end
 		end
 	end	
@@ -209,6 +213,8 @@ function seq000_onTalk(player, quest, npc, classId)
 end
 
 function seq010_onTalk(player, quest, npc, classId)	
+	local data = quest:GetData();
+
 	if (classId == MUSCLEBOUND_DECKHAND) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent020_2");
 	elseif (classId == PEARLYTOOTHED_PORTER) then
