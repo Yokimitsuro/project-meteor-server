@@ -13,8 +13,6 @@ Contains all default lines for talkable npcs in the Sea Region (aka La Noscea).
 
 -- [ActorClassId] = "client_function_name"
 local defaultTalkSea = {
-    
-        -- <<<NOT IMPLEMENTED>>>
 
     [1000003] = "defaultTalkWithWaekbyrt_001",      -- Waekbyrt             (Limsa Lower Decks: MRD Guild) defaultTalkWithWaekbyrt_002 (post-MRD dialog?)
     [1000004] = "defaultTalkWithNunuba_001",        -- Nunuba               (Limsa Lower Decks: MRD Guild)

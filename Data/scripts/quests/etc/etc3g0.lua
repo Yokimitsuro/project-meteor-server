@@ -62,7 +62,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(MESTONNAUX,       (not data:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_PLATE or QFLAG_NONE));
 		quest:SetENpc(LEFWYNE,          (not data:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_PLATE or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
-		quest:SetENpc(KINNISON, QFLAG_PLATE);
+		quest:SetENpc(KINNISON, QFLAG_REWARD);
 	end	
 end
 
@@ -167,6 +167,7 @@ end
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     local possibleMarkers = {};
+    local data = quest:GetData();
     
     if (sequence == SEQ_000) then
         if (not data:GetFlag(FLAG_TALKED_SYBELL)) then table.insert(possibleMarkers, MRKR_SYBELL); end
