@@ -1476,7 +1476,9 @@ namespace Meteor.Map.Actors
 
             if (!isSilent)
             {
-                SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
+                WorldMaster worldMaster = Server.GetWorldManager().GetActor();
+                SendDataPacket("attention", worldMaster, "", 25224, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
+                SendGameMessage(worldMaster, 25224, 0x20, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
             }
 
             instance.OnAccept();

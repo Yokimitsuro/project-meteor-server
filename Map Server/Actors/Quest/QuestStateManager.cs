@@ -172,6 +172,14 @@ namespace Meteor.Map.Actors.QuestNS
                 CompletedQuestsBitfield.Set(questId - SCENARIO_START);
             else 
                 CompletedQuestsBitfield.Clear(questId - SCENARIO_START);
+            QuestGameData[] updated = Server.GetQuestGamedataByPrerequisite(questId);
+            foreach (var questData in updated) 
+            {
+                if (flag)
+                    PrereqBitfield.Set(questData.Id - SCENARIO_START);
+                else
+                    PrereqBitfield.Clear(questData.Id - SCENARIO_START);
+            }
             ComputeAvailable();
         }
     }

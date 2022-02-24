@@ -49,7 +49,7 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)	
-	if (sequence == 65535) then
+	if (sequence == SEQ_ACCEPT) then
 		quest:SetENpc(KINNISON, QFLAG_PLATE);
 	end
 

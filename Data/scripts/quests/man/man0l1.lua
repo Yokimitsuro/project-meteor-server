@@ -26,13 +26,14 @@ SEQ_055	= 55;	-- Search lighthouse for corpse
 SEQ_060	= 60;	-- Talk to Sisipu
 SEQ_065	= 65;	-- Return to FSH Guild
 SEQ_070	= 70;	-- Contact Baderon on LS
-SEQ_075	= 75;	-- Go to the ARM and BSM Guilds.
+SEQ_075	= 75;	-- Go to the ARM and BSM Guilds. Talk to Bodenolf.
 SEQ_080	= 80;	-- Speak with H'naanza
 SEQ_085	= 85;	-- Speak with Bodenolf
 SEQ_090	= 90;	-- Contact Baderon on LS
 SEQ_092	= 92;	-- Return to Baderon.
 
 -- Actor Class Ids
+-- Echo in Adv Guild
 YSHTOLA 				= 1000001;
 CRAPULOUS_ADVENTURER 	= 1000075;
 DUPLICITOUS_TRADER	 	= 1000076;
@@ -46,13 +47,16 @@ COCKAHOOP_COCKSWAIN 	= 1001643;
 SENTENIOUS_SELLSWORD 	= 1001649;
 SOLICITOUS_SELLSWORD 	= 1001650;
 
+-- Sequence 003
 BEARDEDROCK_AETHERYTE	= 1280002;
 
+-- Sequence 007
 CHARLYS					= 1000138;
 ISANDOREL				= 1000152;
 MERLZIRN				= 1000472;
 MSK_TRIGGER				= 1090001;
 
+-- Echo in Mrd Guild
 NERVOUS_BARRACUDA		= 1000096;
 INTIMIDATING_BARRACUDA	= 1000097;
 OVEREAGER_BARRACUDA		= 1000107;
@@ -65,8 +69,24 @@ ADVENTURER2				= 1000870;
 ADVENTURER3				= 1000871;
 ECHO_EXIT_TRIGGER		= 1090003;
 
+-- FSH Guild
+NNMULIKA				= 1000153;
+SISIPU					= 1000155;
+ZEPHYR_TRIGGER			= 1900001;
+
+-- Echo in the Bsm Guild
+TATTOOED_PIRATE			= 1000111;
+IOFA					= 1000135;
+BODENOLF				= 1000144;
+HNAANZA					= 1000145;
+MIMIDOA					= 1000176;
+JOELLAUT				= 1000163;
+WERNER					= 1000247;
+HIHINE					= 1000267;
+TRINNE					= 1000268;
+ECHO_EXIT_TRIGGER2		= 1090001;
+
 -- Quest Markers
-MRKR_HOB				= 11000202;
 
 -- Quest Data
 CNTR_SEQ7_CUL		= 1;
@@ -140,6 +160,32 @@ function onStateChange(player, quest, sequence)
 		if (subseqCUL == 1 and subseqMRD == 4) then
 			player:SetNpcLS(1, 1);
 		end
+	elseif (sequence == SEQ_035) then
+		quest:SetENpc(NNMULIKA, QFLAG_PLATE);
+	elseif (sequence == SEQ_048) then
+		quest:SetENpc(BADERON);
+		quest:SetENpc(ZEPHYR_TRIGGER);
+	elseif (sequence == SEQ_075) then	
+		quest:SetENpc(BODENOLF, QFLAG_PLATE);
+	elseif (sequence == SEQ_080) then	
+		quest:SetENpc(HNAANZA, QFLAG_PLATE);
+		quest:SetENpc(TATTOOED_PIRATE);
+		quest:SetENpc(IOFA);
+		quest:SetENpc(BODENOLF);
+		quest:SetENpc(MIMIDOA);
+		quest:SetENpc(JOELLAUT);
+		quest:SetENpc(WERNER);
+		quest:SetENpc(HIHINE);
+		quest:SetENpc(TRINNE);
+	elseif (sequence == SEQ_085) then	
+		quest:SetENpc(HNAANZA);
+		quest:SetENpc(TATTOOED_PIRATE);
+		quest:SetENpc(WERNER);
+		quest:SetENpc(HIHINE);
+		quest:SetENpc(TRINNE);
+		quest:SetENpc(ECHO_EXIT_TRIGGER2, QFLAG_MAP, false, true);
+	elseif (sequence == SEQ_092) then	
+		quest:SetENpc(BADERON, QFLAG_REWARD);
 	end	
 	
 end
@@ -158,17 +204,68 @@ function onTalk(player, quest, npc)
 	elseif (sequence == SEQ_005) then
 		if (classId == BADERON) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent026");
-			quest:StartSequence(SEQ_006);
 			player:EndEvent();
+			quest:StartSequence(SEQ_006);
 		end
 	elseif (sequence == SEQ_006) then
 		if (classId == BADERON) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent027");			
-			quest:StartSequence(SEQ_007);
 			player:EndEvent();
+			player:SendGameMessage(GetWorldMaster(), 25117, 0x20, 11000125); -- You obtain Baderon's Recommendation
+			quest:StartSequence(SEQ_007);
 		end
 	elseif (sequence == SEQ_007) then
 		seq007_onTalk(player, quest, npc, classId);
+	elseif (sequence == SEQ_035) then
+		if (classId == NNMULIKA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602");
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_2");
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent604");
+			--quest:StartSequence(SEQ_040);
+			player:EndEvent();
+		end
+	elseif (sequence == SEQ_040) then
+		
+	elseif (sequence == SEQ_048) then
+		if (classId == BADERON) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
+			player:EndEvent();
+		elseif (classId == ZEPHYR_TRIGGER) then			
+			local startDuty = callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
+			if (startDuty) then
+			end
+			player:EndEvent();
+		end		
+	elseif (sequence == SEQ_075) then
+		if (classId == BODENOLF) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent630");
+			player:EndEvent();
+			quest:StartSequence(SEQ_080);
+			GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 4, -504.985, 42.490, 433.712, 2.35);
+		end
+	elseif (sequence == SEQ_080) then
+		if (classId == HNAANZA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent632");
+			player:EndEvent();
+			quest:StartSequence(SEQ_085);
+		else
+			seq080_085_onTalk(player, quest, npc, classId);
+		end
+	elseif (sequence == SEQ_085) then
+		if (classId == HNAANZA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent632_2");
+		else
+			seq080_085_onTalk(player, quest, npc, classId);
+		end
+	elseif (sequence == SEQ_092) then
+		if (classId == BADERON) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEventComplete");
+			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 300, 1, 1, 2);
+			player:EndEvent();
+			player:CompleteQuest(quest);
+			return;
+		end
 	end
 	
 	quest:UpdateENPCs();
@@ -279,6 +376,27 @@ function seq007_onTalk(player, quest, npc, classId)
 	player:EndEvent();
 end
 
+function seq080_085_onTalk(player, quest, npc, classId)
+	if (classId == IOFA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_2");
+	elseif (classId == TRINNE) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_3");
+	elseif (classId == HIHINE) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_4");
+	elseif (classId == MIMIDOA) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_5");
+	elseif (classId == WERNER) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_6");
+	elseif (classId == TATTOOED_PIRATE) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_7");
+	elseif (classId == JOELLAUT) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_8");
+	elseif (classId == BODENOLF) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_9");
+	end
+	player:EndEvent();
+end
+
 function onPush(player, quest, npc)
 	local data = quest:GetData();
 	local sequence = quest:getSequence();
@@ -298,7 +416,31 @@ function onPush(player, quest, npc)
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
 		end
+	elseif (sequence == SEQ_048) then
+		if (classId == ZEPHYR_TRIGGER) then
+			local result = callClientFunction(player, "delegateEvent", player, quest, "contentsJoinAskInBasaClass");
+			if (result == 1) then
+				startMan0l1Content(player, quest);
+				return;
+			end
+		end
+	elseif (sequence == SEQ_085) then
+		if (classId == ECHO_EXIT_TRIGGER2) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent635");			
+			player:EndEvent();
+			quest:UpdateENPCs();
+			GetWorldManager():WarpToPublicArea(player);
+		end
 	end
+end
+
+function onEmote(player, quest, npc, emoteId)
+	local sequence = quest:getSequence();
+	
+	if (sequence == SEQ_040) then
+	end
+		
+	quest:UpdateENPCs();
 end
 
 function onNotice(player, quest, target)
@@ -327,6 +469,25 @@ function onNpcLS(player, quest, npcLSId)
 			quest:StartSequence(SEQ_035);
 		end
 	end
+end
+
+function startMan0l1Content(player, quest)
+	quest:StartSequence(SEQ_050);
+		
+	local contentArea = player.CurrentArea:CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "Man0l101", "SimpleContent30002", "Quest/QuestDirectorMan0l101");
+		
+	if (contentArea == nil) then
+		return;
+	end
+	
+	local director = contentArea:GetContentDirector();		
+	
+	player:AddDirector(director);		
+	director:StartDirector(false);	
+	player:KickEvent(director, "noticeEvent", true);
+	player:SetLoginDirector(director);		
+	
+	GetWorldManager():DoZoneChangeContent(player, contentArea, -5, 16.35, 6, 0.5, 16);		
 end
 
 function getJournalInformation(player, quest)

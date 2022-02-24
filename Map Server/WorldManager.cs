@@ -932,6 +932,30 @@ namespace Meteor.Map
             if (player.CurrentArea.IsPrivate())
                 DoZoneChange(player, player.CurrentArea.ZoneId, null, 0, 15, x, y, z, rotation);
         }
+
+        public void WarpToPosition(Player player, float x, float y, float z, float rotation)
+        {
+            //Remove player from currentZone if transfer else it's login
+            if (player.CurrentArea != null)
+            {
+                player.playerSession.LockUpdates(true);
+                player.CurrentArea.RemoveActorFromZone(player);
+                player.CurrentArea.AddActorToZone(player);
+
+                //Update player actor's properties;
+                player.positionX = x;
+                player.positionY = y;
+                player.positionZ = z;
+                player.rotation = rotation;
+
+                //Send packets
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
+                player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(0));
+
+                player.playerSession.LockUpdates(false);
+                player.SendInstanceUpdate();
+            }
+        }
         
         //Moves actor to new zone, and sends packets to spawn at the given coords.
         public void DoZoneChangeContent(Player player, PrivateAreaContent contentArea, float spawnX, float spawnY, float spawnZ, float spawnRotation, ushort spawnType = SetActorPositionPacket.SPAWNTYPE_WARP_DUTY)

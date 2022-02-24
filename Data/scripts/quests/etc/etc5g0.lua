@@ -27,10 +27,7 @@ ITEM_WELL_WORN_BAG      = 11000224;
 MRKR_PFARAHR            = 11082001;
 MRKR_VKOROLON           = 11082002;
 
-
-
 function onStart(player, quest)
-    -- processEventVKOROLONStart -- No means of properly accepting quests yet
     quest:StartSequence(SEQ_000);
     player:SendGameMessage(GetWorldMaster(), 25246, MESSAGE_TYPE_SYSTEM, ITEM_WELL_WORN_BAG, 1);
 end
@@ -38,9 +35,11 @@ end
 function onFinish(player, quest)
 end
 
-
-
 function onStateChange(player, quest, sequence)
+	if (sequence == SEQ_ACCEPT) then
+		quest:SetENpc(VKOROLON, QFLAG_PLATE);
+	end
+
     if (sequence == SEQ_000) then
         quest:SetENpc(VKOROLON);
         quest:SetENpc(PFARAHR, QFLAG_PLATE);
@@ -54,6 +53,10 @@ function onTalk(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
     
+	if (sequence == SEQ_ACCEPT) then
+		callClientFunction(player, "delegateEvent", player, quest, "processEventVKOROLONStart");
+	end
+	
     if (sequence == SEQ_000) then
         if (classId == VKOROLON) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_000_1");
