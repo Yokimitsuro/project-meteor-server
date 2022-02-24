@@ -170,13 +170,13 @@ function getJournalMapMarkerList(player, quest)
     local possibleMarkers = {};
     
     if (sequence == SEQ_000) then
-        if (not data:GetFlag(FLAG_TALKED_VANNES)) then table.insert(possibleMarkers, MRKR_SYBELL); end
-        if (not data:GetFlag(FLAG_TALKED_JEGER)) then table.insert(possibleMarkers, MRKR_KHUMA_MOSHROCA); end
+        if (not data:GetFlag(FLAG_TALKED_VANNES)) then table.insert(possibleMarkers, MRKR_VANNES); end
+        if (not data:GetFlag(FLAG_TALKED_JEGER)) then table.insert(possibleMarkers, MRKR_JEGER); end
         if (not data:GetFlag(FLAG_TALKED_LETTICE)) then table.insert(possibleMarkers, MRKR_LETTICE); end
         if (not data:GetFlag(FLAG_TALKED_ZOENGTERBIN)) then table.insert(possibleMarkers, MRKR_ZOENGTERBIN); end
         if (not data:GetFlag(FLAG_TALKED_THIMM)) then table.insert(possibleMarkers, MRKR_THIMM); end
     elseif (sequence == SEQ_001) then
-        table.insert(possibleMarkers, MRKR_KINNISON);
+        table.insert(possibleMarkers, MRKR_FRUHYBOLG);
     end
     
     return unpack(possibleMarkers)
