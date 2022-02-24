@@ -76,7 +76,7 @@ function onTalk(player, quest, npc)
 		local incCounter = false;
 		local data = quest:GetData();
 		
-        if (npcClassId == SWAENHYLT) then
+        if (classId == SWAENHYLT) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent000_2");
         elseif (classId == FLAVIELLE) then
 			if (not data:GetFlag(FLAG_TALKED_FLAVIELLE)) then
