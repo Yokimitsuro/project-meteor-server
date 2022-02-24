@@ -65,7 +65,7 @@ local defaultTalkWil = {
     [1000861] = "defaultTalkWithLinette_001",           -- Linette
     [1000862] = "defaultTalkWithGagaruna_001",          -- Gagaruna
     [1000863] = "defaultTalkWithLulutsu_001",           -- Lulutsu
-    [1000864] = "defaultTalkWithInn_Desk",              -- Otopa Pottopa - defaultTalkWithOtopapottopa_001 (pre-Inn unlock?)
+    [1000864] = "defaultTalkWithOtopapottopa_001",      -- Otopa Pottopa -  defaultTalkWithInn_Desk - used when Inn unlocked
     [1000865] = "defaultTalkWithThaisie_001",           -- Thaisie      - Mentions retainers, but will not fire since she's not PplStd.
     [1000887] = "defaultTalkWithZssapa_001",            -- <<<NOT IMPLEMENTED>>> - Z'ssapa  (Central Thanalan: Black Brush: 92.779999 183.837 -1030.310059) alt actor ID: 1001217 (used in a quest presumably, different outfit from wiki image)
     [1000915] = "defaultTalkWithCahernaut_001",         -- Cahernaut
@@ -227,7 +227,7 @@ local defaultTalkWil = {
     [1001925] = "defaultTalkWithHortwann_001",          -- <<<NOT IMPLEMENTED>>> - Flame Private Hanskalsyn - (North Thanalan: Camp Bluefog)
     [1001932] = "defaultTalkWithSIBOLD_001",            -- Sibold
     [1001953] = "defaultTalkWithBerndan_001",           -- Berndan
-    [1002047] = "defaultTalkWithInn_Desk_2",            -- Kopuru Fupuru - Inn NPC. -  defaultTalkWithKopuruFupuru_001 (pre-Inn unlock?)
+    [1002047] = "defaultTalkWithKopuruFupuru_001",      -- Kopuru Fupuru - Inn NPC -  defaultTalkWithInn_Desk_2 used when Inn unlocked
     [1002101] = "defaultTalkWithDuraltharal_001",       -- Dural Tharal
     [1002110] = "processEventSOMBER",                   -- Flame Lieutenant Somber Meadow   (Foundation Day 2012 Dialog) Spl000 staticactor
     [1002111] = "processEventMIMIO",                    -- Flame Sergeant Mimio Mio         (Foundation Day 2012 Dialog) Spl000 staticactor
@@ -271,9 +271,19 @@ function onTalk(player, quest, npc, eventName)
     local npcId = npc:GetActorClassId();
     local clientFunc = defaultTalkWil[npcId];
     
-    if (npcId == 1002047) then -- Kopuru Fupuru - Inn NPC
-        defaultTalkWithInn(player, quest, clientFunc);
-    elseif ((npcId >= 1002110) and (npcId <= 1002112)) then
+    if (npcId == 1000864) then -- Kopuru Fupuru (Adv. Guild Inn NPC)
+        if (player:IsQuestCompleted(110848)) then -- "Ring of Deceit" completed.
+            defaultTalkWithInn(player, quest, "defaultTalkWithInn_Desk");
+        else
+            callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+        end
+    elseif (npcId == 1002047) then -- Kopuru Fupuru (Rear-Entrance Inn NPC)
+        if (player:IsQuestCompleted(110848)) then -- "Ring of Deceit" completed.
+            defaultTalkWithInn(player, quest, "defaultTalkWithInn_Desk_2");
+        else
+            callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+        end
+    elseif ((npcId >= 1002110) and (npcId <= 1002112)) then  -- Foundation Day 2012 NPCs
         talkWithSpecial(player, npcId, clientFunc)
     else
         callClientFunction(player, "delegateEvent", player, quest, clientFunc);

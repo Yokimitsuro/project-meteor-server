@@ -17,50 +17,57 @@ local defaultTalkFst = {
     [1000071] = "defaultTalkWithBertennant_001",            -- Bertennant           (Gridania: Blue Badger Gate)
     [1000230] = "defaultTalkWithMiounne_001",               -- Miounne              (Gridania: Adv. Guild)
     [1000427] = "defaultTalkWithAnene_001",                 -- Anene                (Gridania: Adv. Guild) defaultTalkWithAnene_002 / 003 (PGL informant)
+    [1000428] = "defaultTalkWithSylbyrt_001",               -- Sylbyrt              (Gridania: Adv. Guild) defaultTalkWithSylbyrt_002 / 003 (MRD informant)
+    [1000429] = "defaultTalkWithHongavunga_001",            -- Honga Vunga          (Gridania: Adv. Guild) defaultTalkWithHongavunga_002 / 003 (WVR informant)
+    [1000430] = "defaultTalkWithNoncomananco_001",          -- Nonco Menanco        (Gridania: Adv. Guild) arg1=1 or 21, mentions checking out DoW/M, otherwise DoH.  defaultTalkWithNoncomananco_002 / 003 (GSM informant)
+    [1000431] = "defaultTalkWithLtandhaa_001",              -- L'tandhaa            (Gridania: Adv. Guild) defaultTalkWithLtandhaa_002 / 003 (ALC informant)
+    [1000432] = "defaultTalkWithPofufu_001",                -- Pofufu               (Gridania: Adv. Guild) defaultTalkWithPofufu_002 / 003 (MIN informant)
     [1000433] = "defaultTalkWithDrividot_001",              -- Drividot             (Gridania: Adv. Guild) defaultTalkWithDrividot_002 / 003 (FSH informant)
 	[1000435] = "defaultTalkWithBasewin_001",               -- Basewin              (Gridania: Adv. Guild) defaultTalkWithBasewin_002 / 003 (BSM informant)
+    [1000436] = "defaultTalkWithSeikfrae_001",              -- Seikfrae             (Gridania: Adv. Guild) defaultTalkWithSeikfrae_002 / 003 (GLD informant)
     [1000437] = "defaultTalkWithEdasshym_001",              -- E'dasshym            (Gridania: Adv. Guild) defaultTalkWithEdasshym_002 / 003 (THM informant)
+    --[1000456] = "",                                         -- Tierney              (Gridania: Adv. Guild) Guildleve NPC - Will not fire, not PplStd.
+    --[1000457] = "",                                         -- Gontrant             (Gridania: Adv. Guild) Guildleve NPC - Will not fire, not PplStd.
+    [1000458] = "defaultTalkWithInn_Desk",                  -- V'korolon            (Gridania: Adv. Guild) - defaultTalkWithVkorolon_001 - Pre-Inn unlocked dialog
     [1000821] = "defaultTalkWithNellaure_001",				-- Nellaure
+    [1000951] = "defaultTalkWithLonsygg_001",               -- Lonsygg              (Gridania: Blue Badger Gate)
 	[1001081] = "defaultTalkWithKhumamoshroca_001",			-- Khuma Moshroca
 	[1001103] = "defaultTalkWithMestonnaux_001", 			-- Mestonnaux
-    --[1001183] = "",                 -- Emoni                (Gridania: Adv. Guild) - Will not fire, not PplStd.
+    --[1001183] = "",                                         -- Emoni                (Gridania: Adv. Guild) Linkshell NPC - Will not fire, not PplStd.
+    --[1001184] = "",                                         -- Gyles                (Gridania: Adv. Guild) Retainer NPC - Will not fire, not PplStd.
 	[1001396] = "defaultTalkWithLefwyne_001",				-- Lefwyne
+
 	[1001430] = "defaultTalkWithKinnison_001",				-- Kinnison             - Two args (nil errors client).  If either >= 0, dialog mentions you've met Kan-E-Senna.
-	[1001437] = "defaultTalkWithSybell_001",				-- Sybell	
+    [1001432] = "defaultTalkWithMathye_001",                -- Mathye               (Gridania: Blue Badger Gate)
+    [1001433] = "defaultTalkWithUlta_001",                  -- Ulta                 (Gridania: Blue Badger Gate)
+    [1000434] = "defaultTalkWithOdilie_001",                -- Odilie               (Gridania: Adv. Guild) defaultTalkWithOdilie_002 / 003 (CUL informant)
+	[1001437] = "defaultTalkWithSybell_001",				-- Sybell
     [1001459] = "defaultTalkWithFlavielle_001",             -- Flavielle            (Gridania: Adv. Guild) defaultTalkWithFlavielle_002 / 003 (ARM informant)
+    [1001706] = "defaultTalkWithMemama_001",                -- Memama               (Gridania: Adv. Guild)
+    [1001707] = "defaultTalkWithPfarahr_001",               -- Pfarahr              (Gridania: Adv. Guild)
     [1001708] = "defaultTalkWithBeaudonet_001",             -- Beaudonet            (Gridania: Adv. Guild)
     [1001709] = "defaultTalkWithFryswyde_001",              -- Fryswyde             (Gridania: Adv. Guild)
+    [1001710] = "defaultTalkWithWillielmus_001",            -- Willielmus           (Gridania: Adv. Guild)
     [1001951] = "defaultTalkWithAnselm_001",                -- Anselm               (Gridania: Adv. Guild)
+    [1002091] = 
+    [1500055] = "defaultTalkWithLionnellais_001",           -- Lionnellais          (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
+    [1500056] = "defaultTalkWithHida_001",                  -- Hida                 (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
+    --[1500334] = "",                                         -- Serpent Private Hill (Gridania: Adv. Guild) Company Warp NPC - Will not fire, not PplStd.
+    --[1500393] = "",                                         -- Torsefers            (Gridania: Adv. Guild) Wards NPC - Will not fire, not PplStd.
+    --[1600092] = "",                                         -- Aeduin               (Gridania: Adv. Guild) Shop - Will not fire, not PplStd.
+    --[1600100] = "",                                         -- Zagylhaemr           (Gridania: Adv. Guild) Shop - Will not fire, not PplStd.
+    --[1600119] = "",                                         -- Naih Khamazom        (Gridania: Adv. Guild) Shop - Will not fire, not PplStd.
+    [1700001] = "defaultTalkWithPenelope_001",              -- Penelope             (Gridania: Adv. Guild)
+    [1000001] = "defaultTalkWithLionnellais_001",
     
-    --[1600092] = "",                -- Aeduin               - Will not fire since it isn't PplStd.
     
  --   [1000458] = "defaultTalkWithInn_Desk"
 
 --[[
 
-defaultTalkWithVkorolon_001(A0_1, A1_2, A2_3)
-defaultTalkWithPenelope_001(A0_4, A1_5, A2_6)
-defaultTalkWithSylbyrt_001(A0_19, A1_20, A2_21)
-defaultTalkWithSylbyrt_002(A0_22, A1_23, A2_24)
-defaultTalkWithSylbyrt_003(A0_25, A1_26, A2_27)
-defaultTalkWithHongavunga_001(A0_28, A1_29, A2_30)
-defaultTalkWithHongavunga_002(A0_31, A1_32, A2_33)
-defaultTalkWithHongavunga_003(A0_34, A1_35, A2_36)
-defaultTalkWithNoncomananco_001(A0_37, A1_38, A2_39, A3_40)
-defaultTalkWithNoncomananco_002(A0_41, A1_42, A2_43)
-defaultTalkWithNoncomananco_003(A0_44, A1_45, A2_46)
-defaultTalkWithSeikfrae_001(A0_47, A1_48, A2_49)
-defaultTalkWithSeikfrae_002(A0_50, A1_51, A2_52)
-defaultTalkWithSeikfrae_003(A0_53, A1_54, A2_55)
-defaultTalkWithLtandhaa_001(A0_74, A1_75, A2_76)
-defaultTalkWithLtandhaa_002(A0_77, A1_78, A2_79)
-defaultTalkWithLtandhaa_003(A0_80, A1_81, A2_82)
-defaultTalkWithPofufu_001(A0_83, A1_84, A2_85)
-defaultTalkWithPofufu_002(A0_86, A1_87, A2_88)
-defaultTalkWithPofufu_003(A0_89, A1_90, A2_91)
-defaultTalkWithOdilie_001(A0_101, A1_102, A2_103)
-defaultTalkWithOdilie_002(A0_104, A1_105, A2_106)
-defaultTalkWithOdilie_003(A0_107, A1_108, A2_109)
+-- defaultTalkWithStewart_001  -- Hodder line?
+
+
 defaultTalkWithHereward_001(A0_119, A1_120, A2_121)
 defaultTalkWithBeli_001(A0_122, A1_123, A2_124)
 defaultTalkWithMaddeline_001(A0_125, A1_126, A2_127)
@@ -127,12 +134,11 @@ defaultTalkWithSandre_001(A0_312, A1_313, A2_314)
 defaultTalkWithEburhart_001(A0_318, A1_319, A2_320)
 defaultTalkWithOnguen_001(A0_321, A1_322, A2_323)
 defaultTalkEnie_001(A0_324, A1_325, A2_326)
-defaultTalkWithLionnellais_001(A0_327, A1_328, A2_329)
-defaultTalkWithHida_001(A0_330, A1_331, A2_332)
+
 defaultTalkWithNoes_001(A0_333, A1_334, A2_335)
 defaultTalkWithFhrudhem_001(A0_336, A1_337, A2_338)
-defaultTalkWithUlta_001(A0_342, A1_343, A2_344)
-defaultTalkWithMathye_001(A0_345, A1_346, A2_347)
+
+
 defaultTalkWithMitainie_001(A0_348, A1_349, A2_350)
 defaultTalkWithNicia_001(A0_351, A1_352, A2_353)
 defaultTalkWithBlandie_001(A0_354, A1_355, A2_356)
@@ -166,7 +172,7 @@ defaultTalkWithBloisirant_001(A0_447, A1_448, A2_449)
 defaultTalkWithGylbart_001(A0_450, A1_451, A2_452)
 defaultTalkWithHonoroit_001(A0_453, A1_454, A2_455)
 defaultTalkWithYlessa_001(A0_456, A1_457, A2_458)
-defaultTalkWithLonsygg_001(A0_459, A1_460, A2_461)
+
 defaultTalkWithSwaenhylt_001(A0_465, A1_466, A2_467)
 defaultTalkWithMarcette_001(A0_468, A1_469, A2_470)
 defaultTalkWithGuildleveClientG_001(A0_471, A1_472, A2_473)
@@ -188,10 +194,7 @@ defaultTalkWithAruhnsenna_001(A0_516, A1_517, A2_518)
 defaultTalkWithMoogle010_001(A0_519, A1_520, A2_521)
 defaultTalkWithMoogle002_001(A0_522, A1_523, A2_524)
 defaultTalkWithAilith_001(A0_525, A1_526, A2_527)
-defaultTalkWithMemama_001(A0_528, A1_529, A2_530)
-defaultTalkWithPfarahr_001(A0_531, A1_532, A2_533)
 
-defaultTalkWithWillielmus_001(A0_540, A1_541, A2_542)
 defaultTalkWithQZamqo_001(A0_543, A1_544, A2_545)
 defaultTalkLouisoix_001(A0_546, A1_547, A2_548)
 defaultTalkWithRonanKognan_001(A0_549, A1_550, A2_551)
@@ -241,10 +244,11 @@ function onTalk(player, quest, npc, eventName)
     local npcId = npc:GetActorClassId();
 	local clientFunc = defaultTalkFst[npcId];
     
-    if (npcId == 1001430) then -- Kinnison
+    if (npcId == 1000430) then -- Nonco Menanco
+        callClientFunction(player, "delegateEvent", player, quest, clientFunc, 21);
+    elseif (npcId == 1001430) then -- Kinnison
         callClientFunction(player, "delegateEvent", player, quest, clientFunc, -1,-1);
     else
-        
         callClientFunction(player, "delegateEvent", player, quest, clientFunc);
     end
     
