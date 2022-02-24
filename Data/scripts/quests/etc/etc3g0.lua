@@ -135,7 +135,7 @@ function onTalk(player, quest, npc, eventName)
             attentionMessage(player, 51061, 0, counterAmount, 5); -- You have heard word of the Seedseers. (... of 5)
             
             if (seq000_checkCondition(data)) then -- All Seers spoken to
-                attentionMessage(player, 25225, 110674); -- "Seeing the Seers" objectives complete!
+                attentionMessage(player, 25225, quest:GetQuestId()); -- "Seeing the Seers" objectives complete!
                 quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
                 quest:StartSequence(SEQ_001);
             end
@@ -166,6 +166,7 @@ end
 
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
+	local data = quest:GetData();
     local possibleMarkers = {};
     
     if (sequence == SEQ_000) then
