@@ -4,30 +4,30 @@ require ("global")
 
 Quest Script
 
-Name: 	A Bitter Oil to Swallow
-Code: 	Wld0g3
-Id: 	110764
-Prereq: Level 17, Any Class
+Name: 	Spores on the Brain
+Code: 	Wld0g4
+Id: 	110765
+Prereq: Level 11, Any Class, Requires "In the Name of Science"
 
 ]]
 
 -- Sequence Numbers
-SEQ_000	= 0;  -- Kill Oilbugs.
-SEQ_001	= 1;  -- Talk to Eugenaire.
+SEQ_000	= 0;  -- Kill Mature Funguars.
+SEQ_001	= 1;  -- Talk to Marcette.
 
 -- Actor Class Ids
-ENPC_EUGENAIRE 				= 1001190;
-BNPC_OILBUG					= 2103910;
+ENPC_MARCETTE 		= 1001583;
+BNPC_MATURE_FUNGUAR	= 2105916;
 
 -- Quest Markers
-MRKR_EUGENAIRE				= 11120201;
-MRKR_OILBUG_AREA			= 11120202;
+MRKR_MARCETTE		= 11120302;
+MRKR_FUNGUAR_AREA	= 11120301;
 
 -- Counters
-COUNTER_OIL 				= 0;
+COUNTER_SPORESAC	= 0;
 
 -- Quest Details
-OBJECTIVE_OIL				= 8;
+OBJECTIVE_SPORESAC	= 8;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -38,12 +38,12 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_EUGENAIRE, QFLAG_PLATE);
+		quest:SetENpc(ENPC_MARCETTE, QFLAG_PLATE);
 	elseif (sequence == SEQ_000) then
-        quest:SetENpc(ENPC_EUGENAIRE);
-		quest:SetENpc(BNPC_OILBUG);
+        quest:SetENpc(ENPC_MARCETTE);
+		quest:SetENpc(BNPC_MATURE_FUNGUAR);
 	elseif (sequence == SEQ_001) then
-		quest:SetENpc(ENPC_EUGENAIRE, QFLAG_REWARD);
+		quest:SetENpc(ENPC_MARCETTE, QFLAG_REWARD);
 	end	
 end
 
@@ -52,8 +52,8 @@ function onTalk(player, quest, npc, eventName)
 	local seq = quest:GetSequence();
     
 	-- Offer the quest
-	if (npcClassId == ENPC_EUGENAIRE and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventEugenaireStart");
+	if (npcClassId == ENPC_MARCETTE and seq == SEQ_ACCEPT) then
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventMarcetteStart");
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -61,13 +61,13 @@ function onTalk(player, quest, npc, eventName)
 		return;	
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
-        if (npcClassId == ENPC_EUGENAIRE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_000");
+        if (npcClassId == ENPC_MARCETTE) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent000_2");
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
-		if (npcClassId == ENPC_EUGENAIRE) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
+		if (npcClassId == ENPC_MARCETTE) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
             player:CompleteQuest(quest);
 		end
@@ -79,10 +79,10 @@ end
 
 -- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_OILBUG) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_OIL);
+	if (bnpc == BNPC_MATURE_FUNGUAR) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_SPORESAC);
 		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
-        if (counterAmount >= OBJECTIVE_OIL) then
+        if (counterAmount >= OBJECTIVE_SPORESAC) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -90,15 +90,15 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_OIL);
+	return quest:GetData():GetCounter(COUNTER_SPORESAC);
 end
 
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     
     if (sequence == SEQ_000) then
-		return MRKR_OILBUG_AREA;
+		return MRKR_FUNGUAR_AREA;
     elseif (sequence == SEQ_001) then
-        return MRKR_EUGENAIRE;
+        return MRKR_MARCETTE;
     end
 end
