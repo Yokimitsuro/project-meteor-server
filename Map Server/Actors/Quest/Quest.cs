@@ -201,8 +201,7 @@ namespace Meteor.Map.Actors.QuestNS
                 return;
 
             // Send the message that the journal has been updated
-            if (currentSequence != SEQ_NOT_STARTED)
-                owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
+            owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
 
             currentSequence = sequence;            
             questState.UpdateState();
