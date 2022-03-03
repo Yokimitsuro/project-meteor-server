@@ -169,7 +169,7 @@ namespace Meteor.Map.DataObjects
                         if (quests.Length != 0)
                         {
                             QuestENpc questInstance = quests[0].GetQuestState().GetENpc(npc.GetActorClassId());
-                            QueuePacket(npc.GetSetEventStatusPackets());
+                            QueuePacket(npc.GetSetEventStatusPackets(questInstance.isTalkEnabled, questInstance.isEmoteEnabled, questInstance.isPushEnabled));
                             QueuePacket(SetActorQuestGraphicPacket.BuildPacket(npc.Id, questInstance.questFlagType));                            
                         }
                     }

@@ -878,6 +878,10 @@ namespace Meteor.Map
 
             player.playerSession.LockUpdates(false);
 
+            //Send "You have left the instance" if old area is a Private Area
+            if (oldArea is PrivateArea)
+                player.SendGameMessage(GetActor(), 34110, 0x20);
+
             //Send "You have entered an instance" if it's a Private Area
             if (newArea is PrivateArea)
                 player.SendGameMessage(GetActor(), 34108, 0x20);
