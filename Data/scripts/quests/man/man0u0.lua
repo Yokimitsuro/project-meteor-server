@@ -104,15 +104,16 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)
+	local data = quest:GetData();
 
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
-        local asciliaCanPush = not quest:GetFlag(FLAG_SEQ000_MINITUT0);
-        local asciliaFlag = quest:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
-        local fretfulfarmhandFlag = quest:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
-        local gildiggingmistressFlag = quest:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
+        local asciliaCanPush = not data:GetFlag(FLAG_SEQ000_MINITUT0);
+        local asciliaFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
+        local fretfulfarmhandFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
+        local gildiggingmistressFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
 
-        local exitFlag = quest:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;
+        local exitFlag = data:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;
 
         if (asciliaCanPush) then
             fretfulfarmhandFlag = QFLAG_NONE;
@@ -135,7 +136,7 @@ function onStateChange(player, quest, sequence)
         quest:SetENpc(OPENING_STOPER_ULDAH, QFLAG_NONE, false, false, true);
 
     elseif (sequence == SEQ_010) then
-        local yayatokiFlag = quest:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_PLATE;
+        local yayatokiFlag = data:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_PLATE;
         local uldahopeningexitFlag = QFLAG_MAP;
         quest:SetENpc(KEEN_EYED_MERCHANT);
         quest:SetENpc(HIGH_SPIRITED_FELLOW);
@@ -163,16 +164,16 @@ function onTalk(player, quest, npc)
 end
 
 function onPush(player, quest, npc)
-
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
+	local data = quest:GetData();
 
     if (sequence == SEQ_000) then
         if (classId == ASCILIA) then
            callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal002");
            player:EndEvent();
         elseif (classId == EXIT_TRIGGER) then
-            if (quest:GetFlags() == 0xF) then
+            if (data:GetFlags() == 0xF) then
                 doExitTrigger(player, quest, npc);
                 return;
             else
@@ -208,29 +209,29 @@ function onNotice(player, quest, target)
 end
 
 function seq000_onTalk(player, quest, npc, classId)
+	local data = quest:GetData();
 
     if (classId == ASCILIA) then
-
-        if (not quest:GetFlag(FLAG_SEQ000_MINITUT0)) then -- If Talk tutorial
+        if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) then -- If Talk tutorial
             callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal003");
-            quest:SetFlag(FLAG_SEQ000_MINITUT0); -- Used to disable her PushEvent / Allow for her next TalkEvent
+            quest:GetData():SetFlag(FLAG_SEQ000_MINITUT0); -- Used to disable her PushEvent / Allow for her next TalkEvent
         else
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini001");
-            quest:SetFlag(FLAG_SEQ000_MINITUT1); -- Ascilia has now been talked to.
+            quest:GetData():SetFlag(FLAG_SEQ000_MINITUT1); -- Ascilia has now been talked to.
         end
 
     elseif (classId == FRETFUL_FARMHAND) then
-        if (not quest:GetFlag(FLAG_SEQ000_MINITUT2)) then
+        if (not data:GetFlag(FLAG_SEQ000_MINITUT2)) then
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini002_first");
-            quest:SetFlag(FLAG_SEQ000_MINITUT2);
+            data:SetFlag(FLAG_SEQ000_MINITUT2);
         else
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini002");
         end
 
     elseif (classId == GIL_DIGGING_MISTRESS) then
-        if (not quest:GetFlag(FLAG_SEQ000_MINITUT3)) then
+        if (not data:GetFlag(FLAG_SEQ000_MINITUT3)) then
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini003_first");
-            quest:SetFlag(FLAG_SEQ000_MINITUT3);
+            data:SetFlag(FLAG_SEQ000_MINITUT3);
         else
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini003");
         end
@@ -257,7 +258,6 @@ function seq000_onTalk(player, quest, npc, classId)
 end
 
 function seq010_onTalk(player, quest, npc, classId)
-
     if (classId == KEEN_EYED_MERCHANT) then
         callClientFunction(player, "delegateEvent", player, quest, "processEvent020_2");
     elseif (classId == HIGH_SPIRITED_FELLOW) then
@@ -273,9 +273,9 @@ function seq010_onTalk(player, quest, npc, classId)
     elseif (classId == FULL_LIPPED_FILLE) then
         callClientFunction(player, "delegateEvent", player, quest, "processEtc002");
     elseif (classId == YAYATOKI) then
-        if (not quest:GetFlag(FLAG_SEQ010_TALK0)) then
+        if (not quest:GetData():GetFlag(FLAG_SEQ010_TALK0)) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
-            quest:SetFlag(FLAG_SEQ010_TALK0);
+            quest:GetData():SetFlag(FLAG_SEQ010_TALK0);
         else
             callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
         end
@@ -286,17 +286,18 @@ end
 
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
+	local data = quest:GetData();
     local possibleMarkers = {};
 
     if (sequence == SEQ_000) then
-        if (quest:GetFlag(FLAG_SEQ000_MINITUT0)) then
-            if (not quest:GetFlag(FLAG_SEQ000_MINITUT1)) then table.insert(possibleMarkers, MRKR_ASCILIA); end
-            if (not quest:GetFlag(FLAG_SEQ000_MINITUT2)) then table.insert(possibleMarkers, MRKR_FRETFUL_FARMHAND); end
-            if (not quest:GetFlag(FLAG_SEQ000_MINITUT3)) then table.insert(possibleMarkers, MRKR_GIL_DIGGING_MISTRESS); end
+        if (data:GetFlag(FLAG_SEQ000_MINITUT0)) then
+            if (not data:GetFlag(FLAG_SEQ000_MINITUT1)) then table.insert(possibleMarkers, MRKR_ASCILIA); end
+            if (not data:GetFlag(FLAG_SEQ000_MINITUT2)) then table.insert(possibleMarkers, MRKR_FRETFUL_FARMHAND); end
+            if (not data:GetFlag(FLAG_SEQ000_MINITUT3)) then table.insert(possibleMarkers, MRKR_GIL_DIGGING_MISTRESS); end
         end
 
     elseif (sequence == SEQ_010) then
-        if (not quest:GetFlag(FLAG_SEQ010_TALK0)) then
+        if (not data:GetFlag(FLAG_SEQ010_TALK0)) then
             table.insert(possibleMarkers, MRKR_YAYATOKI)
         end
             table.insert(possibleMarkers, MRKR_ADV_GUILD);
@@ -308,8 +309,8 @@ end
 
 
 
-function doExitTrigger(player, quest, npc)
-    quest:ClearData();
+function doExitTrigger(player, quest, npc)	
+    quest:GetData():ClearData();
     quest:StartSequence(SEQ_005);
     contentArea = player.CurrentArea:CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "man0u01", "SimpleContent30079", "Quest/QuestDirectorMan0u001");
 

@@ -8,7 +8,7 @@ Notes:
 --]]
 require("global")
 
-function onEventStarted(player, actor, triggerName, pushCommand, unk1, unk2, unk3, ownerActorId, unk4, unk5, unk6, unk7)
+function onEventStarted(player, actor, eventType, eventName, pushCommand, unk1, unk2, unk3, ownerActorId, unk4, unk5, unk6, unk7)
 	
 	actor = player:GetActorInInstance(ownerActorId);
 	print("TESSSSSSSSSSSSSST");
@@ -17,7 +17,7 @@ function onEventStarted(player, actor, triggerName, pushCommand, unk1, unk2, unk
 		if (actor:GetActorClassId() == 1200052) then
 			player:KickEventSpecial(harvestCommand, 0, "commandJudgeMode", 0, 0, 0, 0, 0x4E26, 0, nil, 0xF, actor, nil, nil, nil, nil);
 		else
-			--player:kickEvent(actor, "pushCommand", false);
+			player:kickEvent(actor, "pushCommand", false);
 		end
 	else
 		player:endEvent();
