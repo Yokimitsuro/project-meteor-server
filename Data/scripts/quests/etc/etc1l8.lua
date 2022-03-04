@@ -128,13 +128,13 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
-function onEmote(player, quest, npc, emoteId, eventName)
+function onEmote(player, quest, npc, eventName)
 	local npcClassId = npc.GetActorClassId();
 	local seq = quest:GetSequence();
 	local data = quest:GetData();
 	local incCounter = false;
 
-	if (seq == SEQ_000 and emoteId == 123) then
+	if (seq == SEQ_000 and eventName == "emoteDefault1") then
 		if (npcClassId == AERGWNYT) then
 			if (not data:GetFlag(FLAG_TALKED_AERGWNYT)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventAergwynt");

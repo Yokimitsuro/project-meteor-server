@@ -1815,7 +1815,7 @@ namespace Meteor.Map.Actors
                     break;
             }
 
-            if (defaultTalk != null && defaultTalk.IsQuestENPC(this, npc))
+            if (defaultTalk != null && defaultTalk.IsQuestENPCByScript(this, npc))
                 return defaultTalk;
 
             return null;

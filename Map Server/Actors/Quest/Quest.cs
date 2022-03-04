@@ -195,6 +195,12 @@ namespace Meteor.Map.Actors.QuestNS
             return (questState?.HasENpc(npc.GetActorClassId()) ?? false);
         }
 
+        public bool IsQuestENPCByScript(Player caller, Npc npc)
+        {
+            List<LuaParam> returned = LuaEngine.GetInstance().CallLuaFunctionForReturn(caller, this, "IsQuestENPC", true, npc, this);
+            return returned != null && returned.Count != 0 && returned[0].typeID == 3;
+        }
+
         public void StartSequence(ushort sequence)
         {
             if (sequence == SEQ_NOT_STARTED)

@@ -34,7 +34,10 @@ namespace Meteor.Map.actors.area
         public float rot;
         public uint motionPack;
 
-        public SpawnLocation(uint classId, string uniqueId, uint zoneId, string privAreaName, int privAreaLevel, float x, float y, float z, float rot, uint animId)
+        public uint mapObjLayoutId;
+        public uint mapObjInstanceId;
+
+        public SpawnLocation(uint classId, string uniqueId, uint zoneId, string privAreaName, int privAreaLevel, float x, float y, float z, float rot, uint animId, uint mapObjLayoutId, uint mapObjInstanceId)
         {
             this.classId = classId;
             this.uniqueId = uniqueId;
@@ -46,6 +49,8 @@ namespace Meteor.Map.actors.area
             this.z = z;
             this.rot = rot;
             this.motionPack = animId;
-        }
+            this.mapObjLayoutId = mapObjLayoutId;
+            this.mapObjInstanceId = mapObjInstanceId;
+    }
     }
 }

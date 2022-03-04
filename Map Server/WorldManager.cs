@@ -335,8 +335,11 @@ namespace Meteor.Map
                                     positionY,
                                     positionZ,
                                     rotation,
-                                    motionPack
-                                    FROM server_eventnpc_spawn_locations                                    
+                                    motionPack,
+                                    layoutId,
+                                    instanceId
+                                    FROM server_eventnpc_spawn_locations
+                                    LEFT JOIN server_eventnpc_mapobj ON server_eventnpc_spawn_locations.id = server_eventnpc_mapobj.id
                                     ";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -363,8 +366,11 @@ namespace Meteor.Map
                             float z = reader.GetFloat("positionZ");
                             float rot = reader.GetFloat("rotation");
                             uint motionPack = reader.GetUInt32("motionPack");
-                            
-                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack);
+
+                            uint layoutId = !reader.IsDBNull(reader.GetOrdinal("layoutId")) ? reader.GetUInt32("layoutId") : 0;
+                            uint instanceId = !reader.IsDBNull(reader.GetOrdinal("instanceId")) ? reader.GetUInt32("instanceId") : 0;
+
+                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack, layoutId, instanceId);
 
                             zone.AddSpawnLocation(spawn);
 

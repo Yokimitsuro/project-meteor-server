@@ -24,13 +24,6 @@ end
 function onEventStarted(player, npc, eventType, eventName)
 	local chosenQuest = nil;
 
-	print(tostring(eventType));
-	print(tostring(eventType));
-	print(tostring(eventType));
-	print(tostring(eventType));
-	print(tostring(eventType));
-	print(tostring(eventType));
-	print(tostring(eventType));
 	if (eventType == 1) then
 		local defaultTalk = player:GetDefaultTalkQuest(npc);
 		local tutorialTalk = player:GetTutorialQuest(npc);
