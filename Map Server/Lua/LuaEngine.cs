@@ -41,6 +41,7 @@ using Meteor.Map.Actors.Chara;
 using Meteor.Map.DataObjects.chara;
 using Meteor.Map.actors.chara;
 using Meteor.Map.Actors.QuestNS;
+using Meteor.Map.actors.group;
 
 namespace Meteor.Map.lua
 {
@@ -78,6 +79,7 @@ namespace Meteor.Map.lua
             UserData.RegisterType<Npc>();
             UserData.RegisterType<Quest>();
             UserData.RegisterType<QuestData>();
+            UserData.RegisterType<ContentGroup>();
             UserData.RegisterType<Zone>();
             UserData.RegisterType<InventoryItem>();
             UserData.RegisterType<ItemPackage>();

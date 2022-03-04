@@ -72,7 +72,7 @@ ECHO_EXIT_TRIGGER		= 1090003;
 -- FSH Guild
 NNMULIKA				= 1000153;
 SISIPU					= 1000155;
-ZEPHYR_TRIGGER			= 1900001;
+ZEPHYR_TRIGGER			= 1090004;
 
 -- Echo in the Bsm Guild
 TATTOOED_PIRATE			= 1000111;
@@ -91,6 +91,7 @@ ECHO_EXIT_TRIGGER2		= 1090001;
 -- Quest Data
 CNTR_SEQ7_CUL		= 1;
 CNTR_SEQ7_MRD		= 2;
+CNTR_SEQ40_FSH		= 3;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -162,9 +163,13 @@ function onStateChange(player, quest, sequence)
 		end
 	elseif (sequence == SEQ_035) then
 		quest:SetENpc(NNMULIKA, QFLAG_PLATE);
+	elseif (sequence == SEQ_040) then
+		quest:SetENpc(SISIPU, QFLAG_PLATE, true, false, true);
+		quest:SetENpc(NNMULIKA);
 	elseif (sequence == SEQ_048) then
 		quest:SetENpc(BADERON);
-		quest:SetENpc(ZEPHYR_TRIGGER);
+		quest:SetENpc(ZEPHYR_TRIGGER, QFLAG_MAP, false, true);
+		quest:SetENpc(NNMULIKA);
 	elseif (sequence == SEQ_075) then	
 		quest:SetENpc(BODENOLF, QFLAG_PLATE);
 	elseif (sequence == SEQ_080) then	
@@ -218,25 +223,52 @@ function onTalk(player, quest, npc)
 		seq007_onTalk(player, quest, npc, classId);
 	elseif (sequence == SEQ_035) then
 		if (classId == NNMULIKA) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent602");
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_2");
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent604");
-			--quest:StartSequence(SEQ_040);
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent600");
+			quest:StartSequence(SEQ_040);
 			player:EndEvent();
+			GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 5);
 		end
 	elseif (sequence == SEQ_040) then
-		
+		if (classId == SISIPU) then
+			local emoteTestStep = quest:GetData():GetCounter(CNTR_SEQ40_FSH);
+			if (emoteTestStep == 0 or emoteTestStep == 1) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_1");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+				if (emoteTestStep == 0) then
+					quest:GetData():IncCounter(CNTR_SEQ40_FSH);
+				end
+			elseif (emoteTestStep == 2) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_2");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+			elseif (emoteTestStep == 3) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_3");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+			elseif (emoteTestStep == 4) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_4");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+			elseif (emoteTestStep == 5) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_5");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+			elseif (emoteTestStep == 6) then
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent601_6");
+				player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+			end			
+		elseif (classId == NNMULIKA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent600_2");
+		end
+		player:EndEvent();
 	elseif (sequence == SEQ_048) then
 		if (classId == BADERON) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
-			player:EndEvent();
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");			
+		elseif (classId == NNMULIKA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent602_2");
 		elseif (classId == ZEPHYR_TRIGGER) then			
 			local startDuty = callClientFunction(player, "delegateEvent", player, quest, "processEvent602_3");
 			if (startDuty) then
 			end
 			player:EndEvent();
 		end		
+		player:EndEvent();
 	elseif (sequence == SEQ_075) then
 		if (classId == BODENOLF) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent630");
@@ -423,6 +455,7 @@ function onPush(player, quest, npc)
 				startMan0l1Content(player, quest);
 				return;
 			end
+			player:EndEvent();
 		end
 	elseif (sequence == SEQ_085) then
 		if (classId == ECHO_EXIT_TRIGGER2) then
@@ -434,12 +467,104 @@ function onPush(player, quest, npc)
 	end
 end
 
-function onEmote(player, quest, npc, emoteId)
+function onEmote(player, quest, npc, eventName)
+	local data = quest:GetData();
 	local sequence = quest:getSequence();
+	local classId = npc:GetActorClassId();	
+
+	-- Play the emote
+	if (eventName == "emoteDefault1") then 		-- Bow
+		player:DoEmote(npc.Id, 5, 21041);
+	elseif (eventName == "emoteDefault2") then	-- Clap
+		player:DoEmote(npc.Id, 7, 21061);
+	elseif (eventName == "emoteDefault3") then	-- Congratulate
+		player:DoEmote(npc.Id, 29, 21281);
+	elseif (eventName == "emoteDefault4") then	-- Poke
+		player:DoEmote(npc.Id, 28, 21271);
+	elseif (eventName == "emoteDefault5") then	-- Joy
+		player:DoEmote(npc.Id, 18, 21171);
+	elseif (eventName == "emoteDefault6") then	-- Wave
+		player:DoEmote(npc.Id, 16, 21151);
+	end
+	wait(2.5);
 	
+	-- Handle the result
 	if (sequence == SEQ_040) then
+		if (classId == SISIPU) then
+			local emoteTestStep = data:GetCounter(CNTR_SEQ40_FSH);
+			-- Bow
+			if (emoteTestStep == 1) then
+				if (eventName == "emoteDefault1") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_7");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_2");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+					data:IncCounter(CNTR_SEQ40_FSH);
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_1");
+				end
+			-- Clap
+			elseif (emoteTestStep == 2) then
+				if (eventName == "emoteDefault2") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_7");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_3");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+					data:IncCounter(CNTR_SEQ40_FSH);
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");					
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_2");
+				end
+			-- Congratulate
+			elseif (emoteTestStep == 3) then
+				if (eventName == "emoteDefault3") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_7");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_4");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+					data:IncCounter(CNTR_SEQ40_FSH);
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");					
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_3");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+				end
+			-- Poke
+			elseif (emoteTestStep == 4) then
+				if (eventName == "emoteDefault4") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_7");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_5");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+					data:IncCounter(CNTR_SEQ40_FSH);					
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_4");
+				end
+			-- Joy
+			elseif (emoteTestStep == 5) then
+				if (eventName == "emoteDefault5") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_7");
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_6");
+					player:SendGameMessage(GetWorldMaster(), 25083, MESSAGE_TYPE_SYSTEM, 1);
+					data:IncCounter(CNTR_SEQ40_FSH);
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");					
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_5");
+				end
+			-- Wave
+			elseif (emoteTestStep == 6) then
+				if (eventName == "emoteDefault6") then
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent602");
+					player:EndEvent();					
+					GetWorldManager():WarpToPublicArea(player);
+					quest:StartSequence(SEQ_048);
+					return;
+				else
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_8");					
+					callClientFunction(player, "delegateEvent", player, quest, "processEvent601_6");
+				end
+			end
+		end
 	end
 		
+	player:EndEvent();
 	quest:UpdateENPCs();
 end
 
@@ -472,22 +597,20 @@ function onNpcLS(player, quest, npcLSId)
 end
 
 function startMan0l1Content(player, quest)
-	quest:StartSequence(SEQ_050);
+	quest:StartSequence(SEQ_050);	
+	callClientFunction(player, "delegateEvent", player, quest, "processEvent604");
+	player:EndEvent();
 		
 	local contentArea = player.CurrentArea:CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "Man0l101", "SimpleContent30002", "Quest/QuestDirectorMan0l101");
-		
+	
 	if (contentArea == nil) then
 		return;
 	end
 	
-	local director = contentArea:GetContentDirector();		
-	
-	player:AddDirector(director);		
-	director:StartDirector(false);	
-	player:KickEvent(director, "noticeEvent", true);
-	player:SetLoginDirector(director);		
-	
-	GetWorldManager():DoZoneChangeContent(player, contentArea, -5, 16.35, 6, 0.5, 16);		
+	local director = contentArea:GetContentDirector();
+	player:AddDirector(director);
+	director:StartDirector(true);
+	GetWorldManager():DoZoneChangeContent(player, contentArea, -63.25, 33.15, 164.51, 0.8, 16);
 end
 
 function getJournalInformation(player, quest)
