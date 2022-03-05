@@ -124,7 +124,7 @@ local weaponskillHandlers = {
 	[0xA0F070EA] = nil
 }
 
-function onEventStarted(player, command, triggerName)			
+function onEventStarted(player, command, eventType, eventName)			
 	
 	--Are they in active mode?
 	if (player:GetState() != 2) then

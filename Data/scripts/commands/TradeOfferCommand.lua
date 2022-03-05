@@ -6,7 +6,7 @@ Handles what happens when you invite to trade
 
 --]]
 
-function onEventStarted(player, actor, triggerName, name, arg1, arg2, arg3, actorId)	
+function onEventStarted(player, actor, eventType, eventName, name, arg1, arg2, arg3, actorId)	
 
 	local otherActor = nil;
 

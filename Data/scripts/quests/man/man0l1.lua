@@ -99,6 +99,7 @@ ECHO_EXIT_TRIGGER2		= 1090001;
 CNTR_SEQ7_CUL		= 1;
 CNTR_SEQ7_MRD		= 2;
 CNTR_SEQ40_FSH		= 3;
+CNTR_LS_MSG			= 4;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -163,11 +164,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ADVENTURER1);
 		quest:SetENpc(ADVENTURER2);
 		quest:SetENpc(ADVENTURER3);
-		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);
-						
-		if (subseqCUL == 1 and subseqMRD == 4) then
-			player:SetNpcLS(1, 1);
-		end
+		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);					
 	elseif (sequence == SEQ_035) then
 		quest:SetENpc(NNMULIKA, QFLAG_PLATE);
 	elseif (sequence == SEQ_040) then
@@ -406,6 +403,9 @@ function seq007_onTalk(player, quest, npc, classId)
 		if (subseqCUL == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030");
 			data:IncCounter(CNTR_SEQ7_CUL);
+			if (data:GetCounter(CNTR_SEQ7_CUL) == 1 and data:GetCounter(CNTR_SEQ7_MSK) = 4) then
+				seq007_endSequence(player, quest);
+			end
 			--give 1000g
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030_2");
@@ -448,6 +448,11 @@ function seq007_onTalk(player, quest, npc, classId)
 	player:EndEvent();
 end
 
+function seq007_endSequence(player, quest)
+	callClientFunction(player, "delegateEvent", player, quest, "processEvent033");
+	player:SetNpcLS(1, 1);
+end
+
 function seq080_085_onTalk(player, quest, npc, classId)
 	if (classId == IOFA) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent630_2");
@@ -484,6 +489,9 @@ function onPush(player, quest, npc)
 		elseif (classId == ECHO_EXIT_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent060");
 			data:IncCounter(CNTR_SEQ7_MRD);
+			if (data:GetCounter(CNTR_SEQ7_CUL) == 1 and data:GetCounter(CNTR_SEQ7_MSK) = 4) then
+				seq007_endSequence(player, quest);
+			end
 			player:EndEvent();
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
@@ -509,7 +517,8 @@ function onPush(player, quest, npc)
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent620");			
 			-- Give 3000 gil
 			player:EndEvent();
-			quest:StartSequence(SEQ_075);
+			data:SetCounter(CNTR_LS_MSG, 0);
+			quest:StartSequence(SEQ_070);
 		end		
 	elseif (sequence == SEQ_085) then
 		if (classId == ECHO_EXIT_TRIGGER2) then
@@ -634,6 +643,7 @@ end
 
 function onNpcLS(player, quest, npcLSId)
 	local sequence = quest:getSequence();
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent625");
 	
 	if (npcLSId == 1) then
 		player:SetNpcLS(1, 1);			
@@ -646,9 +656,18 @@ function onNpcLS(player, quest, npcLSId)
 			player:SendGameMessageLocalizedDisplayName(quest, 82, 39, 1000015, nil);
 			quest:StartSequence(SEQ_035);
 		elseif (sequence == SEQ_070) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent625");
+			local lsStep = data:IncCounter(CNTR_LS_MSG);			
+			if (lsStep == 1) then
+				player:SendGameMessageLocalizedDisplayName(quest, 80, 39, 1000015, nil);
+			elseif (lsStep == 2) then
+				player:SendGameMessageLocalizedDisplayName(quest, 80, 39, 1000015, nil);
+			elseif (lsStep == 3) then
+				player:SendGameMessageLocalizedDisplayName(quest, 80, 39, 1000015, nil);
+			else
+				player:SendGameMessageLocalizedDisplayName(quest, 80, 39, 1000015, nil);
+				quest:StartSequence(SEQ_075);
+			end			
 			player:EndEvent();
-			quest:StartSequence(SEQ_075);
 		elseif (sequence == SEQ_090) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent637");
 			player:EndEvent();

@@ -99,7 +99,7 @@ nodeItems = {
 
 require ("global")
 
-function onEventStarted(player, commandActor, triggerName, arg1, arg2, arg3, arg4, checkedActorId)
+function onEventStarted(player, commandActor, eventType, eventName, arg1, arg2, arg3, arg4, checkedActorId)
 
     debugMsg = false;
     
