@@ -35,6 +35,7 @@ namespace Meteor.Map.Actors.QuestNS
         private QuestState questState = null;
         private QuestData data = null;
 
+
         // Creates a Static Quest for the StaticActors list.
         public Quest(uint actorID, string className, string classPath)
             : base(actorID)
@@ -59,11 +60,11 @@ namespace Meteor.Map.Actors.QuestNS
         }
 
         // Creates a Instance Quest that has been started with data.
-        public Quest(Player owner, Quest staticQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4) : this(staticQuest)
+        public Quest(Player owner, Quest staticQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint npcLsFrom, byte npcLsMsgStep) : this(staticQuest)
         {
             this.owner = owner;
             currentSequence = sequence;
-            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4);
+            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4, npcLsFrom, npcLsMsgStep);
             questState = new QuestState(owner, this);
             questState.UpdateState();
         }
@@ -137,6 +138,35 @@ namespace Meteor.Map.Actors.QuestNS
             }
         }
 
+        public void NewNpcLsMsg(uint from)
+        {
+            data.SetNpcLsFrom(from);
+            owner.SetNpcLs(from, Player.NPCLS_ALERT);            
+            owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25119, 0x20, (object)from); // A glow emanates from the <NpcLs> linkpearl. 
+        }
+
+        public void ReadNpcLsMsg()
+        {            
+            data.IncrementNpcLsMsgStep();
+            owner.SetNpcLs(data.GetNpcLsFrom(), Player.NPCLS_ACTIVE);
+        }
+
+        public void EndOfNpcLsMsgs()
+        {
+            owner.SetNpcLs(data.GetNpcLsFrom(), Player.NPCLS_INACTIVE);
+            data.ClearNpcLs();
+        }
+
+        public bool HasNpcLsMsgs(uint from)
+        {
+            return data.GetNpcLsFrom() == from;
+        }
+
+        public int GetNpcLsMsgStep()
+        {
+            return data.GetMsgStep();
+        }
+
         public QuestState GetQuestState()
         {
             return questState;
@@ -164,9 +194,9 @@ namespace Meteor.Map.Actors.QuestNS
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true, triggerName);
         }
 
-        public void OnNpcLS(Player caller, uint npcLSId)
+        public void OnNpcLS(Player caller)
         {
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNpcLS", true, npcLSId);
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNpcLS", true, data.GetNpcLsFrom(), data.GetMsgStep());
         }
 
         public object[] GetJournalInformation()
@@ -213,6 +243,12 @@ namespace Meteor.Map.Actors.QuestNS
             questState.UpdateState();
         }
 
+        public void StartSequenceForNpcLs(ushort sequence)
+        {
+            currentSequence = sequence;
+            questState.UpdateState();
+        }
+
         public void OnAccept()
         {
             data = new QuestData(owner, this);
@@ -237,6 +273,5 @@ namespace Meteor.Map.Actors.QuestNS
             data = null;
             questState.UpdateState();
         }
-
     }
 }

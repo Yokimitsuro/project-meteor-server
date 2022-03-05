@@ -1845,16 +1845,20 @@ namespace Meteor.Map.Actors
             return quests;
         }
 
-        public void HandleNpcLS(uint id)
+        public bool HandleNpcLs(uint id)
         {
             foreach (Quest quest in questScenario)
             {
-                if (quest != null)
-                    quest.OnNpcLS(this, id);
+                if (quest != null && quest.HasNpcLsMsgs(id))
+                {
+                    quest.OnNpcLS(this);
+                    return true;
+                }
             }
+            return false;
         }
 
-        public void SetNpcLS(uint npcLSId, uint state)
+        public void SetNpcLs(uint npcLSId, uint state)
         {            
             bool isCalling, isExtra;
             isCalling = isExtra = false;

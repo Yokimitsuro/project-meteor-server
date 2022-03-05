@@ -17,9 +17,12 @@ namespace Meteor.Map.Actors.QuestNS
         private ushort counter3;
         private ushort counter4;
 
+        private uint npcLsFrom = 0;
+        private byte npcLsMessageStep = 0;
+
         public bool Dirty { get; private set; } = false;
 
-        public QuestData(Player owner, Quest parent, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4)
+        public QuestData(Player owner, Quest parent, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint npcLsFrom, byte npcLsMessageStep)
         {
             this.owner = owner;
             this.parent = parent;
@@ -28,6 +31,8 @@ namespace Meteor.Map.Actors.QuestNS
             this.counter2 = counter2;
             this.counter3 = counter3;
             this.counter4 = counter4;
+            this.npcLsFrom = npcLsFrom;
+            this.npcLsMessageStep = npcLsMessageStep;
         }
 
         public QuestData(Player owner, Quest parent)
@@ -158,6 +163,34 @@ namespace Meteor.Map.Actors.QuestNS
             }
 
             return 0;
+        }
+
+        public void SetNpcLsFrom(uint from)
+        {
+            npcLsFrom = from;
+            npcLsMessageStep = 1;
+            Dirty = true;
+        }
+
+        public void IncrementNpcLsMsgStep()
+        {
+            npcLsMessageStep++;
+            Dirty = true;
+        }
+
+        public uint GetNpcLsFrom()
+        {
+            return npcLsFrom;
+        }
+
+        public byte GetMsgStep()
+        {
+            return npcLsMessageStep;
+        }
+
+        public void ClearNpcLs()
+        {
+            npcLsFrom = 0;
         }
 
         public void ClearDirty()

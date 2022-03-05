@@ -4,13 +4,14 @@ require ("global")
 
 NpcLinkshellChatCommand Script
 
-Handler for when a player clicks a npc ls to talk to. If adding new linkshells to the handle, make sure to add
-it to the handler table (with correct offset), and that your function is above the handler. If padding is needed
-to hit some ID, add "nils".
+Player class will go through all quests and see if there are active msgs for one. If there was, it will
+return true and that quest must end the event (if needed). Otherwise if nothing caught the event, the
+event is ended here.
 
 --]]
 
 function onEventStarted(player, command, eventType, eventName, npcLsId)
-	player:HandleNpcLS(npcLsId);
-	player:EndEvent();
+	if (player:HandleNpcLs(npcLsId) == false) then
+		player:EndEvent();
+	end
 end
