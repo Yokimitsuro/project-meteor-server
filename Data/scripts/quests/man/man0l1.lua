@@ -105,7 +105,7 @@ CNTR_LS_MSG			= 4;
 NPCLS_MSGS = {
 	{339},
 	{80, 81, 82},
-	{248, 249},
+	{131, 326, 132},
 	{161, 162, 163, 164}
 };
 
@@ -147,20 +147,16 @@ function onStateChange(player, quest, sequence)
 	elseif (sequence == SEQ_007) then
 		local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
 		local subseqMSK = data:GetCounter(CNTR_SEQ7_MSK);
-
 		-- Always active in this seqence
 		quest:SetENpc(BADERON);
 		quest:SetENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
-		
 		-- Down and Up the MSK guild
 		quest:SetENpc(ISANDOREL, (subseqMSK == 0 or subseqMSK == 2) and QFLAG_PLATE or QFLAG_NONE);
-		
 		if (subseqMSK == 1) then
 			quest:SetENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
 		elseif (subseqMSK == 2) then
 			quest:SetENpc(MERLZIRN);
 		end
-		
 		-- In Echo
 		quest:SetENpc(NERVOUS_BARRACUDA);
 		quest:SetENpc(INTIMIDATING_BARRACUDA);
@@ -531,7 +527,9 @@ function onPush(player, quest, npc)
 	elseif (sequence == SEQ_085) then
 		if (classId == ECHO_EXIT_TRIGGER2) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent635");			
-			player:EndEvent();
+			player:EndEvent();			
+			quest:NewNpcLsMsg(1);
+			quest:StartSequence(SEQ_090);
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
 		end
