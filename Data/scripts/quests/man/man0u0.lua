@@ -108,11 +108,6 @@ function onStateChange(player, quest, sequence)
 
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
-<<<<<<< HEAD
-        local data = quest:GetData();
-        
-=======
->>>>>>> origin/ioncannon/quest_system
         local asciliaCanPush = not data:GetFlag(FLAG_SEQ000_MINITUT0);
         local asciliaFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
         local fretfulfarmhandFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
@@ -141,10 +136,6 @@ function onStateChange(player, quest, sequence)
         quest:SetENpc(OPENING_STOPER_ULDAH, QFLAG_NONE, false, false, true);
 
     elseif (sequence == SEQ_010) then
-<<<<<<< HEAD
-        local data = quest:GetData();
-=======
->>>>>>> origin/ioncannon/quest_system
         local yayatokiFlag = data:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_PLATE;
         local uldahopeningexitFlag = QFLAG_MAP;
         quest:SetENpc(KEEN_EYED_MERCHANT);
@@ -175,12 +166,8 @@ end
 function onPush(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
-<<<<<<< HEAD
-    local data = quest:GetData();
-=======
 	local data = quest:GetData();
 
->>>>>>> origin/ioncannon/quest_system
     if (sequence == SEQ_000) then
         if (classId == ASCILIA) then
            callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal002");
@@ -222,17 +209,6 @@ function onNotice(player, quest, target)
 end
 
 function seq000_onTalk(player, quest, npc, classId)
-<<<<<<< HEAD
-    local data = quest:GetData();
-    if (classId == ASCILIA) then
-
-        if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) then -- If Talk tutorial
-            callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal003");
-            data:SetFlag(FLAG_SEQ000_MINITUT0); -- Used to disable her PushEvent / Allow for her next TalkEvent
-        else
-            callClientFunction(player, "delegateEvent", player, quest, "processTtrMini001");
-            data:SetFlag(FLAG_SEQ000_MINITUT1); -- Ascilia has now been talked to.
-=======
 	local data = quest:GetData();
 
     if (classId == ASCILIA) then
@@ -242,7 +218,6 @@ function seq000_onTalk(player, quest, npc, classId)
         else
             callClientFunction(player, "delegateEvent", player, quest, "processTtrMini001");
             quest:GetData():SetFlag(FLAG_SEQ000_MINITUT1); -- Ascilia has now been talked to.
->>>>>>> origin/ioncannon/quest_system
         end
 
     elseif (classId == FRETFUL_FARMHAND) then
@@ -283,10 +258,6 @@ function seq000_onTalk(player, quest, npc, classId)
 end
 
 function seq010_onTalk(player, quest, npc, classId)
-<<<<<<< HEAD
-    local data = quest:GetData();
-=======
->>>>>>> origin/ioncannon/quest_system
     if (classId == KEEN_EYED_MERCHANT) then
         callClientFunction(player, "delegateEvent", player, quest, "processEvent020_2");
     elseif (classId == HIGH_SPIRITED_FELLOW) then
@@ -302,15 +273,9 @@ function seq010_onTalk(player, quest, npc, classId)
     elseif (classId == FULL_LIPPED_FILLE) then
         callClientFunction(player, "delegateEvent", player, quest, "processEtc002");
     elseif (classId == YAYATOKI) then
-<<<<<<< HEAD
-        if (not data:GetFlag(FLAG_SEQ010_TALK0)) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
-            data:SetFlag(FLAG_SEQ010_TALK0);
-=======
         if (not quest:GetData():GetFlag(FLAG_SEQ010_TALK0)) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
             quest:GetData():SetFlag(FLAG_SEQ010_TALK0);
->>>>>>> origin/ioncannon/quest_system
         else
             callClientFunction(player, "delegateEvent", player, quest, "processEvent020_8");
         end
@@ -323,13 +288,8 @@ function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
 	local data = quest:GetData();
     local possibleMarkers = {};
-    local data = quest:GetData();
 
     if (sequence == SEQ_000) then
-<<<<<<< HEAD
-    
-=======
->>>>>>> origin/ioncannon/quest_system
         if (data:GetFlag(FLAG_SEQ000_MINITUT0)) then
             if (not data:GetFlag(FLAG_SEQ000_MINITUT1)) then table.insert(possibleMarkers, MRKR_ASCILIA); end
             if (not data:GetFlag(FLAG_SEQ000_MINITUT2)) then table.insert(possibleMarkers, MRKR_FRETFUL_FARMHAND); end
@@ -349,11 +309,7 @@ end
 
 
 
-<<<<<<< HEAD
-function doExitTrigger(player, quest, npc)
-=======
 function doExitTrigger(player, quest, npc)	
->>>>>>> origin/ioncannon/quest_system
     quest:GetData():ClearData();
     quest:StartSequence(SEQ_005);
     contentArea = player.CurrentArea:CreateContentArea(player, "/Area/PrivateArea/Content/PrivateAreaMasterSimpleContent", "man0u01", "SimpleContent30079", "Quest/QuestDirectorMan0u001");

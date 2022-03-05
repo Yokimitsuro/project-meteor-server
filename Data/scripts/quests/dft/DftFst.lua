@@ -106,12 +106,12 @@ local defaultTalkFst = {
     [1001710] = "defaultTalkWithWillielmus_001",            -- Willielmus           (Gridania: Adv. Guild)
     [1001806] = "defaultTalkEnie_001",                      -- Enie                 (Gridania: BTN Guild)
     [1001951] = "defaultTalkWithAnselm_001",                -- Anselm               (Gridania: Adv. Guild)
-    --[1002090] = "",                                         -- Serpent Private Hodder (Gridania: Adv. Guild) - Will not fire, not PplStd.
-    --[1002091] = "",                                         -- Serpent Private Daurement (Gridania: Adv. Guild) - Will not fire, not PplStd.
+    --[1002090] = "defaultTalkWithStewart_001",               -- Serpent Private Hodder (Gridania: Adv. Guild) defaultTalkWithStewart_002 (Post-Raid dialog?) - Will not fire, not PplStd.
+    --[1002091] = "defaultTalkWithTrisselle_001",             -- Serpent Private Daurement (Gridania: Adv. Guild) defaultTalkWithTrisselle_002 (No idea for context) - Will not fire, not PplStd.
     [1002106] = "processEventELNAURE",                      -- Serpent Lieutenant Marette (Gridania: The Knot) - Foundation Day 2012 - Spl000 staticactor
     [1002107] = "processEventARISMONT",                     -- Serpent Sergeant Frilaix (Gridania: The Knot) - Foundation Day 2012 - Spl000 staticactor
     [1002108] = "processEventMERLIE",                       -- Serpent Private Tristelle (Gridania: The Knot) - Foundation Day 2012 - Spl000 staticactor
-    --[1060022] = "",                                         -- Louisoix           (Gridania: Apkallus Falls) - Will not fire, not PplStd.
+    --[1060022] = "defaultTalkLouisoix_001",                  -- Louisoix           (Gridania: Apkallus Falls) - Will not fire, not PplStd.
     [1500055] = "defaultTalkWithLionnellais_001",           -- Lionnellais          (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
     [1500056] = "defaultTalkWithHida_001",                  -- Hida                 (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
     --[1500061] = "",                                         -- Fruhdhem             (Gridania) Chocobo Taxi - Will not fire, not PplStd.
@@ -122,7 +122,7 @@ local defaultTalkFst = {
 }
 --[[ TO:DO - Map the remainder of these
 
-defaultTalkWithStewart_001  -- Hodder line according to old script?
+
 defaultTalkWithPowle_001    
 defaultTalkWithSansa_001    
 defaultTalkWithNicoliaux_001
@@ -191,7 +191,7 @@ defaultTalkWithMoogle010_001
 defaultTalkWithMoogle002_001
 defaultTalkWithAilith_001
 defaultTalkWithQZamqo_001
-defaultTalkLouisoix_001
+
 defaultTalkWithRonanKognan_001
 defaultTalkWithRonanKognan_002 arg1 arg2
 defaultTalkWithRonanKognan_Hint_00 arg1
@@ -219,10 +219,6 @@ defaultTalkWithMoogleA_001
 defaultTalkWithMoogleA_002
 defaultTalkWithMppgleB_001
 defaultTalkWithMppgleB_002
-defaultTalkWithStewart_001
-defaultTalkWithStewart_002
-defaultTalkWithTrisselle_001
-defaultTalkWithTrisselle_002
 defaultTalkWithInn_Desk
 defaultTalkWithInn_ExitDoor
 defaultTalkWithExit01
