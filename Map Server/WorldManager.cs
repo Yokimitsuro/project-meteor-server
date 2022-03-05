@@ -335,8 +335,11 @@ namespace Meteor.Map
                                     positionY,
                                     positionZ,
                                     rotation,
-                                    motionPack
-                                    FROM server_eventnpc_spawn_locations                                    
+                                    motionPack,
+                                    layoutId,
+                                    instanceId
+                                    FROM server_eventnpc_spawn_locations
+                                    LEFT JOIN server_eventnpc_mapobj ON server_eventnpc_spawn_locations.id = server_eventnpc_mapobj.id
                                     ";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -363,8 +366,11 @@ namespace Meteor.Map
                             float z = reader.GetFloat("positionZ");
                             float rot = reader.GetFloat("rotation");
                             uint motionPack = reader.GetUInt32("motionPack");
-                            
-                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack);
+
+                            uint layoutId = !reader.IsDBNull(reader.GetOrdinal("layoutId")) ? reader.GetUInt32("layoutId") : 0;
+                            uint instanceId = !reader.IsDBNull(reader.GetOrdinal("instanceId")) ? reader.GetUInt32("instanceId") : 0;
+
+                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack, layoutId, instanceId);
 
                             zone.AddSpawnLocation(spawn);
 
@@ -878,6 +884,10 @@ namespace Meteor.Map
 
             player.playerSession.LockUpdates(false);
 
+            //Send "You have left the instance" if old area is a Private Area
+            if (oldArea is PrivateArea)
+                player.SendGameMessage(GetActor(), 34110, 0x20);
+
             //Send "You have entered an instance" if it's a Private Area
             if (newArea is PrivateArea)
                 player.SendGameMessage(GetActor(), 34108, 0x20);
@@ -931,6 +941,30 @@ namespace Meteor.Map
         {
             if (player.CurrentArea.IsPrivate())
                 DoZoneChange(player, player.CurrentArea.ZoneId, null, 0, 15, x, y, z, rotation);
+        }
+
+        public void WarpToPosition(Player player, float x, float y, float z, float rotation)
+        {
+            //Remove player from currentZone if transfer else it's login
+            if (player.CurrentArea != null)
+            {
+                player.playerSession.LockUpdates(true);
+                player.CurrentArea.RemoveActorFromZone(player);
+                player.CurrentArea.AddActorToZone(player);
+
+                //Update player actor's properties;
+                player.positionX = x;
+                player.positionY = y;
+                player.positionZ = z;
+                player.rotation = rotation;
+
+                //Send packets
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
+                player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(0));
+
+                player.playerSession.LockUpdates(false);
+                player.SendInstanceUpdate();
+            }
         }
         
         //Moves actor to new zone, and sends packets to spawn at the given coords.

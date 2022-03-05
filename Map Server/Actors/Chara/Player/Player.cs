@@ -1476,7 +1476,9 @@ namespace Meteor.Map.Actors
 
             if (!isSilent)
             {
-                SendGameMessage(Server.GetWorldManager().GetActor(), 25224, 0x20, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
+                WorldMaster worldMaster = Server.GetWorldManager().GetActor();
+                SendDataPacket("attention", worldMaster, "", 25224, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
+                SendGameMessage(worldMaster, 25224, 0x20, (object)questScenario[freeSlot].GetQuestId()); // "<Quest> accepted."
             }
 
             instance.OnAccept();
@@ -1495,6 +1497,7 @@ namespace Meteor.Map.Actors
                 {                    
                     SendQuestClientUpdate(i);
                     oldQuestInstance.OnComplete();
+                    Database.SaveCompletedQuests(playerSession.GetActor());
                     questStateManager.UpdateQuestCompleted(oldQuestInstance);
                     Quest newQuestInstance = questStateManager.GetActiveQuest(((Quest)Server.GetStaticActors(questName)).GetQuestId());
                     questScenario[i] = newQuestInstance;
@@ -1812,7 +1815,7 @@ namespace Meteor.Map.Actors
                     break;
             }
 
-            if (defaultTalk != null && defaultTalk.IsQuestENPC(this, npc))
+            if (defaultTalk != null && defaultTalk.IsQuestENPCByScript(this, npc))
                 return defaultTalk;
 
             return null;

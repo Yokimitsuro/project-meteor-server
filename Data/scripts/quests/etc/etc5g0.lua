@@ -13,8 +13,8 @@ Notes:  Rewards 200 gil
 ]]
 
 -- Sequence Numbers
-SEQ_000 = 0;  -- Talk to Pfarahr
-SEQ_001 = 1;  -- Return to V'korolon
+SEQ_000 = 0;  -- Talk to Pfarahr.
+SEQ_001 = 1;  -- Return to V'korolon.
 
 -- Actor Class Ids
 VKOROLON                = 1000458;
@@ -27,10 +27,7 @@ ITEM_WELL_WORN_BAG      = 11000224;
 MRKR_PFARAHR            = 11082001;
 MRKR_VKOROLON           = 11082002;
 
-
-
 function onStart(player, quest)
-    -- processEventVKOROLONStart -- No means of properly accepting quests yet
     quest:StartSequence(SEQ_000);
     player:SendGameMessage(GetWorldMaster(), 25246, MESSAGE_TYPE_SYSTEM, ITEM_WELL_WORN_BAG, 1);
 end
@@ -38,9 +35,11 @@ end
 function onFinish(player, quest)
 end
 
-
-
 function onStateChange(player, quest, sequence)
+	if (sequence == SEQ_ACCEPT) then
+		quest:SetENpc(VKOROLON, QFLAG_PLATE);
+	end
+
     if (sequence == SEQ_000) then
         quest:SetENpc(VKOROLON);
         quest:SetENpc(PFARAHR, QFLAG_PLATE);
@@ -54,20 +53,26 @@ function onTalk(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
     
-    if (sequence == SEQ_000) then
+	if (sequence == SEQ_ACCEPT) then
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventVKOROLONStart");
+		if (questAccepted == 1) then
+			player:AcceptQuest(quest);
+		end
+		player:EndEvent();
+		return;
+    elseif (sequence == SEQ_000) then
         if (classId == VKOROLON) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_000_1");
         elseif (classId == PFARAHR) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
             quest:StartSequence(SEQ_001);
-            quest:DoComplete(); -- Need ref since it feels out of place. Just placing it here since original script had it.
         end
        
     elseif (sequence == SEQ_001) then
         if (classId == VKOROLON) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_020");
-            --callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1); -- Reward window, shouldn't be handled by quest script
-			player:CompleteQuest(quest:GetQuestId());
+            callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1)
+            player:CompleteQuest(quest);
         elseif (classId == PFARAHR) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_1");
         end  
@@ -76,27 +81,21 @@ function onTalk(player, quest, npc)
 	quest:UpdateENPCs();
 end
 
-
 function getJournalInformation(player, quest)
-    local sequence = quest:getSequence();
-    
+    local sequence = quest:getSequence();    
     if (sequence == SEQ_000) then
         return ITEM_WELL_WORN_BAG;
     end
 end
 
-
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
-    local possibleMarkers = {};
     
     if (sequence == SEQ_000) then
-        table.insert(possibleMarkers, MRKR_PFARAHR);
+        return MRKR_PFARAHR;
     elseif (sequence == SEQ_001) then
-        table.insert(possibleMarkers, MRKR_VKOROLON);
-    end
-    
-    return unpack(possibleMarkers)
+        return MRKR_VKOROLON;
+    end    
 end
 
 

@@ -149,19 +149,19 @@ namespace Meteor.Map.Actors.QuestNS
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onTalk", true, npc);
         }
 
-        public void OnEmote(Player caller, Npc npc, Command command)
+        public void OnEmote(Player caller, Npc npc, string triggerName)
         {
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onEmote", true, npc, command);
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onEmote", true, npc, triggerName);
         }
 
-        public void OnPush(Player caller, Npc npc)
+        public void OnPush(Player caller, Npc npc, string triggerName)
         {
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onPush", true, npc);
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onPush", true, npc, triggerName);
         }
 
-        public void OnNotice(Player caller)
+        public void OnNotice(Player caller, string triggerName)
         {
-            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true);
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true, triggerName);
         }
 
         public void OnNpcLS(Player caller, uint npcLSId)
@@ -190,9 +190,15 @@ namespace Meteor.Map.Actors.QuestNS
 
         public bool IsQuestENPC(Player caller, Npc npc)
         {
+            //List<LuaParam> returned = LuaEngine.GetInstance().CallLuaFunctionForReturn(caller, this, "IsQuestENPC", true, npc, this);
+            //bool scriptReturned = returned != null && returned.Count != 0 && returned[0].typeID == 3;
+            return (questState?.HasENpc(npc.GetActorClassId()) ?? false);
+        }
+
+        public bool IsQuestENPCByScript(Player caller, Npc npc)
+        {
             List<LuaParam> returned = LuaEngine.GetInstance().CallLuaFunctionForReturn(caller, this, "IsQuestENPC", true, npc, this);
-            bool scriptReturned = returned != null && returned.Count != 0 && returned[0].typeID == 3;
-            return scriptReturned || (questState?.HasENpc(npc.GetActorClassId()) ?? false);
+            return returned != null && returned.Count != 0 && returned[0].typeID == 3;
         }
 
         public void StartSequence(ushort sequence)
@@ -201,8 +207,7 @@ namespace Meteor.Map.Actors.QuestNS
                 return;
 
             // Send the message that the journal has been updated
-            if (currentSequence != SEQ_NOT_STARTED)
-                owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
+            owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25116, 0x20, (object)GetQuestId());
 
             currentSequence = sequence;            
             questState.UpdateState();

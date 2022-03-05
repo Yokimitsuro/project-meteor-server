@@ -1,5 +1,5 @@
 require("global");
-
+require("tutorial");
 --[[
 
 Quest Script
@@ -17,6 +17,7 @@ Notes:
 
 -- Sequence Numbers
 SEQ_000 = 0; 
+SEQ_003 = 3;
 
 
 -- Actor Class Ids
@@ -28,7 +29,8 @@ MOROSE_MERCHANT                 = 1001058;
 NARROW_EYED_ADVENTURER          = 1001059;
 BEAMING_ADVENTURER              = 1001062;
 WELL_BUNDLED_ADVENTURER         = 1001060;
-UNCONCERNED_PASSERBY            = 1001648; -- I don't think this was used?
+UNCONCERNED_PASSERBY            = 1001648;
+--BLOCKER                         = ;
 
 -- Quest Markers
 MRKR_MIOUNNE             = 11000601;
@@ -77,11 +79,11 @@ function onTalk(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
     
-    if (sequence == SEQ_000) then
+    --if (sequence == SEQ_000) then
         seq000_onTalk(player, quest, npc, classId);
-    elseif (sequence == SEQ_005) then
-        seq005_onTalk(player, quest, npc, classId);     
-    end
+   -- elseif (sequence == SEQ_005) then
+    --    seq005_onTalk(player, quest, npc, classId);     
+   -- end
 	quest:UpdateENPCs();
 end
 
@@ -100,21 +102,49 @@ end
 
 
 function onNotice(player, quest, target)
-    callClientFunction(player, "delegateEvent", player, quest, "processEvent000_1"); -- Describes what an Instance is
     player:EndEvent();
-	quest:UpdateENPCs();
+    player:SendMessage(0x20, "", "Test");
+    callClientFunction(player, "delegateEvent", player, quest, "processEventTu_001");  
+    player:EndEvent();
+end
+
+
+-- Copy-pasted from man0l1 for now, fix later
+function onNpcLS(player, quest, npcLSId)
+	local sequence = quest:getSequence();
+	
+	if (npcLSId == 1) then
+		player:SetNpcLS(1, 1);
+        player:SendGameMessageLocalizedDisplayName(quest, 330, 39, 1300018, nil);
+        showTutorialSuccessWidget(player, 9080);
+        wait(3);
+        closeTutorialWidget(player);
+        endTutorialMode(player);
+        
+	end
 end
 
 
     
 function seq000_onTalk(player, quest, npc, classId)
     
-    if (classId == MOMODI) then
-        callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
+    if (classId == MIOUNNE) then
+        
+        callClientFunction(player, "delegateEvent", player, quest, "processEvent100_1");        
         player:EndEvent();
-        quest:StartSequence(SEQ_005);
-        GetWorldManager():DoZoneChange(player, 175, nil, 0, 15, player.positionX, player.positionY, player.positionZ, player.rotation);
-        return;
+		quest:StartSequence(SEQ_003);
+				
+		
+		local director = GetWorldManager():GetArea(155):CreateDirector("AfterQuestWarpDirector", false);		
+		director:StartDirector(true);
+        player:AddDirector(director);
+		--player:SetLoginDirector(director);	     
+		player:KickEvent(director, "noticeEvent", true);
+		
+		quest:UpdateENPCs();
+        --GetWorldManager():WarpToPublicArea(player);
+        GetWorldManager():DoZoneChange(player, 155, nil, 0, 15, player.positionX, player.positionY, player.positionZ, player.rotation);
+  
     elseif (classId == BEAMING_ADVENTURER) then
         callClientFunction (player, "delegateEvent", player, quest, "processEvent100_6");
     elseif (classId == AMIABLE_ADVENTURER) then
@@ -126,16 +156,11 @@ function seq000_onTalk(player, quest, npc, classId)
     elseif (classId == UNCONCERNED_PASSERBY) then
         callClientFunction(player, "delegateEvent", player, quest, "processTtrBlkNml001"); --"processEvent100_9");
     elseif (classId == VKOROLON) then
-        callClientFunction(player, "delegateEvent", player, quest, "defaultTalkWithVkorolon_001");
+        callClientFunction(player, "delegateEvent", player, GetStaticActor("DftWil"), "defaultTalkWithVkorolon_001");
     elseif (classId == WELL_BUNDLED_ADVENTURER) then
         callClientFunction(player, "delegateEvent", player, quest, "processEvent100_4");        
     elseif (classId == WISPILY_WHISKERED_WOODWORKER) then
         callClientFunction(player, "delegateEvent", player, quest, "processEvent100_8");
-    elseif (classId == MIOUNNE) then
-        callClientFunction(player, "delegateEvent", player, quest, "processEvent110");        
-        player:EndEvent();
-        quest:StartSequence(SEQ_005);
-        GetWorldManager():DoZoneChange(player, 155, nil, 0, 15, player.positionX, player.positionY, player.positionZ, player.rotation);
     end
 
     player:EndEvent();

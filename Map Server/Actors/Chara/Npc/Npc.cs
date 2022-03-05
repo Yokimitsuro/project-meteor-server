@@ -51,13 +51,13 @@ namespace Meteor.Map.Actors
         private uint actorClassId;
         private string uniqueIdentifier;
 
-        private bool isMapObj = false;
-        private uint layout, instance;
+        private bool IsMapObjChara = false;
+        private uint MapObjLayoutId, MapObjInstanceId;
 
         public NpcWork npcWork = new NpcWork();
         public NpcSpawnType npcSpawnType;
 
-        public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, ushort actorState, uint animationId, string customDisplayName)
+        public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, ushort actorState, uint animationId, string customDisplayName, uint mapObjLayoutId = 0, uint mapObjInstanceId = 0)
             : base((4 << 28 | spawnedArea.Id << 19 | ((uint)actorNumber + 5)))  
         {
             this.positionX = posX;
@@ -101,24 +101,19 @@ namespace Meteor.Map.Actors
             npcWork.pushCommandSub = actorClass.pushCommandSub;
             npcWork.pushCommandPriority = actorClass.pushCommandPriority;
 
-            if (actorClassId == 1080078 || actorClassId == 1080079 || actorClassId == 1080080 || (actorClassId >= 1080123 && actorClassId <= 1080135) || (actorClassId >= 5000001 && actorClassId <= 5000090) || (actorClassId >= 5900001 && actorClassId <= 5900038))
+            if (mapObjLayoutId != 0 && mapObjInstanceId != 0)
             {
-                isMapObj = true;
-                List<LuaParam> lParams = LuaEngine.GetInstance().CallLuaFunctionForReturn(null, this, "init", false);
-                if (lParams == null || lParams.Count < 6)
-                    isMapObj = false;
-                else
-                {                   
-                    layout = (uint)(Int32)lParams[4].value;
-                    instance = (uint)(Int32)lParams[5].value;
-                    isStatic = true;
-                }
+                isStatic = true;
+                IsMapObjChara = true;
+                MapObjLayoutId = mapObjLayoutId;
+                MapObjInstanceId = mapObjInstanceId;
             }
+
             GenerateActorName((int)actorNumber);
             this.aiContainer = new AIContainer(this, null, new PathFind(this), new TargetFind(this));
         }
 
-        public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, uint layout, uint instance)
+        public Npc(int actorNumber, ActorClass actorClass, string uniqueId, Area spawnedArea, float posX, float posY, float posZ, float rot, uint mapObjLayoutId = 0, uint mapObjInstanceId = 0)
             : base((4 << 28 | spawnedArea.Id << 19 | (uint)actorNumber))
         {
             this.positionX = posX;
@@ -148,9 +143,13 @@ namespace Meteor.Map.Actors
             npcWork.pushCommandSub = actorClass.pushCommandSub;
             npcWork.pushCommandPriority = actorClass.pushCommandPriority;
 
-            this.isMapObj = true;
-            this.layout = layout;
-            this.instance = instance;
+            if (mapObjLayoutId != 0 && mapObjInstanceId != 0)
+            {
+                isStatic = true;
+                IsMapObjChara = true;
+                MapObjLayoutId = mapObjLayoutId;
+                MapObjInstanceId = mapObjInstanceId;
+            }
 
             GenerateActorName((int)actorNumber);
             this.aiContainer = new AIContainer(this, null, new PathFind(this), new TargetFind(null));
@@ -208,8 +207,8 @@ namespace Meteor.Map.Actors
             subpackets.Add(CreateSpeedPacket());            
             subpackets.Add(CreateSpawnPositonPacket(0x0));
 
-            if (isMapObj)
-                subpackets.Add(SetActorBGPropertiesPacket.BuildPacket(Id, instance, layout));
+            if (IsMapObjChara)
+                subpackets.Add(SetActorBGPropertiesPacket.BuildPacket(Id, MapObjLayoutId, MapObjInstanceId));
             else
                 subpackets.Add(CreateAppearancePacket());
 

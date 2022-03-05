@@ -10,29 +10,8 @@ Id:     110005
 Prereq: None (Given on chara creation)
 Notes: 
 
-
+Using PrivateAreaMasterPast Type 1
 ]]
-
---[[
-    SEQS
-    [@IF($E4($E8(1),0),　
-        [@SHEET(xtx/journalxtxFst,177,1)]
-    ,)]
-    [@IF($E4($E8(1),5),　
-        [@SHEET(xtx/journalxtxFst,178,1)]
-    ,)]
-    [@IF($E4($E8(1),10),　
-        [@SHEET(xtx/journalxtxFst,179,1)]
-    ,)]
-
-
-    qItem
-    [@IF($E0($E8(1),10),
-        [@SHEET(xtx/itemName,11000088,5)][@CR]
-    ,)]
---]]
-
-
 
 -- Sequence Numbers
 SEQ_000 = 0;  -- Intro with Yda & Papalymo
@@ -40,19 +19,18 @@ SEQ_005 = 5;  -- Combat tutorial
 SEQ_010 = 10; -- Gridania section
 
 -- Actor Class Ids
-YDA                         = 1000009;
-PAPALYMO                    = 1000010;
+YDA                 = 1000009;
+PAPALYMO            = 1000010;
 
-FARRIMOND                   = 1000017;
-CECILIA                     = 1000683;
-SWETHYNA                    = 1000680;
-TKEBBE                      = 1000876;
-LONSYGG                     = 1000951;
-GUILD_ENTRANCE              = 1099046;
-BLOCKER1                    = 1099047;
+FARRIMOND           = 1000017;
+CECILIA             = 1000683;
+SWETHYNA            = 1000680;
+TKEBBE              = 1000876;
+LONSYGG             = 1000951;
+PUSH_ADV_GUILD      = 1099046;
+BLOCKER1            = 1099047;
 
 -- Non-interactive NPCs
-
 GUILD_ANENE         = 1000427;
 GUILD_SYLBERT       = 1000428; -- No source
 GUILD_HONGA_VUNGA   = 1000429;
@@ -70,26 +48,17 @@ GUILD_EMONI         = 1001183;
 GUILD_GYLES         = 1001184;
 GUILD_PENELOPE      = 1700001; -- No source
 
-
-
-
--- PrivateAreaMasterPast 1
-
 -- Quest Markers
-MRKR_LONSYGG                = 11000501;  -- Obsolete.  Pre-1.19 location for this npc
-MRKR_YDA                    = 11000502;
-MRKR_PAPALYMO               = 11000503;
-MRKR_GUILD                  = 11000504;
+MRKR_LONSYGG        = 11000501;  -- Obsolete.  Pre-1.19 location for this npc
+MRKR_YDA            = 11000502;
+MRKR_PAPALYMO       = 11000503;
+MRKR_GUILD          = 11000504;
 
 -- Quest Flags
-FLAG_SEQ000_MINITUT0    = 0; -- Talked to YDA
-FLAG_SEQ000_MINITUT1    = 1; -- Talked to PAPALYMO
-FLAG_SEQ000_MINITUT2    = 2; -- Talked to YDA again
-
+FLAG_SEQ000_MINITUT0    = 0; -- Talked to Yda.
+FLAG_SEQ000_MINITUT1    = 1; -- Talked to Papalymo.
+FLAG_SEQ000_MINITUT2    = 2; -- Talked to Yda again.
 FLAG_SEQ010_TKEBBE      = 0; -- Talked to T'kebbe (optional)
-
-
-
 
 --[[
 processEvent000_0
@@ -122,9 +91,6 @@ processTtrBtl004
 processInformDialogAsQuest
 --]]
 
-
-
-
 function onStart(player, quest)
     quest:StartSequence(SEQ_000);
 end
@@ -133,7 +99,6 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)
-
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
         local data = quest:GetData();
@@ -172,7 +137,6 @@ function onStateChange(player, quest, sequence)
     end
 end
 
-
 function onTalk(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
@@ -184,8 +148,6 @@ function onTalk(player, quest, npc)
     end
     quest:UpdateENPCs();
 end
-
-
 
 function onPush(player, quest, npc)
     local sequence = quest:getSequence();
@@ -263,7 +225,6 @@ function seq010_onTalk(player, quest, npc, classId)
     player:EndEvent();
 end
 
-
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     local possibleMarkers = {};
@@ -285,9 +246,6 @@ function getJournalMapMarkerList(player, quest)
 
     return unpack(possibleMarkers)
 end
-
-
-
 
 function doContentArea(player, quest, npc)
     quest:GetData():ClearData();

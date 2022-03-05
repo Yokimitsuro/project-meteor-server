@@ -41,6 +41,20 @@ function onEventStarted(player, aetheryte, triggerName)
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent025");
 			quest:StartSequence(SEQ_005);
 		end
+	elseif (player:HasQuest(110006) == true) then
+		require ("quests/man/man0g1");
+		local quest = player:GetQuest("Man0g1");
+		if (quest:GetSequence() == SEQ_005) then			
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent013");
+			--quest:StartSequence(???);
+		end
+	elseif (player:HasQuest(110010) == true) then
+		require ("quests/man/man0u1");
+		local quest = player:GetQuest("Man0u1");
+		if (quest:GetSequence() == SEQ_005) then			
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent013");
+			quest:StartSequence(SEQ_010);
+		end
 	end
 	
 	if (player:GetGuildleveDirector() ~= nil) then

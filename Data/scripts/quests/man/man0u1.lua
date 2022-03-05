@@ -59,8 +59,6 @@ Phase:
 
 --]]
 
-
-
 -- Sequence Numbers
 SEQ_000 = 0; -- Ul'dah Adventurer's Guild
 SEQ_005 = 5; -- Run to Camp Black Brush & Attune
@@ -83,7 +81,6 @@ SEQ_100 = 100;
 SEQ_105 = 105;
 SEQ_110 = 110;
 
-
 -- Actor Class Ids
 OVERCOMPETITIVE_ADVENTURER  = 1000807;
 MOMODI                      = 1000841;
@@ -92,8 +89,6 @@ UNDAUNTED_ADVENTURER        = 1000936;
 GREEDY_MERCHANT             = 1000937;
 LIONHEARTED_ADVENTURER      = 1000938;
 SPRY_SALESMAN               = 1000939;
-
-
 
 UPBEAT_ADVENTURER           = 1000940;
 SEEMINGLY_CALM_ADVENTURER   = 1000941;

@@ -22,44 +22,54 @@ function init(npc)
 end
 
 function onEventStarted(player, npc, eventType, eventName)
-	local defaultTalk = player:GetDefaultTalkQuest(npc);
-	local tutorialTalk = player:GetTutorialQuest(npc);
-	local activeQuests = player:GetQuestsForNpc(npc);
-	local possibleQuests = {};
-	
-	-- Create the switch table for this npc
-	if (defaultTalk ~= nil and eventType == ETYPE_TALK) then
-		table.insert(possibleQuests, defaultTalk);
-	end
-	if (tutorialTalk ~= nil and eventType == ETYPE_TALK) then
-		table.insert(possibleQuests, tutorialTalk);
-	end
-	if (activeQuests ~= nil) then
-		table.insert(possibleQuests, unpack(activeQuests));
-	end
-	
-	-- Either let the player choose the quest or start it if it's the only one.
 	local chosenQuest = nil;
-	if (#possibleQuests > 1) then
-		local currentPage = 0;
-		local numPages = math.floor((#possibleQuests-1)/4) + 1;
+
+	if (eventType == 1) then
+		local defaultTalk = player:GetDefaultTalkQuest(npc);
+		local tutorialTalk = player:GetTutorialQuest(npc);
+		local activeQuests = player:GetQuestsForNpc(npc);
+		local possibleQuests = {};
 		
-		while (true) do
-			local page, index = callClientFunction(player, "switchEvent", possibleQuests[currentPage * 4 + 1], possibleQuests[currentPage * 4 + 2], possibleQuests[currentPage * 4 + 3], possibleQuests[currentPage * 4 + 4], currentPage + 1, numPages, 0x3F1);
-			
-			if (page == 0) then
-				chosenQuest = possibleQuests[(currentPage * 4) + index];
-				break;
-			elseif (page > 0) then
-				currentPage = page - 1;
-			else
-				player:EndEvent();
-				return;
+		-- Create the switch table for this npc
+		if (defaultTalk ~= nil and eventType == ETYPE_TALK) then
+			table.insert(possibleQuests, defaultTalk);
+		end
+		if (tutorialTalk ~= nil and eventType == ETYPE_TALK) then
+			table.insert(possibleQuests, tutorialTalk);
+		end
+		if (activeQuests ~= nil) then
+			for i=1,#activeQuests do
+				table.insert(possibleQuests, activeQuests[i]);
 			end
-		end			
-	elseif (#possibleQuests == 1) then
-		chosenQuest = possibleQuests[1];		
-	end	
+		end
+		
+		-- Either let the player choose the quest or start it if it's the only one.
+		if (#possibleQuests > 1) then
+			local currentPage = 0;
+			local numPages = math.floor((#possibleQuests-1)/4) + 1;
+			
+			while (true) do
+				local page, index = callClientFunction(player, "switchEvent", possibleQuests[currentPage * 4 + 1], possibleQuests[currentPage * 4 + 2], possibleQuests[currentPage * 4 + 3], possibleQuests[currentPage * 4 + 4], currentPage + 1, numPages, 0x3F1);
+				
+				if (page == 0) then
+					chosenQuest = possibleQuests[(currentPage * 4) + index];
+					break;
+				elseif (page > 0) then
+					currentPage = page - 1;
+				else
+					player:EndEvent();
+					return;
+				end
+			end			
+		elseif (#possibleQuests == 1) then
+			chosenQuest = possibleQuests[1];
+		end
+	else
+		local activeQuests = player:GetQuestsForNpc(npc);
+		if (#activeQuests != 0) then
+			chosenQuest = activeQuests[1];
+		end
+	end
 	
 	-- Run the quest event or tell the devs it's missing.
 	if (chosenQuest ~= nil) then
