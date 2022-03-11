@@ -5,10 +5,12 @@ properties = {
     parameters = "ss",
     description =
 [[
-Positions your character forward a set <distance>, defaults to 5 yalms.
+Positions a targeted npc by some <distance>, defaults to 5 yalms.
 !nudge |
 !nudge <distance> |
 !nudge <distance> <up/down> |
+!nudge <distance> <left/right> |
+!nudge <distance> <rotate> |
 ]],
 
 }
@@ -40,7 +42,18 @@ rotation = {
 }
 
 function onTrigger(player, argc, arg1, arg2)
-    local pos = player:GetPos();
+    local messageID = MESSAGE_TYPE_SYSTEM;
+    local sender = "[nudge] ";   
+	
+	local targetActor = player.CurrentArea.FindActorInArea(player.currentTarget) or nil;
+	
+	
+	if (targetActor == nil) then
+		player:SendMessage(MESSAGE_TYPE_SYSTEM, sender, "No target was selected.\n");
+		return;
+	end
+
+    local pos = targetActor:GetPos();
     local x = pos[1];
     local y = pos[2];
     local z = pos[3];
@@ -49,8 +62,6 @@ function onTrigger(player, argc, arg1, arg2)
     local angle = rot + (math.pi/2); 
     
     local worldManager = GetWorldManager();
-    local messageID = MESSAGE_TYPE_SYSTEM_ERROR;
-    local sender = "[nudge] ";   
  	local distance = 5;
     local direction = 0;
 
@@ -96,41 +107,34 @@ function onTrigger(player, argc, arg1, arg2)
             return;
         end
     end
-    
-
-    
-    local message = string.format("Positioning forward %s yalms.", distance);
 
     if direction == 1 then
         y = y + distance;
-        message = string.format("Positioning up %s yalms.", distance);
-        worldManager:DoPlayerMoveInZone(player, x, y, z, rot, 0x0);
+		targetActor:SetPos(x,y,z,rot,true, player);
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), x, y, z, rot);
     elseif direction == -1 then
         y = y - distance;
-        message = string.format("Positioning down %s yalms.", distance);
-        worldManager:DoPlayerMoveInZone(player, x, y, z, rot, 0x0);
+        targetActor:SetPos(x,y,z,rot,true, player);
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), x, y, z, rot);
 	elseif direction == 2 then
 		local px = x - distance * math.cos(angle - math.pi/2);
         local pz = z + distance * math.sin(angle - math.pi/2);
-        message = string.format("Positioning right %s yalms.", distance);
-        worldManager:DoPlayerMoveInZone(player, px, y, pz, rot, 0x0);
+        targetActor:SetPos(px, y, pz, rot, true, player);
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), px, y, pz, rot);
     elseif direction == -2 then
 		local px = x - distance * math.cos(angle + math.pi/2);
         local pz = z + distance * math.sin(angle + math.pi/2);
-        message = string.format("Positioning left %s yalms.", distance);
-        worldManager:DoPlayerMoveInZone(player, px, y, pz, rot, 0x0);
+        targetActor:SetPos(px, y, pz, rot, true, player);		
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), px, y, pz, rot);
 	elseif direction == 3 then
-        message = string.format("ROTATE down %s yalms.", distance);
-        worldManager:DoPlayerMoveInZone(player, x, y, z, distance, 0x0);
+        targetActor:SetPos(x, y, z, distance, true, player);		
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), x, y, z, distance);
     else
         local px = x - distance * math.cos(angle);
         local pz = z + distance * math.sin(angle);
-        if distance < 1 then
-            message = string.format("Positioning back %s yalms.", distance);
-        end
-        worldManager:DoPlayerMoveInZone(player, px, y, pz, rot, 0x0);
-    end;
+        targetActor:SetPos(px, y, pz, rot, true, player);
+		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), px, y, pz, rot);
+    end	
 
     player:SendMessage(messageID, sender, message);	
-
-end;
+end

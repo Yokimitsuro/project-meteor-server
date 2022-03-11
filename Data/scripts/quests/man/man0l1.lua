@@ -28,7 +28,7 @@ SEQ_065	= 65;	-- Return to FSH Guild
 SEQ_070	= 70;	-- Contact Baderon on LS
 SEQ_075	= 75;	-- Go to the ARM and BSM Guilds. Talk to Bodenolf.
 SEQ_080	= 80;	-- Speak with H'naanza
-SEQ_085	= 85;	-- Speak with Bodenolf
+SEQ_085	= 85;	-- Walk into push trigger
 SEQ_090	= 90;	-- Contact Baderon on LS
 SEQ_092	= 92;	-- Return to Baderon.
 
@@ -91,7 +91,7 @@ JOELLAUT				= 1000163;
 WERNER					= 1000247;
 HIHINE					= 1000267;
 TRINNE					= 1000268;
-ECHO_EXIT_TRIGGER2		= 1090001;
+ECHO_EXIT_TRIGGER2		= 1090007;
 
 -- Quest Markers
 

@@ -151,9 +151,12 @@ namespace Meteor.Map.Actors.QuestNS
             return ActiveQuests.Find(quest => quest.GetQuestId() == id);
         }
 
-        public Quest[] GetQuestsForNpc(Npc npc)
+        public Quest[] GetQuestsForNpc(Npc npc, bool isPrivateArea)
         {
-            return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
+            if (isPrivateArea)
+                return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc) && quest.GetSequence() != Quest.SEQ_NOT_STARTED).ToArray();
+            else
+                return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
         }
 
         public byte[] GetCompletionSliceBytes(ushort from, ushort to)

@@ -194,7 +194,12 @@ namespace Meteor.Map.Actors.QuestNS
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNotice", true, triggerName);
         }
 
-        public void OnNpcLS(Player caller)
+        public void OnKillBNpc(Player caller, uint classId)
+        {
+            LuaEngine.GetInstance().CallLuaFunction(caller, this, "onKillBNpc", true, classId);
+        }
+
+        public void OnNpcLs(Player caller)
         {
             LuaEngine.GetInstance().CallLuaFunction(caller, this, "onNpcLS", true, data.GetNpcLsFrom(), data.GetMsgStep());
         }
