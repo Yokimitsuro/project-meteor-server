@@ -156,7 +156,7 @@ local skillAnim = {
 
 local craftStartWidgetOpen = false;
 
-function onEventStarted(player, commandactor, triggerName, arg1, arg2, arg3, arg4, checkedActorId)
+function onEventStarted(player, commandactor, eventType, eventName, arg1, arg2, arg3, arg4, checkedActorId)
     local MENU_CANCEL, MENU_MAINHAND, MENU_OFFHAND, MENU_REQUEST = 0, 1, 2, 3;
     local MENU_RECENT, MENU_AWARDED, MENU_RECENT_DETAILED, MENU_AWARDED_DETAILED = 7, 8, 9, 10;
     

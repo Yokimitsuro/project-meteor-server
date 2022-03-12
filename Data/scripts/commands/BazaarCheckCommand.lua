@@ -8,7 +8,7 @@ Handles what happens when you examine a player's bazaar
 
 require ("global")
 
-function onEventStarted(player, actor, triggerName, name, arg1, arg2, arg3, bazaarActorId)	
+function onEventStarted(player, actor, eventType, eventName, name, arg1, arg2, arg3, bazaarActorId)	
 
 	local bazaarActor = nil;
 

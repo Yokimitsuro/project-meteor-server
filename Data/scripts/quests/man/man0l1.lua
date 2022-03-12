@@ -28,7 +28,7 @@ SEQ_065	= 65;	-- Return to FSH Guild
 SEQ_070	= 70;	-- Contact Baderon on LS
 SEQ_075	= 75;	-- Go to the ARM and BSM Guilds. Talk to Bodenolf.
 SEQ_080	= 80;	-- Speak with H'naanza
-SEQ_085	= 85;	-- Speak with Bodenolf
+SEQ_085	= 85;	-- Walk into push trigger
 SEQ_090	= 90;	-- Contact Baderon on LS
 SEQ_092	= 92;	-- Return to Baderon.
 
@@ -56,7 +56,7 @@ ISANDOREL				= 1000152;
 MERLZIRN				= 1000472;
 MSK_TRIGGER				= 1090001;
 
--- Echo in Mrd Guild
+-- Echo in MSK Guild
 NERVOUS_BARRACUDA		= 1000096;
 INTIMIDATING_BARRACUDA	= 1000097;
 OVEREAGER_BARRACUDA		= 1000107;
@@ -91,14 +91,23 @@ JOELLAUT				= 1000163;
 WERNER					= 1000247;
 HIHINE					= 1000267;
 TRINNE					= 1000268;
-ECHO_EXIT_TRIGGER2		= 1090001;
+ECHO_EXIT_TRIGGER2		= 1090007;
 
 -- Quest Markers
 
 -- Quest Data
 CNTR_SEQ7_CUL		= 1;
-CNTR_SEQ7_MRD		= 2;
+CNTR_SEQ7_MSK		= 2;
 CNTR_SEQ40_FSH		= 3;
+CNTR_LS_MSG			= 4;
+
+-- Msg packs for the Npc LS
+NPCLS_MSGS = {
+	{339},
+	{80, 81, 82},
+	{131, 326, 132},
+	{161, 162, 163, 164}
+};
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -137,21 +146,17 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(BADERON, QFLAG_PLATE);
 	elseif (sequence == SEQ_007) then
 		local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
-		local subseqMRD = data:GetCounter(CNTR_SEQ7_MRD);
-
+		local subseqMSK = data:GetCounter(CNTR_SEQ7_MSK);
 		-- Always active in this seqence
 		quest:SetENpc(BADERON);
 		quest:SetENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
-		
 		-- Down and Up the MSK guild
-		quest:SetENpc(ISANDOREL, (subseqMRD == 0 or subseqMRD == 2) and QFLAG_PLATE or QFLAG_NONE);
-		
-		if (subseqMRD == 1) then
+		quest:SetENpc(ISANDOREL, (subseqMSK == 0 or subseqMSK == 2) and QFLAG_PLATE or QFLAG_NONE);
+		if (subseqMSK == 1) then
 			quest:SetENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
-		elseif (subseqMRD == 2) then
+		elseif (subseqMSK == 2) then
 			quest:SetENpc(MERLZIRN);
 		end
-		
 		-- In Echo
 		quest:SetENpc(NERVOUS_BARRACUDA);
 		quest:SetENpc(INTIMIDATING_BARRACUDA);
@@ -163,11 +168,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ADVENTURER1);
 		quest:SetENpc(ADVENTURER2);
 		quest:SetENpc(ADVENTURER3);
-		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMRD == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMRD == 3);
-						
-		if (subseqCUL == 1 and subseqMRD == 4) then
-			player:SetNpcLS(1, 1);
-		end
+		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMSK == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMSK == 3);					
 	elseif (sequence == SEQ_035) then
 		quest:SetENpc(NNMULIKA, QFLAG_PLATE);
 	elseif (sequence == SEQ_040) then
@@ -363,7 +364,7 @@ function seq000_onTalk(player, quest, npc, classId)
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent010_8");
 	elseif (classId == BADERON) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent020");
-		player:SetNpcLS(1, 3);
+		quest:NewNpcLsMsg(1);
 		quest:StartSequence(SEQ_003);
 		player:EndEvent();		
 		
@@ -392,12 +393,12 @@ end
 function seq007_onTalk(player, quest, npc, classId)
 	local data = quest:GetData();
 	local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
-	local subseqMRD = data:GetCounter(CNTR_SEQ7_MRD);
+	local subseqMSK = data:GetCounter(CNTR_SEQ7_MSK);
 	
 	if (classId == BADERON) then
 		if (subseqCUL == 1) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_3");
-		elseif (subseqMRD == 4) then
+		elseif (subseqMSK == 4) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_4");
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent027_2");
@@ -405,20 +406,23 @@ function seq007_onTalk(player, quest, npc, classId)
 	elseif (classId == CHARLYS) then
 		if (subseqCUL == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030");
-			data:IncCounter(CNTR_SEQ7_CUL);
+			data:IncCounter(CNTR_SEQ7_CUL);			
+			if (data:GetCounter(CNTR_SEQ7_MSK) == 4) then
+				seq007_endSequence(player, quest);
+			end
 			--give 1000g
 		else
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030_2");
 		end
 	elseif (classId == ISANDOREL) then
-		if (subseqMRD == 2) then
+		if (subseqMSK == 2) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent050");
-			data:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MSK);
 			GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 3);
-		elseif (subseqMRD == 0) then
+		elseif (subseqMSK == 0) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035");
-			data:IncCounter(CNTR_SEQ7_MRD);
-		elseif (subseqMRD == 1) then
+			data:IncCounter(CNTR_SEQ7_MSK);
+		elseif (subseqMSK == 1) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent035_2");
 		end
 	elseif (classId == MERLZIRN) then
@@ -446,6 +450,11 @@ function seq007_onTalk(player, quest, npc, classId)
 	end
 		
 	player:EndEvent();
+end
+
+function seq007_endSequence(player, quest)
+	callClientFunction(player, "delegateEvent", player, quest, "processEvent033");
+	quest:NewNpcLsMsg(1);
 end
 
 function seq080_085_onTalk(player, quest, npc, classId)
@@ -477,13 +486,16 @@ function onPush(player, quest, npc)
 	if (sequence == SEQ_007) then
 		if (classId == MSK_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent040");
-			data:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MSK);
 			player:EndEvent();
 			quest:UpdateENPCs();
 			GetWorldManager():DoZoneChange(player, 230, nil, 0, 15, -620.0, 29.476, -70.050, 0.791);
 		elseif (classId == ECHO_EXIT_TRIGGER) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent060");
-			data:IncCounter(CNTR_SEQ7_MRD);
+			data:IncCounter(CNTR_SEQ7_MSK);
+			if (data:GetCounter(CNTR_SEQ7_CUL) == 1) then
+				seq007_endSequence(player, quest);
+			end
 			player:EndEvent();
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
@@ -509,12 +521,15 @@ function onPush(player, quest, npc)
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent620");			
 			-- Give 3000 gil
 			player:EndEvent();
-			quest:StartSequence(SEQ_075);
+			quest:NewNpcLsMsg(1);
+			quest:StartSequence(SEQ_070);
 		end		
 	elseif (sequence == SEQ_085) then
 		if (classId == ECHO_EXIT_TRIGGER2) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent635");			
-			player:EndEvent();
+			player:EndEvent();			
+			quest:NewNpcLsMsg(1);
+			quest:StartSequence(SEQ_090);
 			quest:UpdateENPCs();
 			GetWorldManager():WarpToPublicArea(player);
 		end
@@ -632,29 +647,43 @@ function onNotice(player, quest, target)
 	quest:UpdateENPCs();
 end
 
-function onNpcLS(player, quest, npcLSId)
+function onNpcLS(player, quest, from, msgStep)
 	local sequence = quest:getSequence();
-	
-	if (npcLSId == 1) then
-		player:SetNpcLS(1, 1);			
-		if (sequence == SEQ_003) then					
-			player:SendGameMessageLocalizedDisplayName(quest, 298, 39, 1000015, nil);
+	local msgPack;
+
+	if (from == 1) then
+		-- Get the right msg pack
+		if (sequence == SEQ_003) then
+			msgPack = 1;
+		elseif (sequence == SEQ_007 or sequence == SEQ_035) then
+			msgPack = 2;
+		elseif (sequence == SEQ_070 or sequence == SEQ_075) then
+			msgPack = 3;
+		elseif (sequence == SEQ_090 or sequence == SEQ_092) then
+			msgPack = 4;
+		end	
+				
+		-- Quick way to handle all msgs nicely.
+		player:SendGameMessageLocalizedDisplayName(quest, NPCLS_MSGS[msgPack][msgStep], MESSAGE_TYPE_NPC_LINKSHELL, 1000015);
+		if (msgStep >= #NPCLS_MSGS[msgPack]) then
+			quest:EndOfNpcLsMsgs();
+		else
+			quest:ReadNpcLsMsg();
+		end
+		
+		-- Handle anything else
+		if (sequence == SEQ_003) then
 			endTutorialMode(player);
 		elseif (sequence == SEQ_007) then
-			player:SendGameMessageLocalizedDisplayName(quest, 80, 39, 1000015, nil);
-			player:SendGameMessageLocalizedDisplayName(quest, 81, 39, 1000015, nil);
-			player:SendGameMessageLocalizedDisplayName(quest, 82, 39, 1000015, nil);
-			quest:StartSequence(SEQ_035);
+			quest:StartSequenceForNpcLs(SEQ_035);
 		elseif (sequence == SEQ_070) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent625");
-			player:EndEvent();
-			quest:StartSequence(SEQ_075);
+			quest:StartSequenceForNpcLs(SEQ_075);
 		elseif (sequence == SEQ_090) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent637");
-			player:EndEvent();
-			quest:StartSequence(SEQ_092);
+			quest:StartSequenceForNpcLs(SEQ_092);
 		end
 	end
+	
+	player:EndEvent();
 end
 
 function startMan0l1Content(player, quest)
@@ -675,7 +704,7 @@ function startMan0l1Content(player, quest)
 end
 
 function getJournalInformation(player, quest)
-	return 0, quest:GetData():GetCounter(CNTR_SEQ7_CUL) * 5, quest:GetData():GetCounter(CNTR_SEQ7_MRD) * 5;
+	return 0, quest:GetData():GetCounter(CNTR_SEQ7_CUL) * 5, quest:GetData():GetCounter(CNTR_SEQ7_MSK) * 5;
 end
 
 function getJournalMapMarkerList(player, quest)

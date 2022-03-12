@@ -591,7 +591,7 @@ namespace Meteor.Map
 
                     query = @"
                     UPDATE characters_quest_scenario 
-                    SET sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3
+                    SET sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3, counter4 = @counter4, npcLsFrom = @npcLsFrom, npcLsMsgStep = @npcLsMsgStep
                     WHERE characterId = @charaId and questId = @questId
                     ";
 
@@ -600,14 +600,14 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@questId", 0xFFFFF & quest.Id);
                     cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
 
-                    if (qData != null)
-                    {
-                        cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
-                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
-                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
-                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
-                    }
-
+                    cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
+                    cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
+                    cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
+                    cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                    cmd.Parameters.AddWithValue("@counter4", qData.GetCounter(4));
+                    cmd.Parameters.AddWithValue("@npcLsFrom", qData.GetNpcLsFrom());
+                    cmd.Parameters.AddWithValue("@npcLsMsgStep", qData.GetMsgStep());
+                    
                     cmd.ExecuteNonQuery();
                 }
                 catch (MySqlException e)
@@ -1216,7 +1216,10 @@ namespace Meteor.Map
                         flags,
                         counter1,
                         counter2,
-                        counter3
+                        counter3,
+                        counter4,
+                        npcLsFrom,
+                        npcLsMsgStep
                         FROM characters_quest_scenario WHERE characterId = @charId";
 
                     cmd = new MySqlCommand(query, conn);
@@ -1232,11 +1235,13 @@ namespace Meteor.Map
                             ushort counter1 = reader.GetUInt16("counter1");
                             ushort counter2 = reader.GetUInt16("counter2");
                             ushort counter3 = reader.GetUInt16("counter3");
-                            //ushort counter4 = reader.GetUInt16("counter4");
+                            ushort counter4 = reader.GetUInt16("counter4");
+                            ushort npsLsFrom = reader.GetUInt16("npcLsFrom");
+                            byte npcLsMsgStep = reader.GetByte("npcLsMsgStep");
 
                             Quest baseQuest = (Quest) Server.GetStaticActors(questId);
                             player.playerWork.questScenario[index] = questId;
-                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3, 0);
+                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3, counter4, npsLsFrom, npcLsMsgStep);
                         }
                     }
 

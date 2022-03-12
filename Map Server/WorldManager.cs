@@ -144,9 +144,8 @@ namespace Meteor.Map
                                     privateAreaName,
                                     privateAreaType,
                                     className,
-                                    dayMusic,
-                                    nightMusic,
-                                    battleMusic
+                                    canExitArea,
+                                    music
                                     FROM server_zones_privateareas
                                     WHERE privateAreaName IS NOT NULL";
 
@@ -161,7 +160,7 @@ namespace Meteor.Map
                             if (zoneList.ContainsKey(parentZoneId))
                             {
                                 Zone parent = zoneList[parentZoneId];
-                                PrivateArea privArea = new PrivateArea(parent, reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetInt32("privateAreaType"), reader.GetUInt16("dayMusic"), reader.GetUInt16("nightMusic"), reader.GetUInt16("battleMusic"));
+                                PrivateArea privArea = new PrivateArea(parent, reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetInt32("privateAreaType"), reader.GetBoolean("canExitArea"), reader.GetUInt16("music"));
                                 parent.AddPrivateArea(privArea);
                             }
                             else
@@ -884,10 +883,6 @@ namespace Meteor.Map
 
             player.playerSession.LockUpdates(false);
 
-            //Send "You have left the instance" if old area is a Private Area
-            if (oldArea is PrivateArea)
-                player.SendGameMessage(GetActor(), 34110, 0x20);
-
             //Send "You have entered an instance" if it's a Private Area
             if (newArea is PrivateArea)
                 player.SendGameMessage(GetActor(), 34108, 0x20);
@@ -943,7 +938,7 @@ namespace Meteor.Map
                 DoZoneChange(player, player.CurrentArea.ZoneId, null, 0, 15, x, y, z, rotation);
         }
 
-        public void WarpToPosition(Player player, float x, float y, float z, float rotation)
+        public void WarpToPosition(Player player, float x, float y, float z, float rotation, bool debugInstant = false)
         {
             //Remove player from currentZone if transfer else it's login
             if (player.CurrentArea != null)
@@ -960,13 +955,18 @@ namespace Meteor.Map
 
                 //Send packets
                 player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
-                player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(0));
+                player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(debugInstant ? (ushort) 0x0 : (ushort) 0xF));
 
                 player.playerSession.LockUpdates(false);
                 player.SendInstanceUpdate();
             }
         }
-        
+
+        public void WarpToCharaPosition(Player player, Character target)
+        {
+            WarpToPosition(player, target.positionX, target.positionY, target.positionZ, target.rotation);
+        }
+
         //Moves actor to new zone, and sends packets to spawn at the given coords.
         public void DoZoneChangeContent(Player player, PrivateAreaContent contentArea, float spawnX, float spawnY, float spawnZ, float spawnRotation, ushort spawnType = SetActorPositionPacket.SPAWNTYPE_WARP_DUTY)
         {

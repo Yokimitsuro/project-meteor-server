@@ -33,9 +33,10 @@ namespace Meteor.Map.actors.area
         private readonly Zone ParentZone;
         private readonly string PrivateAreaName;
         private readonly int PrivateAreaType;
+        private readonly bool CanExitArea;
 
-        public PrivateArea(Zone parent, string classPath, string privateAreaName, int privateAreaType, ushort bgmDay, ushort bgmNight, ushort bgmBattle)
-            : base(parent.ZoneId, parent.ZoneName, parent.RegionId, classPath, bgmDay, bgmNight, bgmBattle, parent.isIsolated, parent.isInn, parent.canRideChocobo, parent.canStealth, true)
+        public PrivateArea(Zone parent, string classPath, string privateAreaName, int privateAreaType, bool canExitArea, ushort music)
+            : base(parent.ZoneId, parent.ZoneName, parent.RegionId, classPath, music, music, music, parent.isIsolated, parent.isInn, parent.canRideChocobo, parent.canStealth, true)
         {
             this.ParentZone = parent;
             this.PrivateAreaName = privateAreaName;
@@ -50,6 +51,11 @@ namespace Meteor.Map.actors.area
         public override int GetPrivateAreaType()
         {
             return PrivateAreaType;
+        }
+
+        public bool CanExitPrivateArea()
+        {
+            return CanExitArea;
         }
 
         public override bool IsPublic()

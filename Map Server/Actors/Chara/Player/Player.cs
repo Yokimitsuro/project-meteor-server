@@ -1840,21 +1840,34 @@ namespace Meteor.Map.Actors
 
         public Quest[] GetQuestsForNpc(Npc npc)
         {
-            Quest[] quests = questStateManager.GetQuestsForNpc(npc);
+            Quest[] quests = questStateManager.GetQuestsForNpc(npc, CurrentArea.IsPrivate());
             Array.Sort(quests, (q1, q2) => (q1.HasData() ? 1 : 0) - (q2.HasData() ? 1 : 0));
             return quests;
         }
 
-        public void HandleNpcLS(uint id)
+        public void HandleBNpcKill(uint bnpcClassId)
         {
             foreach (Quest quest in questScenario)
             {
                 if (quest != null)
-                    quest.OnNpcLS(this, id);
+                    quest.OnKillBNpc(this, bnpcClassId);
             }
         }
 
-        public void SetNpcLS(uint npcLSId, uint state)
+        public bool HandleNpcLs(uint id)
+        {
+            foreach (Quest quest in questScenario)
+            {
+                if (quest != null && quest.HasNpcLsMsgs(id))
+                {
+                    quest.OnNpcLs(this);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void SetNpcLs(uint npcLSId, uint state)
         {            
             bool isCalling, isExtra;
             isCalling = isExtra = false;

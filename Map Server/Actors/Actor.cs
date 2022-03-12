@@ -642,7 +642,7 @@ namespace Meteor.Map.Actors
             return new Vector3(positionX, positionY, positionZ);
         }
 
-        public void SetPos(float x, float y, float z, float rot = 0, bool instant = false)
+        public void SetPos(float x, float y, float z, float rot = 0, bool instant = false, Player player = null)
         {
             oldPositionX = positionX;
             oldPositionY = positionY;
@@ -657,8 +657,9 @@ namespace Meteor.Map.Actors
             // todo: handle zone?
             if (instant)
             {
-                CurrentArea.BroadcastPacketAroundPoint(oldPositionX, oldPositionY, CreateSpawnTeleportPacket(0));
-                CurrentArea.BroadcastPacketAroundPoint(positionX, positionY, CreateSpawnTeleportPacket(0));
+                player.QueuePacket(CreateSpawnTeleportPacket(0));
+                //CurrentArea.BroadcastPacketAroundPoint(oldPositionX, oldPositionY, CreateSpawnTeleportPacket(0));
+                //CurrentArea.BroadcastPacketAroundPoint(positionX, positionY, CreateSpawnTeleportPacket(0));
             }
             else
                 CurrentArea.BroadcastPacketAroundActor(this, MoveActorToPositionPacket.BuildPacket(Id, x, y, z, rot, moveState));

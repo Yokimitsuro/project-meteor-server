@@ -168,8 +168,6 @@ function onNotice(player, quest, target)
 	quest:UpdateENPCs();
 end
 
-
-    
 function seq000_onTalk(player, quest, npc, classId)
     
     if (classId == MOMODI) then
