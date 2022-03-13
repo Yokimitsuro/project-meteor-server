@@ -35,11 +35,11 @@ end
 
 
 function onStateChange(player, quest, sequence)
-    if (sequence == 65535) then
-        quest:SetENpc(OTOPA_POTTOPA, QFLAG_PLATE);
+    if (sequence == SEQ_ACCEPT) then
+        quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM);
     elseif (sequence == SEQ_000) then
         quest:SetENpc(OTOPA_POTTOPA);
-        quest:SetENpc(JUDITHE, QFLAG_PLATE);
+        quest:SetENpc(JUDITHE, QFLAG_NORM);
     elseif (sequence == SEQ_001) then 
         quest:SetENpc(OTOPA_POTTOPA, QFLAG_REWARD);
         quest:SetENpc(JUDITHE);
@@ -50,7 +50,7 @@ function onTalk(player, quest, npc)
     local sequence = quest:getSequence();
     local classId = npc:GetActorClassId();
     
-    if (sequence == 65535) then
+    if (sequence == SEQ_ACCEPT) then
         if (classId == OTOPA_POTTOPA) then
             local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart");
            

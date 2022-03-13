@@ -21,6 +21,12 @@ function onTrigger(player, argc, weather, updateTime, zonewide)
         weather = tonumber(weather) or 0;
         updateTime = tonumber(updateTime) or 0;
         zonewide = tonumber(zonewide) or 0;
+        
+        if (weather > 0 and weather < 82) then
+            weather = weather + 8000;
+        end
+        
+        
         message = string.format("changed weather to %u ", weather);
         
         if zonewide ~= 0 then

@@ -62,6 +62,27 @@ function onTrigger(player, argc, p1, p2, p3, p4, privateArea, privateAreaType, n
             worldManager:DoZoneChange(player, zone, privateArea, tonumber(privateAreaType), 0x02, x, y, z, 0.00);
         end
   
+    elseif (argc == 1) then -- Switch city zone
+            
+        local commands = { ["SWITCH"] = 1, ["S"] = 1, ["FLIP"] = 1, ["F"] = 1, ["TOWN"] = 1};
+    
+        if (commands[string.upper(p1)]) then
+            local zones = {
+                        [133] = {133, 230},
+                        [155] = {155, 206},
+                        [175] = {175, 209},
+                        [206] = {206, 155},
+                        [209] = {209, 175},
+                        [230] = {230, 133}
+                        }
+                 
+            if (player_zone == zones[player_zone][1]) then 
+                worldManager:DoZoneChange(player, zones[player_zone][2], "", 0, 0x02, player_x, player_y, player_z, player_rot);
+                player:SendMessage(messageID, sender, string.format("setting coordinates X:%d Y:%d Z:%d to new zone (%d) private area:%s", player_x, player_y, player_z, zones[player_zone][2], privateArea or "unspecified"));
+            end
+        else
+            player:SendMessage(messageID, sender, "Unknown parameters! Usage: "..properties.description);
+        end
     else
         player:SendMessage(messageID, sender, "Unknown parameters! Usage: "..properties.description);
     end;

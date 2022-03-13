@@ -84,7 +84,7 @@ city = {
 
 
 
-function onEventStarted(player, npc, triggerName)	
+function onEventStarted(player, npc, eventType, eventName)	
 
     local npcCity = city[npc:GetActorClassId()] or 1;
     local wardPlaceName = CITY_INFO[npcCity][1];        -- Market Wards category name. Identical in all languages except Japanese
@@ -98,7 +98,7 @@ function onEventStarted(player, npc, triggerName)
     
     local worldMaster = GetWorldMaster(); 
     local pos = player:GetPos();
-    local currZone = pos[4];
+    local currZone = pos[5];
     
     if (currZone == 133 or currZone == 230 or currZone == 155 or currZone == 206 or currZone == 175 or currZone == 209) then 
         exitPlaceName = 0;  -- If in city, hide city menu option

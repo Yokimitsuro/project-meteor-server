@@ -59,7 +59,7 @@ local defaultTalkSea = {
     [1000164] = "defaultTalkWithFaucillien_001",    -- Faucillien           (Limsa Upper Decks: FSH Guild) - Will not fire, not PplStd
     [1000165] = "defaultTalkWithLouviaune_001",     -- Louviaune            (Limsa Upper Decks: FSH Guild) - Will not fire, not PplStd
     [1000166] = "defaultTalkWithUrsulie_001",       -- Ursulie              (Limsa Upper Decks: Adv. Guild) - Will not fire, not PplStd.  Retainer NPC
-    [1000167] = "defaultTalkWithInn_Desk",          -- Mytesyn              (Limsa Upper Decks: Adv. Guild) defaultTalkWithMytesyn_001 (Pre-Inn dialog.)
+    [1000167] = "defaultTalkWithMytesyn_001",       -- Mytesyn              (Limsa Upper Decks: Adv. Guild)  defaultTalkWithInn_Desk - used when Inn unlocked
     [1000168] = "defaultTalkWithPrudentia_001",     -- Prudentia            (Limsa Upper Decks: CUL Guild)
     [1000169] = "defaultTalkWithPulmia_001",        -- Pulmia               (Limsa Upper Decks: CUL Guild)
     [1000170] = "defaultTalkWithRsushmo_001",       -- R'sushmo             (Limsa Upper Decks: CUL Guild)
@@ -260,7 +260,11 @@ function onTalk(player, quest, npc, eventName)
     local clientFunc = defaultTalkSea[npcId];
     
     if (npcId == 1000167) then -- Mytesyn - Inn NPC
-        defaultTalkWithInn(player, quest, clientFunc);
+        if (player:IsQuestCompleted(110838)) then -- "The Ink Thief" completed.
+            defaultTalkWithInn(player, quest, "defaultTalkWithInn_Desk");
+        else
+            callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+        end
     else
         callClientFunction(player, "delegateEvent", player, quest, clientFunc);
     end
