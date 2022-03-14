@@ -12,64 +12,23 @@ Sets anim id for current target
 
 }
 
-function onTrigger(player, argc, aType, a1, a2, uID)
-	--if uID == nil then uID = "test"; end
-    local npc = GetWorldManager():GetActorInWorld(player.currentTarget) or nil;
-    --npc = GetWorldManager():GetActorInWorldByUniqueId(uID);
-	
-   --[[ if argc == 1 then
-       -- aType = tonumber(aType, 16) or 0;
-        if aType > 4294967295 then
- 
-            player:SendMessage(0x20, "[anim] ", "Error: Value too large");
-            return;
-        else
-            player:PlayAnimation(aType);
-        end
-    else--]]
-    
-	aType = tonumber(aType) or 0;
-	a1 = tonumber(a1) or 0;
-	a2 = tonumber(a2) or 1;
-    
-	
-	a1 = bit32.band(a1, 0xFFF);
-	a2 = bit32.band(a2, 0xFFF);
-	aType = bit32.band(aType, 0xFF);
-	
-	animId = bit32.bor(bit32.lshift(a2, 12), a1);
-	animId = bit32.bor(bit32.lshift(aType, 24), animId);
-	print(animId);
-    
-    --[[
-    if npc == nil then	
-        player:PlayAnimation(animId);
-    else
-        npc:PlayAnimation(animId);
-    end 
-    --]]
+function onTrigger(player, argc, aType, a1, a2)
+
     local actor = player.CurrentArea.FindActorInArea(player.currentTarget) or nil;
     
-    if player and actor then
-    
-
+    if (player and actor) then
         a1 = bit32.band(a1, 0xFFF);
         a2 = bit32.band(a2, 0xFFF);
         aType = bit32.band(aType, 0xFF);
             
         animId = bit32.bor(bit32.lshift(a2, 12), a1);
         animId = bit32.bor(bit32.lshift(aType, 24), animId);
-       -- player:SendMessage(0x20, "[anim] ", tostring(animId));
+        -- player:SendMessage(0x20, "[anim] ", tostring(animId));
         actor:PlayAnimation(animId);
-         local output = string.format("%x", animId) 
+        local output = string.format("%x", animId) 
         player:SendMessage(0x20, "[anim] ", "0x"..tostring(output).. " Target:"..tostring(actor));
-    
-
-    end;
-    
-    
-
-end;
+    end
+end
 
 
 --[[ Categories:
@@ -96,9 +55,11 @@ end;
 
 33 = ?
 34 = Crash
-
 120 = ???
 
+
+Notes:
+------
 CATEGORY
 Shift 18 bits right
 CMP 0xB
@@ -122,24 +83,6 @@ CMP 71
 7C000062
 ec000000
 00FFFFFF
-
-BTL:
-ETC:
-GL2:
-KAO:
-
-MGK: 01
-SYS: 02
-LIB: 046
-ITM: 05-09
-GL?: 0B
-GL1: 0C
-CBI: 0D
-ABL: 0E
-POP: 0F
-CFT: 10
-PIC: 14
-WSC: 12
 
 19: Auto Attack?    
 6F: Casting
