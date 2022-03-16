@@ -21,8 +21,8 @@ OTOPA_POTTOPA           = 1000864;
 GAUWYN_THE_GANNET       = 1002065;
 HILDIBRAND              = 1001995;
 NASHU_MHAKARACCA        = 1001996;
-PRIVATE_AREA_ENTRANCE   = 0;
-PRIVATE_AREA_EXIT       = 0;
+PRIVATE_AREA_ENTRANCE   = 1090085;
+PRIVATE_AREA_EXIT       = 1290002;
 
 -- DefaultTalk NPCs?
 UBOKHN                  = 1000668;
@@ -51,7 +51,13 @@ end
 
 function onStateChange(player, quest, sequence)
     if (sequence == SEQ_ACCEPT) then
-        quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM); -- TO-DO: Check player inventory for quest-specific item before flagging?
+        local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
+        local otopaFlag = 0;
+        
+        if (hasQuestItem == false) then 
+            otopaFlag = 2; 
+        end
+        quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
     end
     
     if (sequence == SEQ_000) then
@@ -59,14 +65,14 @@ function onStateChange(player, quest, sequence)
         quest:SetENpc(GAUWYN_THE_GANNET, QFLAG_NORM);
         quest:SetENpc(HILDIBRAND);
         quest:SetENpc(NASHU_MHAKARACCA);
-        quest:SetENPC(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true)
-        quest:SetENpc(PRIVATE_AREA_EXIT, QFLAG_NONE, false, true);
+        
+        --flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned
+        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true, false, true);
     elseif (sequence == SEQ_010) then 
         quest:SetENpc(OTOPA_POTTOPA, QFLAG_REWARD);
         quest:SetENpc(GAUWYN_THE_GANNET);
         quest:SetENpc(HILDIBRAND);
         quest:SetENpc(NASHU_MHAKARACCA);
-        quest:SetENpc(PRIVATE_AREA_EXIT, QFLAG_NONE, false, true);
     end
 end
 
@@ -76,10 +82,17 @@ function onTalk(player, quest, npc)
     
     if (sequence == SEQ_ACCEPT) then
         if (classId == OTOPA_POTTOPA) then
-            -- TO-DO: Add inventory check here?
-            callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart");
-            giveWantedItem(player);
-            --processEventOTOPAPOTTOPAStart_2 
+            local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
+            
+            if (not hasQuestItem) then
+                callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart");
+                giveWantedItem(player);
+                npc:SetQuestGraphic(player, QFLAG_NONE);
+            else
+                callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart_2");
+            end
+            
+            player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 3071);
         end
         
     elseif (sequence == SEQ_000) then
@@ -121,10 +134,8 @@ function onPush(player, quest, npc)
 	
     player:EndEvent();
     if (npcClassId == PRIVATE_AREA_ENTRANCE) then
-        -- TO-DO: Needs spawn coordinates + Private Area arranged
-        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 9999);
-    elseif (npcClassId == PRIVATE_AREA_EXIT) then
-        GetWorldManager():WarpToPublicArea(player);
+        --TO-DO: Fill in the # below for the privateArea when it's made
+        --GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", #, -206.712, 195.148, 151.064, 1.821);
     end
 end
 
@@ -159,6 +170,5 @@ function giveWantedItem(player)
         player:SendMessage(MESSAGE_TYPE_SYSTEM, "", "[DEBUG] Server Error on adding item.");
     elseif (invCheck == INV_ERROR_SUCCESS) then
         player:SendGameMessage(player, GetWorldMaster(), 25246, MESSAGE_TYPE_SYSTEM_ERROR, ITEM_WANTED_GAUWYN, 1);
-        player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 3071); -- Log out in The Hourglass w/ item.
     end
 end

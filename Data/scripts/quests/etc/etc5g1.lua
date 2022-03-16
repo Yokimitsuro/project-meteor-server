@@ -33,6 +33,9 @@ SANSA                   = 1000239;
 ELYN                    = 1000411;
 RYD                     = 1000412;
 
+-- Quest Items
+ITEM_WANTED_GAUWYN      = 10011243;
+
 -- Quest Markers
 MRKR_ACORN_ORCHARD      = 11082101;
 MRKR_NICOLIAUX          = 11082102;
@@ -49,30 +52,21 @@ end
 
 function onStateChange(player, quest, sequence)
     if (sequence == SEQ_ACCEPT) then
-        quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM); -- TO-DO: Check player inventory for quest-specific item before flagging?
+        local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
+        local otopaFlag = 0;
+        
+        if (hasQuestItem == false) then 
+            otopaFlag = 2; 
+        end
+        quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
         quest:SetENpc(VKOROLON, QFLAG_NORM); -- Always shows despite interaction
     end
     
     if (sequence == SEQ_000) then
-        quest:SetENpc(VKOROLON);
-        quest:SetENpc(NICOLIAUX, QFLAG_NORM);
-        quest:SetENpc(POWLE);
-        quest:SetENpc(AUNILLIE);
-        quest:SetENpc(GAUWYN_THE_GANNET);
-        quest:SetENpc(HILDIBRAND);
-        quest:SetENpc(NASHU_MHAKARACCA);
-        quest:SetENPC(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true)
-        quest:SetENpc(PRIVATE_AREA_EXIT, QFLAG_NONE, false, true);
+
 
     elseif (sequence == SEQ_010) then 
-        quest:SetENpc(VKOROLON, QFLAG_REWARD);
-        quest:SetENpc(NICOLIAUX);
-        quest:SetENpc(POWLE);
-        quest:SetENpc(AUNILLIE);
-        quest:SetENpc(GAUWYN_THE_GANNET);
-        quest:SetENpc(HILDIBRAND);
-        quest:SetENpc(NASHU_MHAKARACCA);        
-        quest:SetENpc(PRIVATE_AREA_EXIT, QFLAG_NONE, false, true);        
+      
     end
 end
 
@@ -82,52 +76,26 @@ function onTalk(player, quest, npc)
     
     if (sequence == SEQ_ACCEPT) then
         if (classId == OTOPA_POTTOPA) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart");
-            giveWantedItem(player);
+            local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
+            
+            if (not hasQuestItem) then
+                callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart");
+                giveWantedItem(player);
+                npc:SetQuestGraphic(player, QFLAG_NONE);
+            else
+                callClientFunction(player, "delegateEvent", player, quest, "processEventOTOPAPOTTOPAStart_2");
+            end 
+            player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 2075); -- Log out in The Roost w/ item.
+            
         elseif (classId == VKOROLON) then
             -- This retail accurate.  No dialog functions called.
             player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 2075);
         end
         
     elseif (sequence == SEQ_000) then
-        if (classId == VKOROLON) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_000_1"); -- This is a guess.
-        elseif (classId == NICOLIAUX) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010")
-            attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
-            quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
-            quest:StartSequence(SEQ_010);            
-        elseif (classId == GAUWYN_THE_GANNET) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_2");    
-        elseif (classId == HILDIBRAND) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_3");  
-        elseif (classId == NASHU_MHAKARACCA) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_4");  
-        elseif (classId == AUNILLIE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_5"); -- This is a guess. 
-        elseif (classId == POWLE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_6"); -- This is a guess.
-
-        end
+       
     elseif (sequence == SEQ_010) then
-        if (classId == VKOROLON) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_020"); 
-			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 500, 1, 1);
-            player:CompleteQuest(quest); 
-            player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 1070); -- Log out in The Mizzenmast Inn w/ item.
-        elseif (classId == NICOLIAUX) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_1")  -- This is a guess.            
-        elseif (classId == GAUWYN_THE_GANNET) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_2");    
-        elseif (classId == HILDIBRAND) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_3");  
-        elseif (classId == NASHU_MHAKARACCA) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_4");  
-        elseif (classId == AUNILLIE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_5"); -- This is a guess. 
-        elseif (classId == POWLE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_6"); -- This is a guess.            
-        end
+
     end
     
     player:EndEvent()
@@ -140,7 +108,7 @@ function onPush(player, quest, npc)
 	
     player:EndEvent();
     if (npcClassId == PRIVATE_AREA_ENTRANCE) then
-        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 9999);
+        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 9999); -- Temp
     elseif (npcClassId == PRIVATE_AREA_EXIT) then
         GetWorldManager():WarpToPublicArea(player);
     end
@@ -177,6 +145,5 @@ function giveWantedItem(player)
         player:SendMessage(MESSAGE_TYPE_SYSTEM, "", "[DEBUG] Server Error on adding item.");
     elseif (invCheck == INV_ERROR_SUCCESS) then
         player:SendGameMessage(player, GetWorldMaster(), 25246, MESSAGE_TYPE_SYSTEM_ERROR, ITEM_WANTED_GAUWYN, 1);
-        player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 3071); -- Log out in The Hourglass w/ item.
     end
 end
