@@ -27,7 +27,7 @@ MRKR_HIHINE			= 11063402;
 COUNTER_KILLS		= 0;
 
 -- Quest Details
-OBJECTIVE_KILLS		= 8;
+OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -53,7 +53,7 @@ function onTalk(player, quest, npc, eventName)
     
 	-- Offer the quest
 	if (npcClassId == ENPC_HIHINE and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventHihineStart");
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventHihineStart", OBJECTIVE_AMOUNT);
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -62,7 +62,7 @@ function onTalk(player, quest, npc, eventName)
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
         if (npcClassId == ENPC_HIHINE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent005_2");
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent005_2", OBJECTIVE_AMOUNT);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
@@ -77,12 +77,11 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
 	if (bnpc == BNPC_TOLL_PUK) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_SLUMBERNUT);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
-        if (counterAmount >= OBJECTIVE_SLUMBERNUT) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_KILLS);
+		attentionMessage(player, 25241, counterAmount); -- You have defeated X enemies.
+        if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -90,7 +89,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_SLUMBERNUT);
+	return quest:GetData():GetCounter(COUNTER_KILLS);
 end
 
 function getJournalMapMarkerList(player, quest)

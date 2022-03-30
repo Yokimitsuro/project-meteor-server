@@ -29,6 +29,7 @@ MRKR_CHAUNOLLET		= 11063602;
 COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
+OBJECTIVE_ITEMID	= 11000148;
 OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
@@ -57,7 +58,7 @@ function onTalk(player, quest, npc, eventName)
     
 	-- Offer the quest
 	if (npcClassId == ENPC_CHAUNOLLET and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventChaunolletStart");
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventChaunolletStart", OBJECTIVE_AMOUNT);
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -66,7 +67,7 @@ function onTalk(player, quest, npc, eventName)
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
         if (npcClassId == ENPC_CHAUNOLLET) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent000Chaunollet");
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent000Chaunollet", OBJECTIVE_AMOUNT);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
@@ -81,11 +82,10 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
 	if (bnpc == BNPC_REAVER_EYES or bnpc == BNPC_REAVER_FINS or bnpc == BNPC_REAVER_CLAWS) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
+		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);

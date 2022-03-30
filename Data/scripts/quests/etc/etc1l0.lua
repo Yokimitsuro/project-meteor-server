@@ -24,10 +24,11 @@ MRKR_JELLIES_AREA	= 11063301;
 MRKR_HALDBERK		= 11063302;
 
 -- Counters
-COUNTER_RINGS		= 0;
+COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
-OBJECTIVE_RINGS		= 8;
+OBJECTIVE_ITEMID	= 11000147;
+OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -53,7 +54,7 @@ function onTalk(player, quest, npc, eventName)
     
 	-- Offer the quest
 	if (npcClassId == ENPC_HALDBERK and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventHaldberkStart");
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventHaldberkStart", OBJECTIVE_AMOUNT);
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -62,12 +63,12 @@ function onTalk(player, quest, npc, eventName)
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
         if (npcClassId == ENPC_HALDBERK) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent000");
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent000", 0, OBJECTIVE_AMOUNT);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
 		if (npcClassId == ENPC_HALDBERK) then
-			callClientFunction(player, "delegateEvent", player, quest, "Etc1l0.processEvent010");
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent010", 2);
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
             player:CompleteQuest(quest);
 		end
@@ -77,12 +78,11 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
 	if (bnpc == BNPC_JETSAM_JELLIES) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_RINGS);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
-        if (counterAmount >= OBJECTIVE_RINGS) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
+		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
+        if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -90,7 +90,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_RINGS);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
 end
 
 function getJournalMapMarkerList(player, quest)
