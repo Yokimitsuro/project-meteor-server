@@ -24,10 +24,11 @@ MRKR_MARCETTE		= 11120302;
 MRKR_FUNGUAR_AREA	= 11120301;
 
 -- Counters
-COUNTER_SPORESAC	= 0;
+COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
-OBJECTIVE_SPORESAC	= 8;
+OBJECTIVE_ITEMID	= 11000301;
+OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -77,12 +78,11 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
 	if (bnpc == BNPC_MATURE_FUNGUAR) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_SPORESAC);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
-        if (counterAmount >= OBJECTIVE_SPORESAC) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
+		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
+        if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -90,7 +90,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_SPORESAC);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
 end
 
 function getJournalMapMarkerList(player, quest)
