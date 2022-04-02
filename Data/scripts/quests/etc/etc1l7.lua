@@ -76,7 +76,7 @@ function onTalk(player, quest, npc, eventName)
 		if (npcClassId == ENPC_IMANIA) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEventImaniaFree");
         elseif (npcClassId == ENPC_YUYUBESU) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent000");
+            callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuStart", 0, OBJECTIVE_AMOUNT);
 			quest:StartSequence(SEQ_001);
 		end
 	--Quest Complete
@@ -103,11 +103,10 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_BOMB_EMBER) then
+	if (quest:GetSequence() == SEQ_001 and bnpc == BNPC_BOMB_EMBER) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_002);
@@ -116,7 +115,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM), 0, 0, 0, OBJECTIVE_AMOUNT;
 end
 
 function getJournalMapMarkerList(player, quest)

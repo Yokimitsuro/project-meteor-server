@@ -4,31 +4,30 @@ require ("global")
 
 Quest Script
 
-Name: 	Spores on the Brain
-Code: 	Wld0g4
-Id: 	110765
-Prereq: Level 11, Any Class, Requires "In the Name of Science"
+Name: 	Counting Sheep
+Code: 	Etc2i0
+Id: 	110706
+Prereq: Level 25, Any DoW/DoM
 
 ]]
 
 -- Sequence Numbers
-SEQ_000	= 0;  -- Kill Mature Funguars.
-SEQ_001	= 1;  -- Talk to Marcette.
+SEQ_000	= 0;  -- Kill Dreadwolves.
+SEQ_001	= 1;  -- Talk to Patrick.
 
 -- Actor Class Ids
-ENPC_MARCETTE 		= 1001583;
-BNPC_MATURE_FUNGUAR	= 2105916;
+ENPC_PATRICK 		= 1001358;
+BNPC_DREADWOLVES	= 2101403;
 
 -- Quest Markers
-MRKR_MARCETTE		= 11120302;
-MRKR_FUNGUAR_AREA	= 11120301;
+MRKR_WOLF_AREA		= 11101901;
+MRKR_PATRICK		= 11101902;
 
 -- Counters
-COUNTER_QUESTITEM	= 0;
+COUNTER_KILLS		= 0;
 
 -- Quest Details
-OBJECTIVE_ITEMID	= 11000301;
-OBJECTIVE_AMOUNT	= 8;
+OBJECTIVE_AMOUNT	= 4;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -39,12 +38,12 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_MARCETTE, QFLAG_PLATE);
+		quest:SetENpc(ENPC_PATRICK, QFLAG_PLATE);
 	elseif (sequence == SEQ_000) then
-        quest:SetENpc(ENPC_MARCETTE);
-		quest:SetENpc(BNPC_MATURE_FUNGUAR);
+        quest:SetENpc(ENPC_PATRICK);
+		quest:SetENpc(BNPC_DREADWOLVES);
 	elseif (sequence == SEQ_001) then
-		quest:SetENpc(ENPC_MARCETTE, QFLAG_REWARD);
+		quest:SetENpc(ENPC_PATRICK, QFLAG_REWARD);
 	end	
 end
 
@@ -53,8 +52,8 @@ function onTalk(player, quest, npc, eventName)
 	local seq = quest:GetSequence();
     
 	-- Offer the quest
-	if (npcClassId == ENPC_MARCETTE and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventMarcetteStart");
+	if (npcClassId == ENPC_PATRICK and seq == SEQ_ACCEPT) then
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventPatrickStart");
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -62,12 +61,12 @@ function onTalk(player, quest, npc, eventName)
 		return;	
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
-        if (npcClassId == ENPC_MARCETTE) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent000_2");
+        if (npcClassId == ENPC_PATRICK) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent000");
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
-		if (npcClassId == ENPC_MARCETTE) then
+		if (npcClassId == ENPC_PATRICK) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
             player:CompleteQuest(quest);
@@ -79,9 +78,9 @@ function onTalk(player, quest, npc, eventName)
 end
 
 function onKillBNpc(player, quest, bnpc)
-	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_MATURE_FUNGUAR) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_DREADWOLVES) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_KILLS);
+		attentionMessage(player, 50041, 3101403, counterAmount, OBJECTIVE_AMOUNT); -- The <dispName> has been defeated. (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
@@ -89,16 +88,12 @@ function onKillBNpc(player, quest, bnpc)
 	end
 end
 
-function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
-end
-
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     
     if (sequence == SEQ_000) then
-		return MRKR_FUNGUAR_AREA;
+		return MRKR_WOLF_AREA;
     elseif (sequence == SEQ_001) then
-        return MRKR_MARCETTE;
+        return MRKR_PATRICK;
     end
 end

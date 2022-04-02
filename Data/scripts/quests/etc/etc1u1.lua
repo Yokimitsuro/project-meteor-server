@@ -79,9 +79,9 @@ function onTalk(player, quest, npc, eventName)
 end
 
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_NUTGRABBER_MARMOT) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_NUTGRABBER_MARMOT) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
@@ -90,7 +90,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM), 0, 0, 0, OBJECTIVE_AMOUNT;
 end
 
 function getJournalMapMarkerList(player, quest)

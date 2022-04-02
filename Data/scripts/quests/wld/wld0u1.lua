@@ -36,7 +36,7 @@ function onStateChange(player, quest, sequence)
 	end
 
 	if (sequence == SEQ_000) then
-        quest:SetENpc(MRKR_TYAGO_MOUI);
+        quest:SetENpc(TYAGO_MOUI);
 		quest:SetENpc(LYNGWAEK, QFLAG_PLATE);
 	elseif (sequence == SEQ_001) then	
 		quest:SetENpc(LYNGWAEK);
@@ -49,7 +49,7 @@ function onTalk(player, quest, npc, eventName)
 	local seq = quest:GetSequence();
     
 	-- Offer the quest
-	if (npcClassId == MRKR_TYAGO_MOUI and seq == SEQ_ACCEPT) then
+	if (npcClassId == TYAGO_MOUI and seq == SEQ_ACCEPT) then
 		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventTyagomouiStart");
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
@@ -60,7 +60,7 @@ function onTalk(player, quest, npc, eventName)
 	
 	-- Quest Progress
 	if (seq == SEQ_000) then
-        if (npcClassId == MRKR_TYAGO_MOUI) then
+        if (npcClassId == TYAGO_MOUI) then
             callClientFunction(player, "delegateEvent", player, quest, "followEvent005");
 		elseif (npcClassId == LYNGWAEK) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
@@ -68,7 +68,7 @@ function onTalk(player, quest, npc, eventName)
 		end
 	elseif (seq == SEQ_001) then
 		--Quest Complete
-		if (npcClassId == MRKR_TYAGO_MOUI) then
+		if (npcClassId == TYAGO_MOUI) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent020");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
             player:CompleteQuest(quest);

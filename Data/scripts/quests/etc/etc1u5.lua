@@ -78,9 +78,9 @@ function onTalk(player, quest, npc, eventName)
 end
 
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_STUFFED_DODO) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_STUFFED_DODO) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_KILLS);
-		attentionMessage(player, 25241, counterAmount); -- You have defeated X enemies.
+		attentionMessage(player, 50041, 3102011, counterAmount, OBJECTIVE_AMOUNT); -- The <dispName> has been defeated. (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
@@ -89,7 +89,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_KILLS);
+	return quest:GetData():GetCounter(COUNTER_KILLS), 0, 0, 0, OBJECTIVE_AMOUNT;
 end
 
 function getJournalMapMarkerList(player, quest)

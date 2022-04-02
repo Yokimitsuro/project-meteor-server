@@ -79,9 +79,9 @@ function onTalk(player, quest, npc, eventName)
 end
 
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_AMALJAA_DRUDGES) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_AMALJAA_DRUDGES) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 25246, OBJECTIVE_ITEMID, 1); -- You obtain <item>
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);

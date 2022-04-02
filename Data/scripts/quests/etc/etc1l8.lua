@@ -128,11 +128,14 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
-function onEmote(player, quest, npc, eventName)
+functison onEmote(player, quest, npc, eventName)
+	print("TESSSSSSSSSSSSSSSSSSSSSST2");
 	local npcClassId = npc.GetActorClassId();
 	local seq = quest:GetSequence();
 	local data = quest:GetData();
 	local incCounter = false;
+	
+	print("TESSSSSSSSSSSSSSSSSSSSSST");
 	
 	-- Play the emote
 	if (eventName == "emoteDefault1") then -- Psych
