@@ -34,10 +34,8 @@ function onStateChange(player, quest, sequence)
 	end
 
 	if (sequence == SEQ_000) then
-		quest:SetENpc(FONGHO, QFLAG_PLATE);
-        quest:SetENpc(HASTHWAB);
-	elseif (sequence == SEQ_001) then	
 		quest:SetENpc(FONGHO, QFLAG_REWARD);
+        quest:SetENpc(HASTHWAB);
 	end	
 end
 
