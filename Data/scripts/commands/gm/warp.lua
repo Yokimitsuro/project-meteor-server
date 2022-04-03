@@ -77,7 +77,7 @@ function onTrigger(player, argc, p1, p2, p3, p4, privateArea, privateAreaType, n
                         }
                  
             if (player_zone == zones[player_zone][1]) then 
-                worldManager:DoZoneChange(player, zones[player_zone][2], "", 0, 0x02, player_x, player_y, player_z, player_rot);
+                worldManager:DoZoneChange(player, zones[player_zone][2], "", 0, 0x16, player_x, player_y, player_z, player_rot);
                 player:SendMessage(messageID, sender, string.format("setting coordinates X:%d Y:%d Z:%d to new zone (%d) private area:%s", player_x, player_y, player_z, zones[player_zone][2], privateArea or "unspecified"));
             end
         else

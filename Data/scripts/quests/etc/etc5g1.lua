@@ -19,14 +19,14 @@ SEQ_010 = 10;
 -- Actor Class Ids
 OTOPA_POTTOPA           = 1000864;
 VKOROLON                = 1000458;
-NICOLIAUX               = 1000409;
+NICOLIAUX               = 1002071; -- 1000409: Can't use his public area id, otherwise a ! shows on him there also
 POWLE                   = 1000238;
 AUNILLIE                = 1000410;
 GAUWYN_THE_GANNET       = 1002065;
 HILDIBRAND              = 1002067;
 NASHU_MHAKARACCA        = 1001996;
-PRIVATE_AREA_ENTRANCE   = 0;
-PRIVATE_AREA_EXIT       = 0;
+PRIVATE_AREA_ENTRANCE   = 1090086; -- Check that this ID is free to use before merge
+PRIVATE_AREA_EXIT       = 1290002;
 
 -- DefaultTalk NPCs?
 SANSA                   = 1000239;
@@ -60,13 +60,25 @@ function onStateChange(player, quest, sequence)
         end
         quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
         quest:SetENpc(VKOROLON, QFLAG_NORM); -- Always shows despite interaction
-    end
-    
-    if (sequence == SEQ_000) then
 
-
+    elseif (sequence == SEQ_000) then
+        quest:SetENpc(VKOROLON);
+        quest:SetENpc(NICOLIAUX, QFLAG_NORM);
+        quest:SetENpc(POWLE);
+        quest:SetENpc(AUNILLIE);
+        quest:SetENpc(GAUWYN_THE_GANNET);
+        quest:SetENpc(HILDIBRAND);
+        quest:SetENpc(NASHU_MHAKARACCA);
+        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true, false, true);
+        
     elseif (sequence == SEQ_010) then 
-      
+        quest:SetENpc(VKOROLON, QFLAG_REWARD);
+        quest:SetENpc(NICOLIAUX);
+        quest:SetENpc(POWLE);
+        quest:SetENpc(AUNILLIE);
+        quest:SetENpc(GAUWYN_THE_GANNET);
+        quest:SetENpc(HILDIBRAND);
+        quest:SetENpc(NASHU_MHAKARACCA);
     end
 end
 
@@ -88,14 +100,42 @@ function onTalk(player, quest, npc)
             player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 2075); -- Log out in The Roost w/ item.
             
         elseif (classId == VKOROLON) then
-            -- This retail accurate.  No dialog functions called.
+            -- This is retail accurate.  No dialog functions called.
             player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 2075);
         end
         
-    elseif (sequence == SEQ_000) then
-       
-    elseif (sequence == SEQ_010) then
+    elseif (sequence >= SEQ_000) then
+        if (classId == VKOROLON) then
+            if (sequence == SEQ_010) then
+                callClientFunction(player, "delegateEvent", player, quest, "processEvent_020"); 
+                callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 500, 1, 1);
+                player:CompleteQuest(quest); 
+                -- Log out in Mizzenmast Inn w/ item.
+                player:SendGameMessage(player, GetWorldMaster(), 51148, MESSAGE_TYPE_SYSTEM, 10011243, 1070); 
+            else
+                callClientFunction(player, "delegateEvent", player, quest, "processEvent_000_1"); -- Educated guess
+            end
+        elseif (classId == NICOLIAUX) then
+            if (sequence == SEQ_010) then
+                callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_1"); -- Educated guess
+            else
+                callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
+                attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+                quest:StartSequence(SEQ_010);
+            end
+        elseif (classId == POWLE) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_5");
+        elseif (classId == AUNILLIE) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_6");
+        elseif (classId == GAUWYN_THE_GANNET) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_2");
+        elseif (classId == HILDIBRAND) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_3");
+        elseif (classId == NASHU_MHAKARACCA) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_4");
 
+        end
     end
     
     player:EndEvent()
@@ -103,16 +143,18 @@ function onTalk(player, quest, npc)
 end
 
 
+
 function onPush(player, quest, npc)
 	local npcClassId = npc.GetActorClassId();
 	
     player:EndEvent();
     if (npcClassId == PRIVATE_AREA_ENTRANCE) then
-        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 9999); -- Temp
-    elseif (npcClassId == PRIVATE_AREA_EXIT) then
-        GetWorldManager():WarpToPublicArea(player);
+        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 5, -33.709, 7.810, -1272.337, -0.810);
     end
 end
+
+
+
 
 
 

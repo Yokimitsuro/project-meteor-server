@@ -135,7 +135,7 @@ function onPush(player, quest, npc)
     player:EndEvent();
     if (npcClassId == PRIVATE_AREA_ENTRANCE) then
         --TO-DO: Fill in the # below for the privateArea when it's made
-        --GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", #, -206.712, 195.148, 151.064, 1.821);
+        GetWorldManager():WarpToPrivateArea(player, "PrivateAreaMasterPast", 5, -206.712, 195.148, 151.064, 1.821);
     end
 end
 
