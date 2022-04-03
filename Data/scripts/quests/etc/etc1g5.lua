@@ -24,10 +24,11 @@ MRKR_BRISTLETAIL_AREA	= 11065901;
 MRKR_BELI				= 11065902;
 
 -- Counters
-COUNTER_MARMOTHIDE		= 0;
+COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
-OBJECTIVE_MARMOTHIDE	= 8;
+OBJECTIVE_ITEMID	= 11000144;
+OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -53,7 +54,7 @@ function onTalk(player, quest, npc, eventName)
     
 	-- Offer the quest
 	if (npcClassId == ENPC_BELI and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventLahonoStart");
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventLahonoStart", 0, OBJECTIVE_AMOUNT);
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -62,7 +63,7 @@ function onTalk(player, quest, npc, eventName)
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
         if (npcClassId == ENPC_BELI) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEventFree");
+            callClientFunction(player, "delegateEvent", player, quest, "processEventFree", 0, OBJECTIVE_AMOUNT);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
@@ -77,12 +78,11 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_BRISTLETAIL_MARMOT) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_MARMOTHIDE);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
-        if (counterAmount >= OBJECTIVE_MARMOTHIDE) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_BRISTLETAIL_MARMOT) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
+        if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -90,7 +90,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_MARMOTHIDE);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM), 0, 0, 0, OBJECTIVE_AMOUNT;
 end
 
 function getJournalMapMarkerList(player, quest)

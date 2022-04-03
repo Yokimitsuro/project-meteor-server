@@ -24,7 +24,11 @@ MRKR_MARCETTE				= 11120001;
 MRKR_SPRIGGAN_AREA			= 11120002;
 
 -- Counters
-COUNTER_TEETH 				= 0;
+COUNTER_QUESTITEM 	= 0;
+
+-- Quest Details
+OBJECTIVE_ITEMID	= 11000164;
+OBJECTIVE_AMOUNT	= 4;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -74,12 +78,11 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_SABLETOOTH_SPRIGGAN) then
-		local counterAmount = quest:GetData():IncCounter(COUNTER_TEETH);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You have passed on word of the rite. (... of 5)
-        if (counterAmount >= 4) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_SABLETOOTH_SPRIGGAN) then
+		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
+        if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);
 		end
@@ -87,7 +90,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_TEETH);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
 end
 
 function getJournalMapMarkerList(player, quest)

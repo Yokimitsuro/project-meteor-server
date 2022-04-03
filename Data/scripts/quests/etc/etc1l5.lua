@@ -27,6 +27,7 @@ MRKR_HLAHONO		= 11063802;
 COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
+OBJECTIVE_ITEMID	= 11000149;
 OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
@@ -53,7 +54,7 @@ function onTalk(player, quest, npc, eventName)
     
 	-- Offer the quest
 	if (npcClassId == ENPC_HLAHONO and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventLahonoStart");
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventLahonoStart", 0, OBJECTIVE_AMOUNT);
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -62,7 +63,7 @@ function onTalk(player, quest, npc, eventName)
 	-- Quest Progress
 	elseif (seq == SEQ_000) then
         if (npcClassId == ENPC_HLAHONO) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEventFree");
+            callClientFunction(player, "delegateEvent", player, quest, "processEventFree", 0, OBJECTIVE_AMOUNT);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
@@ -77,11 +78,10 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_MUSK_ROSELING) then
+	if (quest:GetSequence() == SEQ_000 and bnpc == BNPC_MUSK_ROSELING) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_001);

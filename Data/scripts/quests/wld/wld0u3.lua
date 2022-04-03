@@ -4,24 +4,24 @@ require ("global")
 
 Quest Script
 
-Name: 	Of Archons and Muses
-Code: 	Wld0u1
-Id: 	110753 
-Prereq: Level 10, Any Class
+Name: 	Secrets Unearthed
+Code: 	Wld0u3
+Id: 	110756
+Prereq: Level 17, Any Class
 
 ]]
 
 -- Sequence Numbers
-SEQ_000	= 0;  -- Talk to Lyngwaek.
-SEQ_001	= 1;  -- Talk to Tyago Moui.
+SEQ_000	= 0;  -- Talk to Mumukiya.
+SEQ_001	= 1;  -- Talk to Abelard.
 
 -- Actor Class Ids
-TYAGO_MOUI	 	= 1001203;
-LYNGWAEK 		= 1000647;
+MUMUKIYA 		= 1001165;
+ABELARD		 	= 1001596;
 
 -- Quest Markers
-MRKR_LYNGWAEK	= 11130001;
-MRKR_TYAGO_MOUI	= 11130002;
+MRKR_ABELARD	= 11130201;
+MRKR_MUMUKIYA	= 11130202;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
@@ -32,15 +32,15 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(TYAGO_MOUI, QFLAG_PLATE);
+		quest:SetENpc(MUMUKIYA, QFLAG_PLATE);
 	end
 
 	if (sequence == SEQ_000) then
-        quest:SetENpc(TYAGO_MOUI);
-		quest:SetENpc(LYNGWAEK, QFLAG_PLATE);
+        quest:SetENpc(MUMUKIYA);
+		quest:SetENpc(ABELARD, QFLAG_PLATE);
 	elseif (sequence == SEQ_001) then	
-		quest:SetENpc(LYNGWAEK);
-		quest:SetENpc(TYAGO_MOUI, QFLAG_REWARD);
+		quest:SetENpc(ABELARD);
+		quest:SetENpc(MUMUKIYA, QFLAG_REWARD);
 	end	
 end
 
@@ -49,8 +49,8 @@ function onTalk(player, quest, npc, eventName)
 	local seq = quest:GetSequence();
     
 	-- Offer the quest
-	if (npcClassId == TYAGO_MOUI and seq == SEQ_ACCEPT) then
-		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventTyagomouiStart");
+	if (npcClassId == MUMUKIYA and not player:HasQuest(quest)) then
+		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventMUMUKIYAStart");
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
 		end
@@ -60,20 +60,20 @@ function onTalk(player, quest, npc, eventName)
 	
 	-- Quest Progress
 	if (seq == SEQ_000) then
-        if (npcClassId == TYAGO_MOUI) then
-            callClientFunction(player, "delegateEvent", player, quest, "followEvent005");
-		elseif (npcClassId == LYNGWAEK) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent010");
+        if (npcClassId == MUMUKIYA) then
+            callClientFunction(player, "delegateEvent", player, quest, "processEvent_000");
+		elseif (npcClassId == ABELARD) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
 			quest:StartSequence(SEQ_001);
 		end
 	elseif (seq == SEQ_001) then
 		--Quest Complete
-		if (npcClassId == TYAGO_MOUI) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent020");
+		if (npcClassId == MUMUKIYA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent_020");
 			callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9);
             player:CompleteQuest(quest);
-		elseif (npcClassId == LYNGWAEK) then
-			callClientFunction(player, "delegateEvent", player, quest, "followEvent015");
+		elseif (npcClassId == ABELARD) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_1");
 			quest:StartSequence(SEQ_001);
 		end
 	end
@@ -86,8 +86,8 @@ function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     
     if (sequence == SEQ_000) then
-		return MRKR_LYNGWAEK;
+		return MRKR_ABELARD;
     elseif (sequence == SEQ_001) then
-        return MRKR_TYAGO_MOUI;
+        return MRKR_MUMUKIYA;
     end
 end

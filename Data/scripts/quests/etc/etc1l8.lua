@@ -17,7 +17,7 @@ SEQ_001	= 1;  -- Return to Dympna.
 
 -- Actor Class Ids
 DYMPNA 		= 1000331;
-AERGWNYT	= 1000347;
+AERGWYNT	= 1000347;
 FERDILLAIX 	= 1000344;
 BUBUROON	= 1000219;
 RBAHARRA 	= 1000340;
@@ -25,14 +25,14 @@ FUFUNA 		= 1000345;
 
 -- Quest Markers
 MRKR_DYMPNA		= 11064101;
-MRKR_AERGWNYT	= 11064102;
+MRKR_AERGWYNT	= 11064102;
 MRKR_FERDILLAIX	= 11064103;
 MRKR_BUBUROON	= 11064104;
 MRKR_RBAHARRA	= 11064105;
 MRKR_FUFUNA		= 11064106;
 
 -- Quest Flags
-FLAG_TALKED_AERGWNYT 	= 0;
+FLAG_TALKED_AERGWYNT 	= 0;
 FLAG_TALKED_FERDILLAIX 	= 1;
 FLAG_TALKED_BUBUROON 	= 2;
 FLAG_TALKED_RBAHARRA	= 3;
@@ -50,17 +50,17 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(DYMPNA, QFLAG_NORM);
+		quest:SetENpc(DYMPNA, QFLAG_PLATE);
 	end
 
 	local data = quest:GetData();
 	if (sequence == SEQ_000) then
         quest:SetENpc(DYMPNA);
-		quest:SetENpc(AERGWNYT,     (not data:GetFlag(FLAG_TALKED_AERGWNYT) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(BUBUROON,		(not data:GetFlag(FLAG_TALKED_BUBUROON) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(RBAHARRA,     (not data:GetFlag(FLAG_TALKED_RBAHARRA) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(FUFUNA,       (not data:GetFlag(FLAG_TALKED_FUFUNA) and QFLAG_NORM or QFLAG_NONE));
+		quest:SetENpc(AERGWYNT,     (not data:GetFlag(FLAG_TALKED_AERGWYNT) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
+		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
+		quest:SetENpc(BUBUROON,		(not data:GetFlag(FLAG_TALKED_BUBUROON) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
+		quest:SetENpc(RBAHARRA,     (not data:GetFlag(FLAG_TALKED_RBAHARRA) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
+		quest:SetENpc(FUFUNA,       (not data:GetFlag(FLAG_TALKED_FUFUNA) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(DYMPNA, QFLAG_REWARD);
 	end	
@@ -85,8 +85,8 @@ function onTalk(player, quest, npc, eventName)
 	if (seq == SEQ_000) then
         if (npcClassId == DYMPNA) then
             callClientFunction(player, "delegateEvent", player, quest, "processEventOffersAfter");
-		elseif (npcClassId == AERGWNYT) then
-			if (not data:GetFlag(FLAG_TALKED_AERGWNYT)) then
+		elseif (npcClassId == AERGWYNT) then
+			if (not data:GetFlag(FLAG_TALKED_AERGWYNT)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventAergwyntSpeak");
 			else
 				callClientFunction(player, "delegateEvent", player, quest, "processEventAergwyntAfter");
@@ -128,17 +128,27 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
-function onEmote(player, quest, npc, eventName)
+functison onEmote(player, quest, npc, eventName)
+	print("TESSSSSSSSSSSSSSSSSSSSSST2");
 	local npcClassId = npc.GetActorClassId();
 	local seq = quest:GetSequence();
 	local data = quest:GetData();
 	local incCounter = false;
-
+	
+	print("TESSSSSSSSSSSSSSSSSSSSSST");
+	
+	-- Play the emote
+	if (eventName == "emoteDefault1") then -- Psych
+		player:DoEmote(npc.Id, 30, 21291);
+	end
+	wait(2.5);
+	
+	-- Handle the result
 	if (seq == SEQ_000 and eventName == "emoteDefault1") then
-		if (npcClassId == AERGWNYT) then
-			if (not data:GetFlag(FLAG_TALKED_AERGWNYT)) then
+		if (npcClassId == AERGWYNT) then
+			if (not data:GetFlag(FLAG_TALKED_AERGWYNT)) then
 				callClientFunction(player, "delegateEvent", player, quest, "processEventAergwynt");
-				data:SetFlag(FLAG_TALKED_AERGWNYT);
+				data:SetFlag(FLAG_TALKED_AERGWYNT);
                 incCounter = true;
 			end
 		elseif (npcClassId == FERDILLAIX) then
@@ -175,7 +185,7 @@ function onEmote(player, quest, npc, eventName)
             
             if (seq000_checkCondition(data)) then -- All informants spoken to
                 attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
                 quest:StartSequence(SEQ_001);
             end
         end       
@@ -187,7 +197,7 @@ end
 
 -- Check if all informants are talked to
 function seq000_checkCondition(data)
-	return (data:GetFlag(FLAG_TALKED_AERGWNYT) and
+	return (data:GetFlag(FLAG_TALKED_AERGWYNT) and
 			data:GetFlag(FLAG_TALKED_FERDILLAIX) and
 			data:GetFlag(FLAG_TALKED_BUBUROON) and
 			data:GetFlag(FLAG_TALKED_RBAHARRA) and
@@ -200,7 +210,7 @@ function getJournalMapMarkerList(player, quest)
     local possibleMarkers = {};
     
     if (sequence == SEQ_000) then
-        if (not data:GetFlag(FLAG_TALKED_AERGWNYT)) then table.insert(possibleMarkers, MRKR_AERGWNYT); end
+        if (not data:GetFlag(FLAG_TALKED_AERGWYNT)) then table.insert(possibleMarkers, MRKR_AERGWYNT); end
         if (not data:GetFlag(FLAG_TALKED_FERDILLAIX)) then table.insert(possibleMarkers, MRKR_FERDILLAIX); end
         if (not data:GetFlag(FLAG_TALKED_BUBUROON)) then table.insert(possibleMarkers, MRKR_BUBUROON); end
         if (not data:GetFlag(FLAG_TALKED_RBAHARRA)) then table.insert(possibleMarkers, MRKR_RBAHARRA); end

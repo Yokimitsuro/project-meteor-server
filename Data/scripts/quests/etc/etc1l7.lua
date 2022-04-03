@@ -32,6 +32,7 @@ MRKR_BOMB_AREA		= 11064003;
 COUNTER_QUESTITEM	= 0;
 
 -- Quest Details
+OBJECTIVE_ITEMID	= 11000151;
 OBJECTIVE_AMOUNT	= 8;
 
 function onStart(player, quest)	
@@ -46,12 +47,12 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ENPC_IMANIA, QFLAG_PLATE);
 	elseif (sequence == SEQ_000) then
 		quest:SetENpc(ENPC_IMANIA);
-		quest:SetENpc(ENPC_YUYUBESU, QFLAG_REWARD);
+		quest:SetENpc(ENPC_YUYUBESU, QFLAG_PLATE);
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(ENPC_YUYUBESU);
 		quest:SetENpc(BNPC_BOMB_EMBER);
 	elseif (sequence == SEQ_002) then
-		quest:SetENpc(ENPC_YUYUBESU, QFLAG_REWARD);
+		quest:SetENpc(ENPC_YUYUBESU, QFLAG_PLATE);
 	elseif (sequence == SEQ_003) then
 		quest:SetENpc(ENPC_YUYUBESU);
 		quest:SetENpc(ENPC_HILDIE, QFLAG_REWARD);
@@ -75,17 +76,17 @@ function onTalk(player, quest, npc, eventName)
 		if (npcClassId == ENPC_IMANIA) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEventImaniaFree");
         elseif (npcClassId == ENPC_YUYUBESU) then
-            callClientFunction(player, "delegateEvent", player, quest, "processEvent000");
+            callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuStart", 0, OBJECTIVE_AMOUNT);
 			quest:StartSequence(SEQ_001);
 		end
 	--Quest Complete
 	elseif (seq == SEQ_001) then
 		if (npcClassId == ENPC_YUYUBESU) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuFree");
+			callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuFree", 0, OBJECTIVE_AMOUNT);
 		end
 	elseif (seq == SEQ_002) then
 		if (npcClassId == ENPC_YUYUBESU) then
-			callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuAfter");
+			callClientFunction(player, "delegateEvent", player, quest, "processEventYuyubesuAfter", 0, OBJECTIVE_AMOUNT);
 			quest:StartSequence(SEQ_003);
 		end	
 	elseif (seq == SEQ_003) then
@@ -102,11 +103,10 @@ function onTalk(player, quest, npc, eventName)
 	player:EndEvent();
 end
 
--- TODO FINISH THIS
 function onKillBNpc(player, quest, bnpc)
-	if (bnpc == BNPC_BOMB_EMBER) then
+	if (quest:GetSequence() == SEQ_001 and bnpc == BNPC_BOMB_EMBER) then
 		local counterAmount = quest:GetData():IncCounter(COUNTER_QUESTITEM);
-		attentionMessage(player, 51062, 0, counterAmount, 4); -- You obtain <item>
+		attentionMessage(player, 25226, OBJECTIVE_ITEMID, 1, counterAmount, OBJECTIVE_AMOUNT); -- You obtain <item> (X of Y)
         if (counterAmount >= OBJECTIVE_AMOUNT) then
 			attentionMessage(player, 25225, quest:GetQuestId()); -- Objectives complete!
 			quest:StartSequence(SEQ_002);
@@ -115,7 +115,7 @@ function onKillBNpc(player, quest, bnpc)
 end
 
 function getJournalInformation(player, quest)
-	return quest:GetData():GetCounter(COUNTER_QUESTITEM);
+	return quest:GetData():GetCounter(COUNTER_QUESTITEM), 0, 0, 0, OBJECTIVE_AMOUNT;
 end
 
 function getJournalMapMarkerList(player, quest)
