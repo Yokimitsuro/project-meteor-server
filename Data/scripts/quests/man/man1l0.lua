@@ -61,7 +61,8 @@ TRIGGER_FSH					= 1090006;
 TRIGGER_SEAFLD				= 1090082;
 
 -- ACN Guild Echo
-ASSESSOR			 		= 1000121;
+ASSESSOR1			 		= 1000120;
+ASSESSOR2			 		= 1000121;
 PTAHJHA						= 1000150;
 HALDBERK		 			= 1000160;
 LILINA			 			= 1000178;
@@ -141,7 +142,8 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(PTAHJHA, QFLAG_PLATE);
 	elseif (sequence == SEQ_100) then
 		quest:SetENpc(TRIGGER_ACN_LOWER, QFLAG_MAP, false, true);
-		quest:SetENpc(ASSESSOR);
+		quest:SetENpc(ASSESSOR1);
+		quest:SetENpc(ASSESSOR2);
 		quest:SetENpc(HALDBERK);
 		quest:SetENpc(LILINA);
 		quest:SetENpc(VOLUPTUOUS_PIRATE);
@@ -271,9 +273,9 @@ function seq000_030_040_onTalk(player, quest, npc, classId)
 end
 
 function seq000_100_onTalk(player, quest, npc, classId)
-	if (classId == ASSESSOR) then
+	if (classId == ASSESSOR1) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_2");
-	elseif (classId == 0) then  -- !!!MISSING DIALOG OWNER!!!
+	elseif (classId == ASSESSOR2) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_3");
 	elseif (classId == HALDBERK) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_4");
