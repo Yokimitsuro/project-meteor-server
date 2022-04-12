@@ -167,6 +167,12 @@ namespace Meteor.Map.Actors
         private List<Director> ownedDirectors = new List<Director>();
         private Director loginInitDirector = null;
 
+        //SNpc (Path Companion)
+        public string SNpcNickname { set; get; }
+        public byte SNpcSkin { set; get; }
+        public byte SNpcPersonality { set; get; }
+        public short SNpcCoordinate { set; get; }
+
         List<ushort> hotbarSlotsToUpdate = new List<ushort>();
 
         public PlayerWork playerWork = new PlayerWork();
@@ -269,6 +275,11 @@ namespace Meteor.Map.Actors
             charaWork.commandBorder = 0x20;
 
             charaWork.parameterTemp.tp = 0;
+
+            SNpcNickname = "???";
+            SNpcSkin = 1;
+            SNpcPersonality = 1;
+            SNpcCoordinate = 1;
 
             Database.LoadPlayerCharacter(this);
             lastPlayTimeUpdate = Utils.UnixTimeStampUTC();
@@ -408,7 +419,7 @@ namespace Meteor.Map.Actors
                 bool[] testComplete = new bool[2048]; //TODO: Change to playerwork.scenarioComplete
                 for (int i = 0; i < 2048; i++)
                     testComplete[i] = true;
-                QueuePacket(cutsceneBookPacket.BuildPacket(Id, "<Path Companion>", 11, 1, 1, testComplete));
+                QueuePacket(cutsceneBookPacket.BuildPacket(Id, SNpcNickname, SNpcSkin, SNpcPersonality, SNpcCoordinate, testComplete));
                 QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, 0x16, GetInnCode()));
             }
 
@@ -1729,6 +1740,85 @@ namespace Meteor.Map.Actors
         }
         #endregion
 
+        #region SNpc Functions (Path Companion)
+        public void SetSNpc(string nickname, uint actorClassId, byte classType)
+        {
+            // Set name and appearance
+            SNpcNickname = nickname;
+            SNpcSkin = (byte) (actorClassId - 1070000);
+
+            switch (SNpcSkin % 16)
+            {
+                // Hyur Male
+                case 1:
+                    SNpcPersonality = 1;
+                    break;
+                // Hyur Female
+                case 2:
+                case 16:
+                    SNpcPersonality = 2;
+                    break;
+                // Elezen Male
+                case 3:
+                case 4:
+                    SNpcPersonality = 3;
+                    break;
+                // Elezen Female
+                case 5:
+                case 6:
+                    SNpcPersonality = 4;
+                    break;
+                // Lalafel Male
+                case 7:
+                case 8:
+                    SNpcPersonality = 5;
+                    break;
+                // Lalafel Female
+                case 9:
+                case 10:
+                    SNpcPersonality = 6;
+                    break;
+                // Miqo'te
+                case 11:
+                case 12:
+                    SNpcPersonality = 8;
+                    break;
+                // Roegadyn
+                case 13:
+                case 14:
+                    SNpcPersonality = 7;
+                    break;
+                // Highlander
+                case 15:
+                    SNpcPersonality = 9;
+                    break;
+            }
+
+            // Save to DB
+            Database.CreateOrUpdateSNpc(this, SNpcNickname, SNpcSkin, SNpcPersonality);
+        }
+
+        public string GetSNpcNickname()
+        {
+            return SNpcNickname ?? "???";
+        }
+
+        public byte GetSNpcSkin()
+        {
+            return SNpcSkin;
+        }
+
+        public byte GetSNpcPersonality()
+        {
+            return SNpcPersonality;
+        }
+
+        public short GetSNpcCoordinate()
+        {
+            return SNpcCoordinate;
+        }
+        #endregion
+
         #region Guildleves
         public void AddGuildleve(uint id)
         {
@@ -1867,49 +1957,58 @@ namespace Meteor.Map.Actors
             return false;
         }
 
-        public void SetNpcLs(uint npcLSId, uint state)
+        public void AddNpcLs(uint npcLsId)
+        {
+            if (playerWork.npcLinkshellChatExtra[npcLsId] == false && playerWork.npcLinkshellChatCalling[npcLsId] == false)
+            {
+                SetNpcLs(npcLsId, NPCLS_INACTIVE);
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25118, 0x20, npcLsId); // "<NpcLs> linkpearl obtained."
+            }
+        }
+
+        public void SetNpcLs(uint npcLsId, uint state)
         {            
             bool isCalling, isExtra;
             isCalling = isExtra = false;
 
-            if (npcLSId < 1 || npcLSId > 40)
+            if (npcLsId < 1 || npcLsId > 40)
                 return;
 
-            npcLSId--;
+            npcLsId--;
 
             switch (state)
             {
                 case NPCLS_INACTIVE:
 
-                    if (playerWork.npcLinkshellChatExtra[npcLSId] == true && playerWork.npcLinkshellChatCalling[npcLSId] == false)
+                    if (playerWork.npcLinkshellChatExtra[npcLsId] == true && playerWork.npcLinkshellChatCalling[npcLsId] == false)
                         return;
 
                     isExtra = true;
                     break;
                 case NPCLS_ACTIVE:
 
-                    if (playerWork.npcLinkshellChatExtra[npcLSId] == false && playerWork.npcLinkshellChatCalling[npcLSId] == true)
+                    if (playerWork.npcLinkshellChatExtra[npcLsId] == false && playerWork.npcLinkshellChatCalling[npcLsId] == true)
                         return;
 
                     isCalling = true;
                     break;
                 case NPCLS_ALERT:
 
-                    if (playerWork.npcLinkshellChatExtra[npcLSId] == true && playerWork.npcLinkshellChatCalling[npcLSId] == true)
+                    if (playerWork.npcLinkshellChatExtra[npcLsId] == true && playerWork.npcLinkshellChatCalling[npcLsId] == true)
                         return;
 
                     isExtra = isCalling = true;
                     break;
             }
 
-            playerWork.npcLinkshellChatExtra[npcLSId] = isExtra;
-            playerWork.npcLinkshellChatCalling[npcLSId] = isCalling;
+            playerWork.npcLinkshellChatExtra[npcLsId] = isExtra;
+            playerWork.npcLinkshellChatCalling[npcLsId] = isCalling;
 
-            Database.SaveNpcLS(this, npcLSId, isCalling, isExtra);
+            Database.SaveNpcLS(this, npcLsId, isCalling, isExtra);
 
             ActorPropertyPacketUtil propPacketUtil = new ActorPropertyPacketUtil("playerWork/npcLinkshellChat", this);
-            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatExtra[{0}]", npcLSId));
-            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatCalling[{0}]", npcLSId));
+            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatExtra[{0}]", npcLsId));
+            propPacketUtil.AddProperty(String.Format("playerWork.npcLinkshellChatCalling[{0}]", npcLsId));
             QueuePackets(propPacketUtil.Done());
         }
 
@@ -2069,7 +2168,7 @@ namespace Meteor.Map.Actors
                 return;
 
             List<LuaParam> lParams = LuaUtils.CreateLuaParamList(parameters);
-            SubPacket spacket = KickEventPacket.BuildPacket(Id, actor.Id, eventName, 0, lParams);
+            SubPacket spacket = KickEventPacket.BuildPacket(Id, actor.Id, eventName, 5, lParams);
             spacket.DebugPrintSubPacket();
             QueuePacket(spacket);
         }

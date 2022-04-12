@@ -15,10 +15,37 @@ function init(npc)
 end
 
 function onEventStarted(player, npc, triggerName)	
-	choice = callClientFunction(player, "eventDoorMoveAsk");
+	local choice = callClientFunction(player, "eventDoorMoveAsk");
 	
 	if (choice == 1) then
+		local activeQuests = player:GetQuestsForNpc(npc);
+		-- Either let the player choose the quest or start it if it's the only one.
+		local chosenQuest;
+		if (#activeQuests > 1) then
+			local currentPage = 0;
+			local numPages = math.floor((#activeQuests-1)/4) + 1;
+			
+			while (true) do
+				local page, index = callClientFunction(player, "switchEvent", activeQuests[currentPage * 4 + 1], activeQuests[currentPage * 4 + 2], possibleQuests[currentPage * 4 + 3], possibleQuests[currentPage * 4 + 4], currentPage + 1, numPages, 0x3F1);
+				
+				if (page == 0) then
+					chosenQuest = activeQuests[(currentPage * 4) + index];
+					break;
+				elseif (page > 0) then
+					currentPage = page - 1;
+				else
+					player:EndEvent();
+					return;
+				end
+			end			
+		elseif (#activeQuests == 1) then
+			chosenQuest = activeQuests[1];
+		end
 		
+		if (chosenQuest ~= nil) then
+			chosenQuest:OnPush(player, npc, eventName);		
+			return;
+		end
 	end
 	
 	player:EndEvent();	

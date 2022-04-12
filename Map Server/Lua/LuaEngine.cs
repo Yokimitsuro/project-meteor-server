@@ -42,6 +42,7 @@ using Meteor.Map.DataObjects.chara;
 using Meteor.Map.actors.chara;
 using Meteor.Map.Actors.QuestNS;
 using Meteor.Map.actors.group;
+using static Meteor.Map.LuaUtils;
 
 namespace Meteor.Map.lua
 {
@@ -82,6 +83,12 @@ namespace Meteor.Map.lua
             UserData.RegisterType<ContentGroup>();
             UserData.RegisterType<Zone>();
             UserData.RegisterType<InventoryItem>();
+            UserData.RegisterType<ItemRefParam>();
+            UserData.RegisterType<Type9Param>();
+            UserData.RegisterType<WeaponItem>();
+            UserData.RegisterType<ArmorItem>();
+            UserData.RegisterType<EquipmentItem>();
+            UserData.RegisterType<ItemData>();
             UserData.RegisterType<ItemPackage>();
             UserData.RegisterType<ReferencedItemPackage>();
             UserData.RegisterType<PrivateArea>();
@@ -643,6 +650,9 @@ namespace Meteor.Map.lua
 
         public void EventStarted(Player player, Actor target, EventStartPacket eventStart)
         {
+            if (eventStart.luaParams == null)
+                return;
+
             List<LuaParam> lparams = new List<LuaParam>();
             lparams.AddRange(eventStart.luaParams);
             lparams.Insert(0, new LuaParam(0, eventStart.eventType));

@@ -82,7 +82,7 @@ namespace Meteor.Map.actors
         public class PushBoxEventCondition
         {
             public bool isEnabled = true;
-            public uint bgObj;
+            public uint instance;
             public uint layout;
             public string conditionName = "";
             public string reactName = "";

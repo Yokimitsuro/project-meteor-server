@@ -1326,6 +1326,28 @@ namespace Meteor.Map
                         }
                     }
 
+                    //Load Path Companion
+                    query = @"
+                        SELECT 
+                        nickname,
+                        skin,
+                        personality,
+                        coordinate
+                        FROM characters_snpc WHERE characterId = @charId";
+
+                    cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charId", player.Id);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            player.SNpcNickname = reader.GetString("nickname");
+                            player.SNpcSkin = reader.GetByte("skin");
+                            player.SNpcPersonality = reader.GetByte("personality");
+                            player.SNpcCoordinate = reader.GetInt16("coordinate");
+                        }
+                    }
+
                     player.GetItemPackage(ItemPackage.NORMAL).InitList(GetItemPackage(player, 0, ItemPackage.NORMAL));
                     player.GetItemPackage(ItemPackage.KEYITEMS).InitList(GetItemPackage(player, 0, ItemPackage.KEYITEMS));
                     player.GetItemPackage(ItemPackage.CURRENCY_CRYSTALS).InitList(GetItemPackage(player, 0, ItemPackage.CURRENCY_CRYSTALS));
@@ -1345,6 +1367,40 @@ namespace Meteor.Map
                 }
             }
 
+        }
+
+        public static void CreateOrUpdateSNpc(Player player, string nickname, uint skin, byte personality)
+        {
+            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
+            {
+                try
+                {
+                    conn.Open();
+                    string query = @"
+                                    INSERT INTO characters_snpc                                    
+                                    (characterId, nickname, skin, personality)
+                                    VALUES
+                                    (@charId, @nickname, @skin, @personality)
+                                    ON DUPLICATE KEY UPDATE
+                                    nickname = @nickname, skin = @skin, personality = @personality
+                                    ";
+
+                    MySqlCommand cmd = new MySqlCommand(query, conn);
+                    cmd.Parameters.AddWithValue("@charId", player.Id);
+                    cmd.Parameters.AddWithValue("@nickname", nickname);
+                    cmd.Parameters.AddWithValue("@skin", skin);
+                    cmd.Parameters.AddWithValue("@personality", personality);
+                    cmd.ExecuteNonQuery();
+                }
+                catch (MySqlException e)
+                {
+                    Program.Log.Error(e.ToString());
+                }
+                finally
+                {
+                    conn.Dispose();
+                }
+            }
         }
 
         public static InventoryItem[] GetEquipment(Player player, ushort classId)

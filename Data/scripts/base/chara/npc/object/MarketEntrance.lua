@@ -82,15 +82,19 @@ city = {
     [1500394] = 3, -- Ul'dah    : Edine
 }
 
+ENTRANCE_LIMSA_DT		= 1090238; -- Main Limsa Entrance
+ENTRANCE_LIMSA_ALT		= 1500392; -- M'septha Alternate
+ENTRANCE_GRIDANIA_DT	= 1090264; -- Main Grid Entrance
+ENTRANCE_GRIDANIA_ALT	= 1500393; -- Torsefers Alternate
+ENTRANCE_ULDAH_DT		= 1090265; -- Main Uldah Entrance
+ENTRANCE_ULDAH_ALT		= 1500394; -- Edine Alternate
 
-
-function onEventStarted(player, npc, triggerName)	
-
+function onEventStarted(player, npc, eventType, eventName)	
     local npcCity = city[npc:GetActorClassId()] or 1;
-    local wardPlaceName = CITY_INFO[npcCity][1];        -- Market Wards category name. Identical in all languages except Japanese
+    local marketPlaceName = CITY_INFO[npcCity][1];        -- Market Wards category name. Identical in all languages except Japanese
     local exitPlaceName = CITY_INFO[npcCity][2];        -- Central Limsa Lominsa / Heartstream / The Fronds
     local gcHQPlaceName = CITY_INFO[npcCity][3];        -- Maelstrom Command / Adders' Nest / Hall of Flames
-    local questAreaName = 0; --CITY_INFO[npcCity][4];   -- Sailors Ward / Peasants Ward / Merchants Ward
+    local questPlaceName = CITY_INFO[npcCity][4];   		-- Sailors Ward / Peasants Ward / Merchants Ward
     local wardListStart = CITY_INFO[npcCity][5];        -- Starting id for the market wards
     local wardListCount = CITY_INFO[npcCity][6];        -- Amount of wards in the list
     local showItemSearchCounter = false;
@@ -98,19 +102,30 @@ function onEventStarted(player, npc, triggerName)
     
     local worldMaster = GetWorldMaster(); 
     local pos = player:GetPos();
-    local currZone = pos[4];
+    local currZone = pos[5];
+	local currRegion = player.CurrentArea.RegionId;	
+	local quests = player:GetQuestsForNpc(npc);
     
-    if (currZone == 133 or currZone == 230 or currZone == 155 or currZone == 206 or currZone == 175 or currZone == 209) then 
+	-- City entrance specific stuff
+    if (currRegion == 101 or currRegion == 103 or currRegion == 104) then 
         exitPlaceName = 0;  -- If in city, hide city menu option
-    elseif (currZone == 232 or currZone == 234 or currZone == 233) then 
-        gcHQPlaceName = 0;  -- If in GC Office, hide office menu option
+		
+		-- If no quests attached to this entrence, don't show quest area
+		if (#quests == 0) then
+			questPlaceName = 0;
+		end
+    end
+	
+	-- If in GC Office, hide office menu option
+	if (currZone == 232 or currZone == 234 or currZone == 233) then 
+        gcHQPlaceName = 0;  
     end
 
-    choice = callClientFunction(player, "eventPushChoiceAreaOrQuest", exitPlaceName, wardPlaceName, gcHQPlaceName, questAreaName, showItemSearchCounter, itemSearchId);
+    choice = callClientFunction(player, "eventPushChoiceAreaOrQuest", exitPlaceName, marketPlaceName, gcHQPlaceName, questPlaceName, showItemSearchCounter, itemSearchId);
         
     while (true) do
         
-        if choice == wardPlaceName then -- Market Wards
+        if choice == marketPlaceName then -- Market Wards
             wardSelect = callClientFunction(player, "eventPushStepPrvMarket", wardListStart, wardListCount, 0);
             
             if wardSelect and (wardSelect >= wardListStart and wardSelect <= (wardListStart+wardListCount)) then
@@ -139,11 +154,14 @@ function onEventStarted(player, npc, triggerName)
                 wait(1);
                 GetWorldManager():DoZoneChange(player, warp[1], nil, 0, 0x02, warp[2], warp[3], warp[4], warp[5]);          
                 break;
+		elseif (choice == 2095 or choice == 3095) then -- Quest
+			quests[1]:OnPush(player, npc, eventName);
+			return;
         elseif (choice == 0 or choice == -3) then -- Menu Closed
             break;  
         end 
         
-        choice = callClientFunction(player, "eventPushChoiceAreaOrQuest", exitPlaceName, wardPlaceName, gcHQPlaceName, questAreaName, showItemSearchCounter, itemSearchId);
+        choice = callClientFunction(player, "eventPushChoiceAreaOrQuest", exitPlaceName, marketPlaceName, gcHQPlaceName, questAreaName, showItemSearchCounter, itemSearchId);
           
     end
     
