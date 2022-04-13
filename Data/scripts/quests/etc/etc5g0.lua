@@ -28,8 +28,6 @@ MRKR_PFARAHR            = 11082001;
 MRKR_VKOROLON           = 11082002;
 
 function onStart(player, quest)
-    quest:StartSequence(SEQ_000);
-    player:SendGameMessage(GetWorldMaster(), 25246, MESSAGE_TYPE_SYSTEM, ITEM_WELL_WORN_BAG, 1);
 end
 
 function onFinish(player, quest)
@@ -57,6 +55,10 @@ function onTalk(player, quest, npc)
 		local questAccepted = callClientFunction(player, "delegateEvent", player, quest, "processEventVKOROLONStart");
 		if (questAccepted == 1) then
 			player:AcceptQuest(quest);
+            quest:StartSequence(SEQ_000);
+            wait(2);
+            attentionMessage(player, 25246, ITEM_WELL_WORN_BAG, 1);
+            
 		end
 		player:EndEvent();
 		return;

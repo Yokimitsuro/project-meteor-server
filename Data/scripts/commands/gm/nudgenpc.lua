@@ -38,7 +38,8 @@ horizontal = {
 rotation = {
 ["ROTATE"] = 3,
 ["ORIENTATION"] = 3,
-["O"] = 3
+["O"] = 3,
+["ROT"] = 3
 }
 
 function onTrigger(player, argc, arg1, arg2)

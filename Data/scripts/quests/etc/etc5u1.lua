@@ -18,6 +18,7 @@ SEQ_010 = 10;
 
 -- Actor Class Ids
 OTOPA_POTTOPA           = 1000864;
+HOURGLASS_BED           = 1200380;
 GAUWYN_THE_GANNET       = 1002065;
 HILDIBRAND              = 1001995;
 NASHU_MHAKARACCA        = 1001996;
@@ -52,12 +53,11 @@ end
 function onStateChange(player, quest, sequence)
     if (sequence == SEQ_ACCEPT) then
         local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
-        local otopaFlag = 0;
-        
+
         if (hasQuestItem == false) then 
-            otopaFlag = 2; 
+            quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM);
         end
-        quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
+        quest:SetENpc(HOURGLASS_BED, 5); 
     end
     
     if (sequence == SEQ_000) then

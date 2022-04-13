@@ -19,6 +19,7 @@ SEQ_010 = 10;
 -- Actor Class Ids
 OTOPA_POTTOPA           = 1000864;
 VKOROLON                = 1000458;
+THE_ROOST_BED           = 1200379;
 NICOLIAUX               = 1002071; -- 1000409: Can't use his public area id, otherwise a ! shows on him there also
 POWLE                   = 1000238;
 AUNILLIE                = 1000410;
@@ -51,14 +52,14 @@ end
 
 
 function onStateChange(player, quest, sequence)
+
     if (sequence == SEQ_ACCEPT) then
         local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
-        local otopaFlag = 0;
-        
+
         if (hasQuestItem == false) then 
-            otopaFlag = 2; 
+            quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM);
         end
-        quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
+        quest:SetENpc(THE_ROOST_BED, 5);
         quest:SetENpc(VKOROLON, QFLAG_NORM); -- Always shows despite interaction
 
     elseif (sequence == SEQ_000) then
