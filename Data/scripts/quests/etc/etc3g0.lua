@@ -168,6 +168,7 @@ function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
 	local data = quest:GetData();
     local possibleMarkers = {};
+    local data = quest:GetData();
     
     if (sequence == SEQ_000) then
         if (not data:GetFlag(FLAG_TALKED_SYBELL)) then table.insert(possibleMarkers, MRKR_SYBELL); end

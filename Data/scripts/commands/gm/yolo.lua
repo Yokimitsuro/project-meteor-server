@@ -144,11 +144,11 @@ function onTrigger(player, argc, width, height, blockCount)
         end;
         
         local pos = player:GetPos();
-        local x = tonumber(pos[0]);
-        local y = tonumber(pos[1]);
-        local z = tonumber(pos[2]);
-        local rot = tonumber(pos[3]);
-        local zone = pos[4];
+        local x = tonumber(pos[1]);
+        local y = tonumber(pos[2]);
+        local z = tonumber(pos[3]);
+        local rot = tonumber(pos[4]);
+        local zone = pos[5];
         local w = tonumber(width) or 0;
 
         local h = tonumber(height) or 0;
@@ -160,7 +160,7 @@ function onTrigger(player, argc, width, height, blockCount)
             for i = 0, w do
                 for j = 0, h do
                     local actor = player.CurrentArea.SpawnActor(2104001, 'ass', x + (i * 1), y, z + (j * 1), rot, 0, 0, true);
-                    --actor.ChangeNpcAppearance(2200905);
+                    actor.ChangeNpcAppearance(2200905);
                     actor.SetMaxHP(500);
                     actor.SetHP(500);
                     actor.SetMod(modifiersGlobal.CanBlock, 1);

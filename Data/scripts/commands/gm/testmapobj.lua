@@ -3,7 +3,12 @@ require("global");
 properties = {
     permissions = 0,
     parameters = "sssss",
-    description = ""
+    description =
+[[
+
+Tests a layout/region id w/ an animation string
+!testmapobj <anim> <region> <layout> <maxlayout>
+]],
 }
 
 function onTrigger(player, argc, animation, layoutId, instanceId, maxInstanceId)

@@ -603,7 +603,7 @@ namespace Meteor.Map.Actors
         public void SendZoneInPackets(WorldManager world, ushort spawnType)
         {
             QueuePacket(SetActorIsZoningPacket.BuildPacket(Id, false));
-            QueuePacket(SetDalamudPacket.BuildPacket(Id, 0));
+            QueuePacket(SetDalamudPacket.BuildPacket(Id, 7));
 
             //Music Packets
             if (currentMainState == SetActorStatePacket.MAIN_STATE_MOUNTED)

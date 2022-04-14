@@ -82,13 +82,6 @@ city = {
     [1500394] = 3, -- Ul'dah    : Edine
 }
 
-ENTRANCE_LIMSA_DT		= 1090238; -- Main Limsa Entrance
-ENTRANCE_LIMSA_ALT		= 1500392; -- M'septha Alternate
-ENTRANCE_GRIDANIA_DT	= 1090264; -- Main Grid Entrance
-ENTRANCE_GRIDANIA_ALT	= 1500393; -- Torsefers Alternate
-ENTRANCE_ULDAH_DT		= 1090265; -- Main Uldah Entrance
-ENTRANCE_ULDAH_ALT		= 1500394; -- Edine Alternate
-
 function onEventStarted(player, npc, eventType, eventName)	
     local npcCity = city[npc:GetActorClassId()] or 1;
     local marketPlaceName = CITY_INFO[npcCity][1];        -- Market Wards category name. Identical in all languages except Japanese

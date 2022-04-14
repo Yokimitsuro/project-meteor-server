@@ -14,7 +14,6 @@ Contains all default lines for talkable npcs in the Wilderness Region (aka Thana
 
 -- [ActorClassId] = "client_function_name"
 local defaultTalkWil = {
-    
     [1000046] = "defaultTalkWithGogofu_001",            -- Gogofu
     [1000047] = "defaultTalkWithHahayo_001",            -- Hahayo
     [1000070] = "defaultTalkWithKukumuko_001",          -- Kukumuko
@@ -66,7 +65,7 @@ local defaultTalkWil = {
     [1000861] = "defaultTalkWithLinette_001",           -- Linette
     [1000862] = "defaultTalkWithGagaruna_001",          -- Gagaruna
     [1000863] = "defaultTalkWithLulutsu_001",           -- Lulutsu
-    [1000864] = "defaultTalkWithInn_Desk",              -- Otopa Pottopa - defaultTalkWithOtopapottopa_001 (pre-Inn unlock?)
+    [1000864] = "defaultTalkWithOtopapottopa_001",      -- Otopa Pottopa -  defaultTalkWithInn_Desk - used when Inn unlocked
     [1000865] = "defaultTalkWithThaisie_001",           -- Thaisie      - Mentions retainers, but will not fire since she's not PplStd.
     [1000887] = "defaultTalkWithZssapa_001",            -- <<<NOT IMPLEMENTED>>> - Z'ssapa  (Central Thanalan: Black Brush: 92.779999 183.837 -1030.310059) alt actor ID: 1001217 (used in a quest presumably, different outfit from wiki image)
     [1000915] = "defaultTalkWithCahernaut_001",         -- Cahernaut
@@ -98,8 +97,8 @@ local defaultTalkWil = {
     [1001143] = "defaultTalkWithTotono_001",            -- Totono
     [1001144] = "defaultTalkWithFyrilsunn_001",         -- Fyrilsunn
     [1001145] = "defaultTalkWithSinette_001",           -- Sinette
-    [1001146] = "defaultTalkWithZirnbyrt_001",          -- <<<NOT IMPLEMENTED>>> - Zirnbyrt - Entry Denier Guard (East Thanalan: X:1831.565 Y:248.576 Z:448.872 Educated guess from wiki picture.  Guards unused dun01)
-    [1001147] = "defaultTalkWithVhasotayuun_001",       -- <<<NOT IMPLEMENTED>>> - Vhaso Tayuun - (Entry Denier?  No wiki info)
+    [1001146] = "defaultTalkWithZirnbyrt_001",          -- <<<NOT IMPLEMENTED>>> - Zirnbyrt - Entry Denier (East Thanalan: X:1831.565 Y:248.576 Z:448.872 Educated guess from wiki picture.  Guards unused dun01)
+    [1001147] = "defaultTalkWithVhasotayuun_001",       -- <<<NOT IMPLEMENTED>>> - Vhaso Tayuun - Entry Denier (East Thanalan:  X:1818.940 Y:244.810 Z:-76.766 rough guess from vid. Guards unused dun03)
     [1001148] = "defaultTalkWithPulbeiyalbei_001",      -- <<<NOT IMPLEMENTED>>> - Pulbei Yalbei - (Entry Denier?  No wiki info)
     [1001149] = "defaultTalkWithGembert_001",           -- <<<NOT IMPLEMENTED>>> - Gembert - Entry Denier Guard (South Thanalan: X:1707.143 Y:238.150 Z:1617.570 Rough estimate. Guards unused dun06)
     [1001165] = "defaultTalkWithMumukiya_001",          -- Mumukiya
@@ -200,9 +199,9 @@ local defaultTalkWil = {
     [1001600] = "defaultTalkWithBertouaint_001",        -- <<<NOT IMPLEMENTED>>> - Bertouaint (Eastern Thanalan: Mythril Pit T-8)
     [1001601] = "defaultTalkWithAldebrand_001",         -- <<<NOT IMPLEMENTED>>> - Aldebrand (Eastern Thanalan: Mythril Pit T-8)
     [1001602] = "defaultTalkWithPyhajawantal_001",      -- <<<NOT IMPLEMENTED>>> - Pyha Jawantal (Eastern Thanalan: Mythril Pit T-8)
-    [1001624] = "talkIdayCap",                          -- <<<NOT IMPLEMENTED>>> - Flame Lieutenant Somber Meadow   (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
-    [1001625] = "talkIday1",                            -- <<<NOT IMPLEMENTED>>> - Flame Sergeant Mimio Mio         (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
-    [1001626] = "talkIday2",                            -- <<<NOT IMPLEMENTED>>> - Flame Private Sisimuza Tetemuza  (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
+    --[1001624] = "talkIdayCap",                        -- <<<NOT IMPLEMENTED>>> - Flame Lieutenant Somber Meadow   (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
+    --[1001625] = "talkIday1",                          -- <<<NOT IMPLEMENTED>>> - Flame Sergeant Mimio Mio         (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
+    --[1001626] = "talkIday2",                          -- <<<NOT IMPLEMENTED>>> - Flame Private Sisimuza Tetemuza  (Foundation Day 2011 Dialog) - OLD EVENT NPC: Replaced by 2012 version
     [1001630] = "defaultTalkWithChocobo_001",           -- <<<NOT IMPLEMENTED>>> - Chocobo (Western Thanalan: The Coffer & Coffin) - Stands beside Haipo Eipo
     [1001685] = "defaultTalkWithAdalbert_001",          -- <<<NOT IMPLEMENTED>>> - Flame Sergeant Cotter (Ul'dah: Merchant Strip: -0.92 196.100 126.32) - Double check caps.
     [1001699] = "defaultTalkWithJandonaut_001",         -- <<<NOT IMPLEMENTED>>> - Flame Sergeant Fouillel (Southern Thanalan: Camp Broken Water: 1704 296.001 999)
@@ -228,8 +227,11 @@ local defaultTalkWil = {
     [1001925] = "defaultTalkWithHortwann_001",          -- <<<NOT IMPLEMENTED>>> - Flame Private Hanskalsyn - (North Thanalan: Camp Bluefog)
     [1001932] = "defaultTalkWithSIBOLD_001",            -- Sibold
     [1001953] = "defaultTalkWithBerndan_001",           -- Berndan
-    [1002047] = "defaultTalkWithInn_Desk_2",            -- Kopuru Fupuru - Inn NPC. -  defaultTalkWithKopuruFupuru_001 (pre-Inn unlock?)
+    [1002047] = "defaultTalkWithKopuruFupuru_001",      -- Kopuru Fupuru - Inn NPC -  defaultTalkWithInn_Desk_2 used when Inn unlocked
     [1002101] = "defaultTalkWithDuraltharal_001",       -- Dural Tharal
+    [1002110] = "processEventSOMBER",                   -- Flame Lieutenant Somber Meadow   (Foundation Day 2012 Dialog) Spl000 staticactor
+    [1002111] = "processEventMIMIO",                    -- Flame Sergeant Mimio Mio         (Foundation Day 2012 Dialog) Spl000 staticactor
+    [1002112] = "processEventSISIMUZA",                 -- Flame Private Sisimuza Tetemuza  (Foundation Day 2012 Dialog) Spl000 staticactor
     [1002116] = "defaultTalkWithHAVAK_ALVAK_001",       -- <<<NOT IMPLEMENTED>>> - Havak Alvak (Ul'dah: Milvaneth Sacrarium)
     [1060028] = "defaultTalkWithCURIOUS_001",           -- <<<NOT IMPLEMENTED>>> - Curious Gorge (Western Thanalan: -1116.040039, 53.2, 285.48999)? - defaultTalkWithCURIOUS_002
     [1060029] = "defaultTalkWithSarra_001",             -- <<<NOT IMPLEMENTED>>> - Sarra (Location unknown) defaultTalkWithSarra_002 / 003
@@ -240,16 +242,15 @@ local defaultTalkWil = {
     [1060037] = "defaultTalkWithHateli_001",            -- <<<NOT IMPLEMENTED>>> - Dozol Meloc (Western Thanalan: -1513.660034, 10.617, -235.220001)  defaultTalkWithHateli_002 / 003 / 004 / 005 / 006 / 007
     [1060038] = "defaultTalkWithDaza_001",              -- <<<NOT IMPLEMENTED>>> - 269th Order Mendicant Da Za (Western Thanalan: Somewhere in the cave around -1567, 25, -170) -  defaultTalkWithDaza_002 / 003 / 004 / 005 / 006 / 007
     [1060042] = "defaultTalkWithJenlyns_001",           -- Jenlyns      - defaultTalkWithJenlyns_002 (PLD-unlocked specific dialog?)
-    [1200120] = "bookTalk",                             -- Dusty Tomes - - Will not fire since it isn't PplStd.  Identical dialog regardless.
+    [1200120] = "bookTalk",                             -- Dusty Tomes  - Will not fire since it isn't PplStd.  Identical dialog regardless.
     [1500059] = "defaultTalkWithLdhakya_001",           -- <<<NOT IMPLEMENTED>>> - L'dhakya (Western Thanalan Ferry Docks)
     [1500109] = "defaultTalkWithSylviel_001",           -- <<<NOT IMPLEMENTED>>> - Sylviel (Western Thanalan Ferry Docks)
     [1500110] = "defaultTalkWithSamigamduhla_001",      -- <<<NOT IMPLEMENTED>>> - Sami Gamduhla (Western Thanalan Ferry Docks)
     [1500126] = "tribeTalk",                            -- Vavaki
     [1500129] = "defaultTalkWithYayatoki_001",          -- Yayatoki
+    [1500230] = "defaultTalkCaravanChocoboUld_001",     -- Pack Chocobo (needs verifying)
     [1700039] = "defaultTalkWithBATERICH_100",          -- Baterich
         
-    [1000001] = "defaultTalkWithHamletGuardUld_001"            -- TEST TEST TEST
-    
     --[1090549] = "defaultTalkWithInn_ExitDoor"         -- Ul'dah Inn Exit Door pushEvent - "Leave your room?"
     --[1200336] = "defaultTalkWithInn_ExitDoor"         -- Ul'dah Inn Exit Door talkEvent - "Leave your room?"
     
@@ -260,23 +261,30 @@ local defaultTalkWil = {
     [???] = "defaultTalkWithHamletGuardUld_001"          -- 
 --]]
     
-    -- [1002110] = "processEventSOMBER", arg1,          -- Flame Lieutenant Somber Meadow   (Foundation Day 2012 Dialog) Spl000 staticactor
-    -- [1002111] = "processEventMIMIO"                  -- Flame Sergeant Mimio Mio         (Foundation Day 2012 Dialog) Spl000 staticactor
-    -- [1002112] = "processEventSISIMUZA"               -- Flame Private Sisimuza Tetemuza  (Foundation Day 2012 Dialog) Spl000 staticactor
 
     
     }
  
     
-
-
 function onTalk(player, quest, npc, eventName)
 
     local npcId = npc:GetActorClassId();
     local clientFunc = defaultTalkWil[npcId];
     
-    if (npcId == 1002047) then -- Kopuru Fupuru - Inn NPC
-        defaultTalkWithInn(player, quest, clientFunc);
+    if (npcId == 1000864) then -- Otopa Pottopa (Adv. Guild Inn NPC)
+        if (player:IsQuestCompleted(110848)) then -- "Ring of Deceit" completed.
+            callClientFunction(player, "delegateEvent", player, quest, "defaultTalkWithInn_Desk");
+        else
+            callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+        end
+    elseif (npcId == 1002047) then -- Kopuru Fupuru (Rear-Entrance Inn NPC)
+        if (player:IsQuestCompleted(110848)) then -- "Ring of Deceit" completed.
+            defaultTalkWithInn(player, quest, "defaultTalkWithInn_Desk_2");
+        else
+            callClientFunction(player, "delegateEvent", player, quest, clientFunc);
+        end
+    elseif ((npcId >= 1002110) and (npcId <= 1002112)) then  -- Foundation Day 2012 NPCs
+        talkWithSpecial(player, npcId, clientFunc)
     else
         callClientFunction(player, "delegateEvent", player, quest, clientFunc);
     end
@@ -284,10 +292,10 @@ function onTalk(player, quest, npc, eventName)
     player:EndEvent();
 end
 
+
 function IsQuestENPC(player, quest, npc)
     return defaultTalkWil[npc:GetActorClassId()] ~= nil;
 end
-
 
 
 
@@ -304,4 +312,12 @@ function defaultTalkWithInn(player, quest, clientFunc)
             player:SendGameMessage(GetWorldMaster(), 51140, 0x20); --This inn is already your Secondary Homepoint
         end
     end
+end
+
+
+
+function talkWithSpecial(player, npcId, clientFunc)
+        local splQuest = GetStaticActor("Spl000");
+        local magickedPrism = 0;
+        callClientFunction(player, "delegateEvent", player, splQuest, clientFunc, magickedPrism);
 end

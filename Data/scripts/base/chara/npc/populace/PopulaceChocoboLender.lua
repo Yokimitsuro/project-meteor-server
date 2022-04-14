@@ -41,7 +41,8 @@ local startAppearances = {
 local cityExits = {
 	[1500006] = {133, -6.032, 46.356, 132.572, 3.034},
 	[1500061] = {150, 333.271, 5.889, -943.275, 0.794},
-	[1000840] = {170, -26.088, 181.846, -79.438, 2.579}
+	[1000840] = {170, -26.088, 181.846, -79.438, 2.579},
+    [1500059] = {172, -2133.028, 15.476, -421.471, 1.5}
 };
 
 function init(npc)
@@ -110,7 +111,7 @@ function onEventStarted(player, npc, triggerName)
         elseif(menuChoice == 3) then -- Change Barding
             callClientFunction(player, "eventTalkStepBreak", player);
         elseif(menuChoice == 5) then -- Rent Bird
-            mountChocobo(player, true, 1);
+            mountChocobo(player, true, 10);
             GetWorldManager():DoZoneChange(player, cityExits[classId][1], nil, 0, SPAWN_CHOCOBO_RENTAL, cityExits[classId][2], cityExits[classId][3], cityExits[classId][4], cityExits[classId][5]);
         else
             callClientFunction(player, "eventTalkStepBreak", player);
