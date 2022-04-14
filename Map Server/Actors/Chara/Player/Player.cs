@@ -119,6 +119,7 @@ namespace Meteor.Map.Actors
         public uint lastPlayTimeUpdate;
         public bool isGM = false;
         public bool isZoneChanging = true;
+        public byte LoginDreamCode = 0;
 
         //Trading
         private Player otherTrader = null;
@@ -420,7 +421,7 @@ namespace Meteor.Map.Actors
                 for (int i = 0; i < 2048; i++)
                     testComplete[i] = true;
                 QueuePacket(cutsceneBookPacket.BuildPacket(Id, SNpcNickname, SNpcSkin, SNpcPersonality, SNpcCoordinate, testComplete));
-                QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, 0x16, GetInnCode()));
+                QueuePacket(SetPlayerDreamPacket.BuildPacket(Id, LoginDreamCode, GetInnCode()));
             }
 
             return subpackets;
@@ -867,6 +868,16 @@ namespace Meteor.Map.Actors
                     return 1;
             }
             return 0;
+        }
+
+        public void SetLoginDreamCode(byte code)
+        {
+            LoginDreamCode = code;
+        }
+
+        public byte GetLoginDreamCode()
+        {
+            return LoginDreamCode;
         }
 
         public void SetSleeping()
@@ -2196,7 +2207,7 @@ namespace Meteor.Map.Actors
             currentEventName = "";
             currentEventType = 0;
             currentEventRunning = null;
-        }
+        }        
 
         public void BroadcastCountdown(byte countdownLength, ulong syncTime)
         {

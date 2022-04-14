@@ -127,7 +127,7 @@ function onTrigger(player, argc, arg1, arg2)
         targetActor:SetPos(px, y, pz, rot, true, player);		
 		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), px, y, pz, rot);
 	elseif direction == 3 then
-        targetActor:SetPos(x, y, z, distance, true, player);		
+        targetActor:SetPos(x, y, z, angle + distance, true, player);		
 		message = string.format("Moved %s @ %f, %f, %f, %f", targetActor:GetUniqueId(), x, y, z, distance);
     else
         local px = x - distance * math.cos(angle);

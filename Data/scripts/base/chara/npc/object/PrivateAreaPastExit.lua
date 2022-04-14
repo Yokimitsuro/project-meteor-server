@@ -27,10 +27,10 @@ function onEventStarted(player, privAreaExit, eventType, eventName)
 			-- If you can leave, warp to public zone and show message.
 			if (area.CanExitPrivateArea()) then
 				player:SendGameMessage(player, GetWorldMaster(), 34110, MESSAGE_TYPE_SYSTEM); -- You have left the instance.
-				GetWorldManager():WarpToPublicArea(player);
+				--GetWorldManager():WarpToPublicArea(player);
 			-- Otherwise warp back to the center of the zone.
 			else
-				GetWorldManager():WarpToCharaPosition(player, privAreaExit);
+				--GetWorldManager():WarpToCharaPosition(player, privAreaExit);
 			end
 		end
 	end

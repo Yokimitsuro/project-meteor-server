@@ -23,7 +23,7 @@ function onTrigger(player, argc, name, posX, posY, posZ, rotation)
 				
 	actor = player.CurrentArea:FindActorInZoneByUniqueID(name);
 	if (actor ~= nil) then
-		actor:SetPos(x,y,z,rot,true);
+		actor:SetPos(x,y,z,rot,true, player);
 		player:SendMessage(0x20, "", string.format("Moved %s @ %f, %f, %f, %f", name, x, y, z, rot));
 	else
 		player:SendMessage(0x20, "", string.format("Could not find %s.", name));
