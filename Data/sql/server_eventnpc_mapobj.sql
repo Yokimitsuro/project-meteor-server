@@ -17,13 +17,14 @@ CREATE DATABASE IF NOT EXISTS `ffxiv_server` /*!40100 DEFAULT CHARACTER SET lati
 USE `ffxiv_server`;
 
 -- Dumping structure for table ffxiv_server.server_eventnpc_mapobj
+DROP TABLE IF EXISTS `server_eventnpc_mapobj`;
 CREATE TABLE IF NOT EXISTS `server_eventnpc_mapobj` (
   `id` int(10) unsigned NOT NULL,
   `layoutId` int(10) unsigned NOT NULL,
   `instanceId` int(10) unsigned NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table ffxiv_server.server_eventnpc_mapobj: ~65 rows (approximately)
+-- Dumping data for table ffxiv_server.server_eventnpc_mapobj: ~72 rows (approximately)
 /*!40000 ALTER TABLE `server_eventnpc_mapobj` DISABLE KEYS */;
 REPLACE INTO `server_eventnpc_mapobj` (`id`, `layoutId`, `instanceId`) VALUES
 	(589, 321, 3294),
@@ -70,18 +71,18 @@ REPLACE INTO `server_eventnpc_mapobj` (`id`, `layoutId`, `instanceId`) VALUES
 	(495, 121, 2420),
 	(500, 196, 456),
 	(0, 391, 2),
-	(146, 141, 4040),
-	(145, 141, 4125),
-	(144, 141, 4039),
-	(143, 141, 4038),
-	(280, 141, 4044),
-	(282, 141, 4126),
-	(283, 141, 4043),
-	(286, 141, 4042),
-	(281, 141, 4057),
-	(285, 141, 4059),
-	(284, 141, 4041),
-	(279, 141, 4055),
+	(146, 421, 4040),
+	(145, 421, 4038),
+	(144, 421, 4039),
+	(143, 421, 4125),
+	(280, 421, 4126),
+	(282, 421, 4043),
+	(283, 421, 4042),
+	(286, 421, 4041),
+	(281, 421, 4057),
+	(285, 421, 4059),
+	(284, 421, 4055),
+	(279, 421, 4044),
 	(287, 431, 3525),
 	(0, 491, 2),
 	(730, 5145, 252),
@@ -96,7 +97,14 @@ REPLACE INTO `server_eventnpc_mapobj` (`id`, `layoutId`, `instanceId`) VALUES
 	(628, 421, 2825),
 	(629, 421, 2829),
 	(938, 421, 4040),
-	(2050, 421, 4289);
+	(2050, 421, 4289),
+	(2031, 121, 2416),
+	(2032, 121, 2413),
+	(2114, 1101, 286),
+	(2166, 5013, 399),
+	(2167, 5013, 398),
+	(2168, 5013, 408),
+	(2169, 5013, 161);
 /*!40000 ALTER TABLE `server_eventnpc_mapobj` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
