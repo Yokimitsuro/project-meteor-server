@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -59,16 +60,16 @@ function onStateChange(player, quest, sequence)
             otopaFlag = 2; 
         end
         quest:SetENpc(OTOPA_POTTOPA, otopaFlag);
-        quest:SetENpc(MYTESYN, QFLAG_NORM); -- Assuming this functions the same as it did in Etc5g1
+        quest:SetENpc(MYTESYN, QFLAG_TALK); -- Assuming this functions the same as it did in Etc5g1
         quest:SetENpc(MIZZENMAST_BED, 5);
         
     elseif (sequence == SEQ_000) then
         quest:SetENpc(MYTESYN);
-        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true, false, true);
-        quest:SetENpc(BERTRAND, QFLAG_NORM);
+        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_PUSH, false, true, false, true);
+        quest:SetENpc(BERTRAND, QFLAG_TALK);
         quest:SetENpc(ABRAHAM);
     elseif (sequence == SEQ_010) then 
-        quest:SetENpc(CUTSCENE_PUSH_TRIGGER, QFLAG_MAP,false, true, false, true);
+        quest:SetENpc(CUTSCENE_PUSH_TRIGGER, QFLAG_PUSH,false, true, false, true);
     end
 end
 
@@ -98,7 +99,7 @@ function onTalk(player, quest, npc)
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_000_1"); 
         elseif (classId == BERTRAND) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
-            quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+            quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
             quest:StartSequence(SEQ_010);
             GetWorldManager():WarpToPublicArea(player);
         elseif (classId == ABRAHAM) then

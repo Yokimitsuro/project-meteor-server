@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -71,9 +72,9 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_GAGARUNA, QFLAG_PLATE);
+		quest:SetENpc(ENPC_GAGARUNA, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
-		quest:SetENpc(ENPC_TITININ, QFLAG_PLATE);
+		quest:SetENpc(ENPC_TITININ, QFLAG_TALK);
 		quest:SetENpc(ENPC_GAGARUNA);
 		quest:SetENpc(ENPC_MELISIE);
 		quest:SetENpc(ENPC_GUNNULF);
@@ -86,7 +87,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ENPC_GAGARUNA);
 		quest:SetENpc(ENPC_SULTRY_STRUMPET);
 		quest:SetENpc(ENPC_BEAUTEOUS_BEAUTY);
-		quest:SetENpc(ENPC_ESPERAUNCE, QFLAG_PLATE);
+		quest:SetENpc(ENPC_ESPERAUNCE, QFLAG_TALK);
 		quest:SetENpc(ENPC_TRIGGER_GSM, QFLAG_NONE, false, true);
 		quest:SetENpc(ENPC_PRIVAREA_EXIT, QFLAG_NONE, false, true);
 	elseif (sequence == SEQ_010) then
@@ -95,16 +96,16 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ENPC_ESPERAUNCE);
 	elseif (sequence == SEQ_015) then
 		quest:SetENpc(ENPC_TITININ);
-		quest:SetENpc(ENPC_NAIDA_ZAMAIDA, QFLAG_PLATE);
+		quest:SetENpc(ENPC_NAIDA_ZAMAIDA, QFLAG_TALK);
 		quest:SetENpc(ENPC_GAGARUNA);
 	elseif (sequence == SEQ_025) then
 		quest:SetENpc(ENPC_TITININ);
 		quest:SetENpc(ENPC_GAGARUNA);
-		quest:SetENpc(ENPC_TRIGGER_PGL, QFLAG_MAP, false, true);
+		quest:SetENpc(ENPC_TRIGGER_PGL, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_030) then
 		quest:SetENpc(ENPC_TITININ);
 		quest:SetENpc(ENPC_GAGARUNA);
-		quest:SetENpc(ENPC_SINGLETON, QFLAG_PLATE);
+		quest:SetENpc(ENPC_SINGLETON, QFLAG_TALK);
 	elseif (sequence == SEQ_035) then
 		quest:SetENpc(ENPC_TITININ, QFLAG_REWARD);
 		quest:SetENpc(ENPC_GAGARUNA);

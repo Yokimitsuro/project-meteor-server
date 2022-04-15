@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -55,19 +56,19 @@ function onStateChange(player, quest, sequence)
         local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
 
         if (hasQuestItem == false) then 
-            quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM);
+            quest:SetENpc(OTOPA_POTTOPA, QFLAG_TALK);
         end
         quest:SetENpc(HOURGLASS_BED, 5); 
     end
     
     if (sequence == SEQ_000) then
         quest:SetENpc(OTOPA_POTTOPA);
-        quest:SetENpc(GAUWYN_THE_GANNET, QFLAG_NORM);
+        quest:SetENpc(GAUWYN_THE_GANNET, QFLAG_TALK);
         quest:SetENpc(HILDIBRAND);
         quest:SetENpc(NASHU_MHAKARACCA);
         
         --flagType, isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned
-        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true, false, true);
+        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_PUSH, false, true, false, true);
     elseif (sequence == SEQ_010) then 
         quest:SetENpc(OTOPA_POTTOPA, QFLAG_REWARD);
         quest:SetENpc(GAUWYN_THE_GANNET);
@@ -101,7 +102,7 @@ function onTalk(player, quest, npc)
         elseif (classId == GAUWYN_THE_GANNET) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
             attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
-            quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+            quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
             quest:StartSequence(SEQ_010);
         elseif (classId == HILDIBRAND) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent_010_1");

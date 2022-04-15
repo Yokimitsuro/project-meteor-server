@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -50,17 +51,17 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(FRUHYBOLG, QFLAG_PLATE);
+		quest:SetENpc(FRUHYBOLG, QFLAG_TALK);
 	end
 
 	local data = quest:GetData();
 	if (sequence == SEQ_000) then
         quest:SetENpc(FRUHYBOLG);
-		quest:SetENpc(VANNES,       (not data:GetFlag(FLAG_TALKED_VANNES) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(JEGER,   		(not data:GetFlag(FLAG_TALKED_JEGER) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(LETTICE,      (not data:GetFlag(FLAG_TALKED_LETTICE) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(ZOENGTERBIN,  (not data:GetFlag(FLAG_TALKED_ZOENGTERBIN) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(THIMM,        (not data:GetFlag(FLAG_TALKED_THIMM) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(VANNES,       (not data:GetFlag(FLAG_TALKED_VANNES) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(JEGER,   		(not data:GetFlag(FLAG_TALKED_JEGER) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(LETTICE,      (not data:GetFlag(FLAG_TALKED_LETTICE) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(ZOENGTERBIN,  (not data:GetFlag(FLAG_TALKED_ZOENGTERBIN) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(THIMM,        (not data:GetFlag(FLAG_TALKED_THIMM) and QFLAG_TALK or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(FRUHYBOLG, QFLAG_REWARD);
 	end	
@@ -136,7 +137,7 @@ function onTalk(player, quest, npc, eventName)
             
             if (seq000_checkCondition(data)) then -- All people spoken to
                 attentionMessage(player, 25225, quest:GetQuestId()); -- "A Call to Arms" objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end

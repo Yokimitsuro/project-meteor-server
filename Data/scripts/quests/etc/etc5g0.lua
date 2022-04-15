@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -35,14 +36,14 @@ end
 
 function onStateChange(player, quest, sequence)
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(VKOROLON, QFLAG_PLATE);
+		quest:SetENpc(VKOROLON, QFLAG_TALK);
 	end
 
     if (sequence == SEQ_000) then
         quest:SetENpc(VKOROLON);
-        quest:SetENpc(PFARAHR, QFLAG_PLATE);
+        quest:SetENpc(PFARAHR, QFLAG_TALK);
     elseif (sequence == SEQ_001) then 
-        quest:SetENpc(VKOROLON, QFLAG_PLATE);
+        quest:SetENpc(VKOROLON, QFLAG_TALK);
         quest:SetENpc(PFARAHR);
     end
 end

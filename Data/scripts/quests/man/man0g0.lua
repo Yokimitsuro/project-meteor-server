@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -104,15 +105,15 @@ function onStateChange(player, quest, sequence)
         local data = quest:GetData();
 
         local ydaCanPush = (not data:GetFlag(FLAG_SEQ000_MINITUT0));
-        local ydaFlag = QFLAG_PLATE;
+        local ydaFlag = QFLAG_TALK;
         
         if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) or (data:GetFlag(FLAG_SEQ000_MINITUT1)) then
-            ydaFlag = QFLAG_PLATE;
+            ydaFlag = QFLAG_TALK;
         else
             ydaFlag = QFLAG_NONE;
         end
         
-        local papalymoFlag = ((not data:GetFlag(FLAG_SEQ000_MINITUT1)) and data:GetFlag(FLAG_SEQ000_MINITUT0) and QFLAG_PLATE or QFLAG_NONE);
+        local papalymoFlag = ((not data:GetFlag(FLAG_SEQ000_MINITUT1)) and data:GetFlag(FLAG_SEQ000_MINITUT0) and QFLAG_TALK or QFLAG_NONE);
         
         --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
         quest:SetENpc(YDA, ydaFlag, true, ydaCanPush);
@@ -122,7 +123,7 @@ function onStateChange(player, quest, sequence)
     elseif (sequence == SEQ_010) then
         local data = quest:GetData();
         
-        local tkebbeTalk = (not data:GetFlag(FLAG_SEQ010_TKEBBE) and QFLAG_PLATE or QFLAG_NONE);
+        local tkebbeTalk = (not data:GetFlag(FLAG_SEQ010_TKEBBE) and QFLAG_TALK or QFLAG_NONE);
         
         quest:SetENpc(FARRIMOND);
         quest:SetENpc(CECILIA);
@@ -130,7 +131,7 @@ function onStateChange(player, quest, sequence)
         quest:SetENpc(TKEBBE, tkebbeTalk);
         quest:SetENpc(LONSYGG);
         quest:SetENpc(BLOCKER1, QFLAG_NONE, false, true);
-        quest:setENpc(GUILD_ENTRANCE, QFLAG_MAP, false, true);
+        quest:setENpc(GUILD_ENTRANCE, QFLAG_PUSH, false, true);
         
         
         

@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -128,7 +129,7 @@ function onStateChange(player, quest, sequence)
         -- Setup states incase we loaded in.
 
         --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
-        quest:SetENpc(MOMODI, QFLAG_PLATE);
+        quest:SetENpc(MOMODI, QFLAG_TALK);
         quest:SetENpc(OTOPA_POTTOPA);
 
     elseif (sequence == SEQ_005) then 

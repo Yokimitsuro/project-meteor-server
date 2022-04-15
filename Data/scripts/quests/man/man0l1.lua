@@ -1,5 +1,6 @@
-require("global");
-require("tutorial")
+require ("global")
+require ("quest")
+require ("tutorial")
 
 --[[
 
@@ -133,7 +134,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ONYXHAIRED_ADVENTURER);
 		quest:SetENpc(SKITTISH_ADVENTURER);
 		quest:SetENpc(RELAXING_ADVENTURER);
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 		quest:SetENpc(MYTESYN);
 		quest:SetENpc(COCKAHOOP_COCKSWAIN);
 		quest:SetENpc(SENTENIOUS_SELLSWORD);
@@ -141,19 +142,19 @@ function onStateChange(player, quest, sequence)
 	elseif (sequence == SEQ_003) then
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_005) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 	elseif (sequence == SEQ_006) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 	elseif (sequence == SEQ_007) then
 		local subseqCUL = data:GetCounter(CNTR_SEQ7_CUL);
 		local subseqMSK = data:GetCounter(CNTR_SEQ7_MSK);
 		-- Always active in this seqence
 		quest:SetENpc(BADERON);
-		quest:SetENpc(CHARLYS, subseqCUL == 0 and QFLAG_PLATE or QFLAG_NONE);
+		quest:SetENpc(CHARLYS, subseqCUL == 0 and QFLAG_TALK or QFLAG_NONE);
 		-- Down and Up the MSK guild
-		quest:SetENpc(ISANDOREL, (subseqMSK == 0 or subseqMSK == 2) and QFLAG_PLATE or QFLAG_NONE);
+		quest:SetENpc(ISANDOREL, (subseqMSK == 0 or subseqMSK == 2) and QFLAG_TALK or QFLAG_NONE);
 		if (subseqMSK == 1) then
-			quest:SetENpc(MSK_TRIGGER, QFLAG_MAP, false, true);
+			quest:SetENpc(MSK_TRIGGER, QFLAG_PUSH, false, true);
 		elseif (subseqMSK == 2) then
 			quest:SetENpc(MERLZIRN);
 		end
@@ -168,32 +169,32 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ADVENTURER1);
 		quest:SetENpc(ADVENTURER2);
 		quest:SetENpc(ADVENTURER3);
-		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMSK == 3 and QFLAG_MAP or QFLAG_NONE, false, subseqMSK == 3);					
+		quest:SetENpc(ECHO_EXIT_TRIGGER, subseqMSK == 3 and QFLAG_PUSH or QFLAG_NONE, false, subseqMSK == 3);					
 	elseif (sequence == SEQ_035) then
-		quest:SetENpc(NNMULIKA, QFLAG_PLATE);
+		quest:SetENpc(NNMULIKA, QFLAG_TALK);
 	elseif (sequence == SEQ_040) then
-		quest:SetENpc(SISIPU_EMOTE, QFLAG_PLATE, true, false, true);
+		quest:SetENpc(SISIPU_EMOTE, QFLAG_TALK, true, false, true);
 		quest:SetENpc(NNMULIKA);
 	elseif (sequence == SEQ_048) then
 		quest:SetENpc(BADERON);
-		quest:SetENpc(ZEPHYR_TRIGGER, QFLAG_MAP, false, true);
+		quest:SetENpc(ZEPHYR_TRIGGER, QFLAG_PUSH, false, true);
 		quest:SetENpc(NNMULIKA);
 	elseif (sequence == SEQ_055) then
-		quest:SetENpc(WINDWORN_CORPSE, QFLAG_PLATE);
+		quest:SetENpc(WINDWORN_CORPSE, QFLAG_TALK);
 		quest:SetENpc(GLASSYEYED_CORPSE);
 		quest:SetENpc(FEARSTRICKEN_CORPSE);
 		quest:SetENpc(SISIPU);
 	elseif (sequence == SEQ_060) then
-		quest:SetENpc(SISIPU, QFLAG_PLATE);
+		quest:SetENpc(SISIPU, QFLAG_TALK);
 		quest:SetENpc(WINDWORN_CORPSE);
 		quest:SetENpc(GLASSYEYED_CORPSE);
 		quest:SetENpc(FEARSTRICKEN_CORPSE);
 	elseif (sequence == SEQ_065) then
-		quest:SetENpc(FSH_TRIGGER, QFLAG_MAP, false, true);
+		quest:SetENpc(FSH_TRIGGER, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_075) then	
-		quest:SetENpc(BODENOLF, QFLAG_PLATE);
+		quest:SetENpc(BODENOLF, QFLAG_TALK);
 	elseif (sequence == SEQ_080) then	
-		quest:SetENpc(HNAANZA, QFLAG_PLATE);
+		quest:SetENpc(HNAANZA, QFLAG_TALK);
 		quest:SetENpc(TATTOOED_PIRATE);
 		quest:SetENpc(IOFA);
 		quest:SetENpc(BODENOLF);
@@ -208,7 +209,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(WERNER);
 		quest:SetENpc(HIHINE);
 		quest:SetENpc(TRINNE);
-		quest:SetENpc(ECHO_EXIT_TRIGGER2, QFLAG_MAP, false, true);
+		quest:SetENpc(ECHO_EXIT_TRIGGER2, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_092) then	
 		quest:SetENpc(BADERON, QFLAG_REWARD);
 	end	

@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -67,12 +68,12 @@ function onStateChange(player, quest, sequence)
 		-- Setup states incase we loaded in.
 		local data = quest:GetData();
 		
-		local rostnsthalFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
-		local vixenFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
-		local babyfaceFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
+		local rostnsthalFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_TALK;
+		local vixenFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_TALK;
+		local babyfaceFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_TALK;
 		local rostnsthalCanPush = not data:GetFlag(FLAG_SEQ000_MINITUT0);
 		local exitCanPush = data:GetFlags() == 0xF;
-		local exitFlag = data:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;		
+		local exitFlag = data:GetFlags() == 0xF and QFLAG_PUSH or QFLAG_NONE;		
 		
 		quest:SetENpc(WELLTRAVELED_MERCHANT);
 		quest:SetENpc(TIPSY_ADVENTURER);
@@ -93,7 +94,7 @@ function onStateChange(player, quest, sequence)
 		print(tostring(exitCanPush));
 	elseif (sequence == SEQ_005) then
 	elseif (sequence == SEQ_010) then		
-		quest:SetENpc(HOB, QFLAG_PLATE);
+		quest:SetENpc(HOB, QFLAG_TALK);
 		quest:SetENpc(GERT);
 		quest:SetENpc(LORHZANT);
 		quest:SetENpc(MUSCLEBOUND_DECKHAND);

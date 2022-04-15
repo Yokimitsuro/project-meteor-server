@@ -1,5 +1,6 @@
-require("global");
-require("tutorial");
+require ("global")
+require ("quest")
+require ("tutorial")
 --[[
 
 Quest Script
@@ -60,7 +61,7 @@ function onStateChange(player, quest, sequence)
         -- Setup states incase we loaded in.
 
         --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)        
-        quest:SetENpc(MIOUNNE, QFLAG_PLATE);
+        quest:SetENpc(MIOUNNE, QFLAG_TALK);
        -- quest:SetENpc(VKOROLON);
         quest:SetENpc(WISPILY_WHISKERED_WOODWORKER);
         quest:SetENpc(AMIABLE_ADVENTURER);

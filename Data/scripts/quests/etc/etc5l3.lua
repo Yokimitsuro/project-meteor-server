@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -73,23 +74,23 @@ function onStateChange(player, quest, sequence)
 
     -- Quest not accepted:  Set up actors to let you retrieve the item & initiate the log-in check at the Inn
     if (sequence == SEQ_ACCEPT) then
-        quest:SetENpc(KOPURU_FUPURU, QFLAG_NORM);
-        quest:SetENpc(VKOROLON, QFLAG_NORM);
-        quest:SetENpc(MYTESYN, QFLAG_NORM);
+        quest:SetENpc(KOPURU_FUPURU, QFLAG_TALK);
+        quest:SetENpc(VKOROLON, QFLAG_TALK);
+        quest:SetENpc(MYTESYN, QFLAG_TALK);
         quest:SetENpc(BED_ULDAH, 5);
         quest:SetENpc(BED_GRIDANIA, 5);
         quest:SetENpc(BED_LIMSA, 5);
     -- Quest started
     elseif (sequence == SEQ_000) then
-        quest:SetENpc(COFFER_AND_COFFIN_PUSH, QFLAG_MAP, false, true, false, true);
+        quest:SetENpc(COFFER_AND_COFFIN_PUSH, QFLAG_PUSH, false, true, false, true);
     elseif (sequence == SEQ_005) then
-        local bane1Flag = data:GetFlag(FLAG_SEQ005_BANE_1) and QFLAG_NONE or QFLAG_PLATE;
-        local bane2Flag = data:GetFlag(FLAG_SEQ005_BANE_2) and QFLAG_NONE or QFLAG_PLATE;
-        local bane3Flag = data:GetFlag(FLAG_SEQ005_BANE_3) and QFLAG_NONE or QFLAG_PLATE;
-        local bane4Flag = data:GetFlag(FLAG_SEQ005_BANE_4) and QFLAG_NONE or QFLAG_PLATE;
-        local bane5Flag = data:GetFlag(FLAG_SEQ005_BANE_5) and QFLAG_NONE or QFLAG_PLATE;
+        local bane1Flag = data:GetFlag(FLAG_SEQ005_BANE_1) and QFLAG_NONE or QFLAG_TALK;
+        local bane2Flag = data:GetFlag(FLAG_SEQ005_BANE_2) and QFLAG_NONE or QFLAG_TALK;
+        local bane3Flag = data:GetFlag(FLAG_SEQ005_BANE_3) and QFLAG_NONE or QFLAG_TALK;
+        local bane4Flag = data:GetFlag(FLAG_SEQ005_BANE_4) and QFLAG_NONE or QFLAG_TALK;
+        local bane5Flag = data:GetFlag(FLAG_SEQ005_BANE_5) and QFLAG_NONE or QFLAG_TALK;
     
-        quest:SetENpc(COFFER_AND_COFFIN_PUSH, QFLAG_MAP, false, true, false, true);
+        quest:SetENpc(COFFER_AND_COFFIN_PUSH, QFLAG_PUSH, false, true, false, true);
         quest:SetENpc(HILDIBRAND);
         quest:SetENpc(NASHU_MHAKARACCA);
         quest:SetENpc(ALRET);
@@ -168,7 +169,7 @@ function onTalk(player, quest, npc)
             if (counterAmount >= 5) then
                 attentionMessage(player, 25225, quest:GetQuestId()); -- "Seeing the Seers" objectives complete!
                 quest:GetData():ClearData();
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_010);
             end
         end

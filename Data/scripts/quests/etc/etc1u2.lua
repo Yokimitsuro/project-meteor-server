@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -35,7 +36,7 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_TUTUBUKI, QFLAG_PLATE);
+		quest:SetENpc(ENPC_TUTUBUKI, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
         quest:SetENpc(ENPC_TUTUBUKI);
 		quest:SetENpc(BNPC_DAPPER_CADAVER);

@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -37,12 +38,12 @@ end
 
 function onStateChange(player, quest, sequence)
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(MYTESYN, QFLAG_NORM);
+		quest:SetENpc(MYTESYN, QFLAG_TALK);
 	end
 
     if (sequence == SEQ_000) then
         quest:SetENpc(MYTESYN);
-        quest:SetENpc(SWEETNIX, QFLAG_NORM);
+        quest:SetENpc(SWEETNIX, QFLAG_TALK);
     elseif (sequence == SEQ_001) then 
         quest:SetENpc(MYTESYN, QFLAG_REWARD);
         quest:SetENpc(SWEETNIX);

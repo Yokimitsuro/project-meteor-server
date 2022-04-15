@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -61,40 +62,40 @@ function onStateChange(player, quest, sequence)
 	local data = quest:GetData();
 
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
-		quest:SetENpc(TRIGGER_DOCKS, QFLAG_MAP, false, true);
-		quest:SetENpc(HOB, QFLAG_PLATE);
+		quest:SetENpc(TRIGGER_DOCKS, QFLAG_PUSH, false, true);
+		quest:SetENpc(HOB, QFLAG_TALK);
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_010) then
 		quest:SetENpc(TRIGGER_DOCKS, QFLAG_NONE, false, true);
 		quest:SetENpc(HOB);
 		quest:SetENpc(BARRACUDA_KNIGHT1);
 		quest:SetENpc(BARRACUDA_KNIGHT2);
-		quest:SetENpc(EVENTDOOR_SHIP1, QFLAG_MAP, false, true);
+		quest:SetENpc(EVENTDOOR_SHIP1, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_015) then
 		quest:SetENpc(TRIGGER_DOCKS, QFLAG_NONE, false, true);
 		quest:SetENpc(HOB);
 		quest:SetENpc(BARRACUDA_KNIGHT1);
 		quest:SetENpc(BARRACUDA_KNIGHT2);
-		quest:SetENpc(EVENTDOOR_SHIP2, QFLAG_MAP, false, true);
-		quest:SetENpc(TRIGGER_DUTYSTART, QFLAG_MAP, false, true);
+		quest:SetENpc(EVENTDOOR_SHIP2, QFLAG_PUSH, false, true);
+		quest:SetENpc(TRIGGER_DUTYSTART, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_020) then
 		-- DUTY HAPPENS HERE
 	elseif (sequence == SEQ_035) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 	elseif (sequence == SEQ_037) then
-		quest:SetENpc(TRIGGER_SEAFLD1, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_SEAFLD1, QFLAG_PUSH, false, true);
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_042) then
-		quest:SetENpc(TRIGGER_MSK, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_MSK, QFLAG_PUSH, false, true);
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_045) then
-		quest:SetENpc(ISAUDOREL, QFLAG_PLATE);
+		quest:SetENpc(ISAUDOREL, QFLAG_TALK);
 	elseif (sequence == SEQ_050) then
-		quest:SetENpc(TRIGGER_SEAFLD2, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_SEAFLD2, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_055) then
-		quest:SetENpc(TRIGGER_SEAFLD3, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_SEAFLD3, QFLAG_PUSH, false, true);
 		quest:SetENpc(YSHTOLA);
 	end	
 	

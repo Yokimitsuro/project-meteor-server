@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -50,17 +51,17 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(KINNISON, QFLAG_PLATE);
+		quest:SetENpc(KINNISON, QFLAG_TALK);
 	end
 
 	local data = quest:GetData();
 	if (sequence == SEQ_000) then
         quest:SetENpc(KINNISON);
-		quest:SetENpc(SYBELL,           (not data:GetFlag(FLAG_TALKED_SYBELL) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(KHUMA_MOSHROCA,   (not data:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(NELLAURE,         (not data:GetFlag(FLAG_TALKED_NELLAURE) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(MESTONNAUX,       (not data:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(LEFWYNE,          (not data:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(SYBELL,           (not data:GetFlag(FLAG_TALKED_SYBELL) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(KHUMA_MOSHROCA,   (not data:GetFlag(FLAG_TALKED_KHUMA_MOSHROCA) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(NELLAURE,         (not data:GetFlag(FLAG_TALKED_NELLAURE) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(MESTONNAUX,       (not data:GetFlag(FLAG_TALKED_MESTONNAUX) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(LEFWYNE,          (not data:GetFlag(FLAG_TALKED_LEFWYNE) and QFLAG_TALK or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(KINNISON, QFLAG_REWARD);
 	end	
@@ -136,7 +137,7 @@ function onTalk(player, quest, npc, eventName)
             
             if (seq000_checkCondition(data)) then -- All Seers spoken to
                 attentionMessage(player, 25225, quest:GetQuestId()); -- "Seeing the Seers" objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end

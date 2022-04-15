@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -48,14 +49,14 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(SWAENHYLT, QFLAG_PLATE);
+		quest:SetENpc(SWAENHYLT, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
 		local data = quest:GetData();
         quest:SetENpc(SWAENHYLT);
-		quest:SetENpc(FLAVIELLE,    (not data:GetFlag(FLAG_TALKED_FLAVIELLE) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(KEKETO,   	(not data:GetFlag(FLAG_TALKED_KEKETO) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(CEADDA,       (not data:GetFlag(FLAG_TALKED_CEADDA) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(THIMM,       	(not data:GetFlag(FLAG_TALKED_THIMM) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(FLAVIELLE,    (not data:GetFlag(FLAG_TALKED_FLAVIELLE) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(KEKETO,   	(not data:GetFlag(FLAG_TALKED_KEKETO) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(CEADDA,       (not data:GetFlag(FLAG_TALKED_CEADDA) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(THIMM,       	(not data:GetFlag(FLAG_TALKED_THIMM) and QFLAG_TALK or QFLAG_NONE));
     elseif (sequence == SEQ_001) then 
         quest:SetENpc(SWAENHYLT, QFLAG_REWARD);
     end
@@ -120,7 +121,7 @@ function onTalk(player, quest, npc)
             
             if (seq000_checkCondition(data)) then -- All lost souls spoken to
                 attentionMessage(player, 25225, quest:GetQuestId()); -- "Hearing Confessions" objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end

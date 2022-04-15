@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -50,17 +51,17 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(DYMPNA, QFLAG_PLATE);
+		quest:SetENpc(DYMPNA, QFLAG_TALK);
 	end
 
 	local data = quest:GetData();
 	if (sequence == SEQ_000) then
         quest:SetENpc(DYMPNA);
-		quest:SetENpc(AERGWYNT,     (not data:GetFlag(FLAG_TALKED_AERGWYNT) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
-		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
-		quest:SetENpc(BUBUROON,		(not data:GetFlag(FLAG_TALKED_BUBUROON) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
-		quest:SetENpc(RBAHARRA,     (not data:GetFlag(FLAG_TALKED_RBAHARRA) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
-		quest:SetENpc(FUFUNA,       (not data:GetFlag(FLAG_TALKED_FUFUNA) and QFLAG_PLATE or QFLAG_NONE), true, false, true);
+		quest:SetENpc(AERGWYNT,     (not data:GetFlag(FLAG_TALKED_AERGWYNT) and QFLAG_TALK or QFLAG_NONE), true, false, true);
+		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_TALK or QFLAG_NONE), true, false, true);
+		quest:SetENpc(BUBUROON,		(not data:GetFlag(FLAG_TALKED_BUBUROON) and QFLAG_TALK or QFLAG_NONE), true, false, true);
+		quest:SetENpc(RBAHARRA,     (not data:GetFlag(FLAG_TALKED_RBAHARRA) and QFLAG_TALK or QFLAG_NONE), true, false, true);
+		quest:SetENpc(FUFUNA,       (not data:GetFlag(FLAG_TALKED_FUFUNA) and QFLAG_TALK or QFLAG_NONE), true, false, true);
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(DYMPNA, QFLAG_REWARD);
 	end	
@@ -185,7 +186,7 @@ functison onEmote(player, quest, npc, eventName)
             
             if (seq000_checkCondition(data)) then -- All informants spoken to
                 attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end       

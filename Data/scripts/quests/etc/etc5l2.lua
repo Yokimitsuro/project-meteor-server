@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -41,16 +42,16 @@ end
 function onStateChange(player, quest, sequence)
 
     if (sequence == SEQ_ACCEPT) then
-        quest:SetENpc(KOPURU_FUPURU, QFLAG_NORM);
+        quest:SetENpc(KOPURU_FUPURU, QFLAG_TALK);
     elseif (sequence == SEQ_000) then
-        quest:SetENpc(KOPURU_FUPURU, QFLAG_NORM);
-        quest:SetENpc(BOOK, QFLAG_NORM);
-        quest:SetENpc(INN_EXIT, QFLAG_MAP, false, true, false, true);
+        quest:SetENpc(KOPURU_FUPURU, QFLAG_TALK);
+        quest:SetENpc(BOOK, QFLAG_TALK);
+        quest:SetENpc(INN_EXIT, QFLAG_PUSH, false, true, false, true);
     elseif (sequence == SEQ_005) then
         quest:SetENpc(BOOK);
         quest:SetENpc(KOPURU_FUPURU);
-        quest:SetENpc(INN_EXIT, QFLAG_MAP, false, true, false, true);
-        quest:SetENpc(CUTSCENE_PUSH_TRIGGER, QFLAG_MAP,false, true, false, true);
+        quest:SetENpc(INN_EXIT, QFLAG_PUSH, false, true, false, true);
+        quest:SetENpc(CUTSCENE_PUSH_TRIGGER, QFLAG_PUSH,false, true, false, true);
     end
 end
 
@@ -73,7 +74,7 @@ function onTalk(player, quest, npc)
             GetWorldManager():DoZoneChange(player, 181, "PrivateAreaMasterPast", 5, 15, 0,0,0, player.rotation);
         elseif (classId == BOOK) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent000");
-            quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+            quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
             quest:StartSequence(SEQ_005);
         end
     elseif (sequence == SEQ_005) then

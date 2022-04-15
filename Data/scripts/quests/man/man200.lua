@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -76,36 +77,36 @@ function onStateChange(player, quest, sequence)
 	
 	-- Sequence changing ENpcs
 	if (sequence == SEQ_000) then
-		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_MAP, false, true);
+		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_PUSH, false, true);
 		quest:SetENpc(TATARU);
 	elseif (sequence == SEQ_005) then
-		quest:SetENpc(MINFILIA, QFLAG_PLATE);
-		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_MAP, false, true);
+		quest:SetENpc(MINFILIA, QFLAG_TALK);
+		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_PUSH, false, true);
 		quest:SetENpc(EVENT_DOOR_OFFICE_E, QFLAG_NONE, false, true);
 		quest:SetENpc(TATARU);
 	elseif (sequence == SEQ_010) then
-		quest:SetENpc(MINFILIA, QFLAG_PLATE);
-		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_MAP, false, true);
+		quest:SetENpc(MINFILIA, QFLAG_TALK);
+		quest:SetENpc(EVENT_DOOR_OFFICE_W, QFLAG_PUSH, false, true);
 		quest:SetENpc(EVENT_DOOR_OFFICE_E, QFLAG_NONE, false, true);
 		quest:SetENpc(TATARU);
 	elseif (sequence == SEQ_020) then
-		quest:SetENpc(TATARU, QFLAG_PLATE);
+		quest:SetENpc(TATARU, QFLAG_TALK);
 		quest:SetENpc(MINFILIA);
 	elseif (sequence == SEQ_025) then
 		quest:SetENpc(TATARU);
 	elseif (sequence == SEQ_027) then
 		if (quest:GetData():GetFlag(FLAG_DUTY_COMPLETE)) then
-			quest:SetENpc(MOMODI, QFLAG_PLATE);
+			quest:SetENpc(MOMODI, QFLAG_TALK);
 			quest:SetENpc(TATARU);
 		else
-			quest:SetENpc(TATARU, QFLAG_PLATE);
+			quest:SetENpc(TATARU, QFLAG_TALK);
 			quest:SetENpc(SNPC_START + player:GetSNpcSkin());
 		end
 	end
 	
 	-- All the other ENpcs in the Waking Sands
 	quest:SetENpc(MARKET_ENTRENCE, QFLAG_NONE, false, true);
-	quest:SetENpc(EVENT_DOOR_EXIT, QFLAG_MAP, false, true);
+	quest:SetENpc(EVENT_DOOR_EXIT, QFLAG_PUSH, false, true);
 	quest:SetENpc(SATZFLOH);
 	quest:SetENpc(PERCEVAINS);
 	quest:SetENpc(UNA_TAYUUN);

@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -50,17 +51,17 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(GINNADE, QFLAG_NORM);
+		quest:SetENpc(GINNADE, QFLAG_TALK);
 	end
 
 	local data = quest:GetData();
 	if (sequence == SEQ_000) then
         quest:SetENpc(GINNADE);
-		quest:SetENpc(ZONGGO,     	(not data:GetFlag(FLAG_TALKED_ZONGGO) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(WHAHTOA,		(not data:GetFlag(FLAG_TALKED_WHAHTOA) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(FRAILOISE,    (not data:GetFlag(FLAG_TALKED_FRAILOISE) and QFLAG_NORM or QFLAG_NONE));
-		quest:SetENpc(ARNEGIS,      (not data:GetFlag(FLAG_TALKED_ARNEGIS) and QFLAG_NORM or QFLAG_NONE));
+		quest:SetENpc(ZONGGO,     	(not data:GetFlag(FLAG_TALKED_ZONGGO) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(WHAHTOA,		(not data:GetFlag(FLAG_TALKED_WHAHTOA) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(FERDILLAIX,   (not data:GetFlag(FLAG_TALKED_FERDILLAIX) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(FRAILOISE,    (not data:GetFlag(FLAG_TALKED_FRAILOISE) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(ARNEGIS,      (not data:GetFlag(FLAG_TALKED_ARNEGIS) and QFLAG_TALK or QFLAG_NONE));
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(GINNADE, QFLAG_REWARD);
 	end	
@@ -136,7 +137,7 @@ function onTalk(player, quest, npc, eventName)
             
             if (seq000_checkCondition(data)) then -- All informants spoken to
                 attentionMessage(player, 25225, quest.GetQuestId()); -- "The Tug of the Whorl" objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end

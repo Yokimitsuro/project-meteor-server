@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -48,14 +49,14 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(AHLDSKYF, QFLAG_PLATE);
+		quest:SetENpc(AHLDSKYF, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
 		local data = quest:GetData();
         quest:SetENpc(AHLDSKYF);
-		quest:SetENpc(FZHUMII,      (not data:GetFlag(FLAG_TALKED_FZHUMII) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(SHOSHOMA,     (not data:GetFlag(FLAG_TALKED_SHOSHOMA) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(DACA_JINJAHL, (not data:GetFlag(FLAG_TALKED_DACA_JINJAHL) and QFLAG_PLATE or QFLAG_NONE));
-		quest:SetENpc(AENTFOET,   	(not data:GetFlag(FLAG_TALKED_AENTFOET) and QFLAG_PLATE or QFLAG_NONE));
+		quest:SetENpc(FZHUMII,      (not data:GetFlag(FLAG_TALKED_FZHUMII) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(SHOSHOMA,     (not data:GetFlag(FLAG_TALKED_SHOSHOMA) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(DACA_JINJAHL, (not data:GetFlag(FLAG_TALKED_DACA_JINJAHL) and QFLAG_TALK or QFLAG_NONE));
+		quest:SetENpc(AENTFOET,   	(not data:GetFlag(FLAG_TALKED_AENTFOET) and QFLAG_TALK or QFLAG_NONE));
     elseif (sequence == SEQ_001) then 
         quest:SetENpc(AHLDSKYF, QFLAG_REWARD);
     end
@@ -120,7 +121,7 @@ function onTalk(player, quest, npc)
             
             if (seq000_checkCondition(data)) then -- All lost souls spoken to
                 attentionMessage(player, 25225, quest:GetQuestId()); -- "Letting Out Orion's Belt" objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_PLATE issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_001);
             end
         end

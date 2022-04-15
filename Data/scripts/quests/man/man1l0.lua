@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -98,7 +99,7 @@ end
 function onStateChange(player, quest, sequence)
 	local data = quest:GetData();
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
 		quest:SetENpc(BADERON);
 		quest:SetENpc(ADVENTURER);
@@ -106,9 +107,9 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(UNAPPROACHABLE_ADVENTURER);
 		quest:SetENpc(FISH_SMELLING_ADVENTURER);
 		quest:SetENpc(SPEAR_WIELDING_ADVENTURER);
-		quest:SetENpc(TRIGGER_ADVGUILD, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_ADVGUILD, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_010) then
-		quest:SetENpc(BADERON, QFLAG_PLATE);
+		quest:SetENpc(BADERON, QFLAG_TALK);
 		quest:SetENpc(ADVENTURER);
 		quest:SetENpc(WHISPERING_ADVENTURER);
 		quest:SetENpc(UNAPPROACHABLE_ADVENTURER);
@@ -116,10 +117,10 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(SPEAR_WIELDING_ADVENTURER);
 		quest:SetENpc(YSHTOLA);
 	elseif (sequence == SEQ_020) then
-		quest:SetENpc(WAEKBYRT, QFLAG_PLATE);
+		quest:SetENpc(WAEKBYRT, QFLAG_TALK);
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_030) then
-		quest:SetENpc(TRIGGER_MRD, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_MRD, QFLAG_PUSH, false, true);
 		quest:SetENpc(HULKING_CUDA_KNIGHT);
 		quest:SetENpc(SOPHISTICATED_CUDA_KNIGHT);
 		quest:SetENpc(FRIGHTENED_CUDA_KNIGHT);
@@ -127,21 +128,21 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(ENRAGED_PIRATE);
 		quest:SetENpc(WAEKBYRT);
 	elseif (sequence == SEQ_040) then
-		quest:SetENpc(TRIGGER_MRD, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_MRD, QFLAG_PUSH, false, true);
 		quest:SetENpc(PINE_SCENTED_PIRATE);
 		quest:SetENpc(BARITONE_PIRATE);
 		quest:SetENpc(BAYARD);
 		quest:SetENpc(DISGRUNTLED_PIRATE);
 	elseif (sequence == SEQ_060) then
-		quest:SetENpc(TRIGGER_FSH, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_FSH, QFLAG_PUSH, false, true);
 		quest:SetENpc(BADERON);
 	elseif (sequence == SEQ_070) then
-		quest:SetENpc(TRIGGER_SEAFLD, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_SEAFLD, QFLAG_PUSH, false, true);
 		quest:SetENpc(NNMULIKA);
 	elseif (sequence == SEQ_090) then
-		quest:SetENpc(PTAHJHA, QFLAG_PLATE);
+		quest:SetENpc(PTAHJHA, QFLAG_TALK);
 	elseif (sequence == SEQ_100) then
-		quest:SetENpc(TRIGGER_ACN_LOWER, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_ACN_LOWER, QFLAG_PUSH, false, true);
 		quest:SetENpc(ASSESSOR1);
 		quest:SetENpc(ASSESSOR2);
 		quest:SetENpc(HALDBERK);
@@ -152,7 +153,7 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(COQUETTISH_PIRATE);
 		quest:SetENpc(IVAN);
 	elseif (sequence == SEQ_110) then
-		quest:SetENpc(TRIGGER_ACN_UPPER, QFLAG_MAP, false, true);
+		quest:SetENpc(TRIGGER_ACN_UPPER, QFLAG_PUSH, false, true);
 	elseif (sequence == SEQ_122) then
 		quest:SetENpc(BADERON, QFLAG_REWARD);
 	end	

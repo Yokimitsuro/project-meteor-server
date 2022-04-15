@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -57,20 +58,20 @@ function onStateChange(player, quest, sequence)
         local hasQuestItem = player:GetItemPackage(INVENTORY_NORMAL):HasItem(ITEM_WANTED_GAUWYN);
 
         if (hasQuestItem == false) then 
-            quest:SetENpc(OTOPA_POTTOPA, QFLAG_NORM);
+            quest:SetENpc(OTOPA_POTTOPA, QFLAG_TALK);
         end
         quest:SetENpc(THE_ROOST_BED, 5);
-        quest:SetENpc(VKOROLON, QFLAG_NORM); -- Always shows despite interaction
+        quest:SetENpc(VKOROLON, QFLAG_TALK); -- Always shows despite interaction
 
     elseif (sequence == SEQ_000) then
         quest:SetENpc(VKOROLON);
-        quest:SetENpc(NICOLIAUX, QFLAG_NORM);
+        quest:SetENpc(NICOLIAUX, QFLAG_TALK);
         quest:SetENpc(POWLE);
         quest:SetENpc(AUNILLIE);
         quest:SetENpc(GAUWYN_THE_GANNET);
         quest:SetENpc(HILDIBRAND);
         quest:SetENpc(NASHU_MHAKARACCA);
-        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_MAP, false, true, false, true);
+        quest:SetENpc(PRIVATE_AREA_ENTRANCE, QFLAG_PUSH, false, true, false, true);
         
     elseif (sequence == SEQ_010) then 
         quest:SetENpc(VKOROLON, QFLAG_REWARD);
@@ -122,7 +123,7 @@ function onTalk(player, quest, npc)
             else
                 callClientFunction(player, "delegateEvent", player, quest, "processEvent_010");
                 attentionMessage(player, 25225, quest.GetQuestId()); -- objectives complete!
-                quest:UpdateENPCs(); -- Band-aid for a QFLAG_NORM issue
+                quest:UpdateENPCs(); -- Band-aid for a QFLAG_TALK issue
                 quest:StartSequence(SEQ_010);
             end
         elseif (classId == POWLE) then

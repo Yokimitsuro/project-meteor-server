@@ -1,4 +1,5 @@
-require("global");
+require ("global")
+require ("quest")
 
 --[[
 
@@ -109,11 +110,11 @@ function onStateChange(player, quest, sequence)
     if (sequence == SEQ_000) then
         -- Setup states incase we loaded in.
         local asciliaCanPush = not data:GetFlag(FLAG_SEQ000_MINITUT0);
-        local asciliaFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_PLATE;
-        local fretfulfarmhandFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_PLATE;
-        local gildiggingmistressFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_PLATE;
+        local asciliaFlag = data:GetFlag(FLAG_SEQ000_MINITUT1) and QFLAG_NONE or QFLAG_TALK;
+        local fretfulfarmhandFlag = data:GetFlag(FLAG_SEQ000_MINITUT2) and QFLAG_NONE or QFLAG_TALK;
+        local gildiggingmistressFlag = data:GetFlag(FLAG_SEQ000_MINITUT3) and QFLAG_NONE or QFLAG_TALK;
 
-        local exitFlag = data:GetFlags() == 0xF and QFLAG_MAP or QFLAG_NONE;
+        local exitFlag = data:GetFlags() == 0xF and QFLAG_PUSH or QFLAG_NONE;
 
         if (asciliaCanPush) then
             fretfulfarmhandFlag = QFLAG_NONE;
@@ -136,8 +137,8 @@ function onStateChange(player, quest, sequence)
         quest:SetENpc(OPENING_STOPER_ULDAH, QFLAG_NONE, false, false, true);
 
     elseif (sequence == SEQ_010) then
-        local yayatokiFlag = data:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_PLATE;
-        local uldahopeningexitFlag = QFLAG_MAP;
+        local yayatokiFlag = data:GetFlag(FLAG_SEQ010_TALK0) and QFLAG_NONE or QFLAG_TALK;
+        local uldahopeningexitFlag = QFLAG_PUSH;
         quest:SetENpc(KEEN_EYED_MERCHANT);
         quest:SetENpc(HIGH_SPIRITED_FELLOW);
         quest:SetENpc(DISREPUTABLE_MIDLANDER);

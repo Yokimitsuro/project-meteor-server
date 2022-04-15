@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -45,15 +46,15 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_NICOLIAUX, QFLAG_PLATE);
+		quest:SetENpc(ENPC_NICOLIAUX, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
-        quest:SetENpc(ENPC_SYLBYRT, QFLAG_PLATE);
+        quest:SetENpc(ENPC_SYLBYRT, QFLAG_TALK);
 		quest:SetENpc(ENPC_NICOLIAUX);
 	elseif (sequence == SEQ_001) then
 		quest:SetENpc(ENPC_SYLBYRT);
 		quest:SetENpc(BNPC_WANDERING_WIGHT);
 	elseif (sequence == SEQ_002) then
-        quest:SetENpc(ENPC_SYLBYRT, QFLAG_PLATE);
+        quest:SetENpc(ENPC_SYLBYRT, QFLAG_TALK);
 	elseif (sequence == SEQ_003) then
         quest:SetENpc(ENPC_SYLBYRT);
 		quest:SetENpc(ENPC_NICOLIAUX, QFLAG_REWARD);

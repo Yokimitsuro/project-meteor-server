@@ -1,4 +1,5 @@
 require ("global")
+require ("quest")
 
 --[[
 
@@ -41,7 +42,7 @@ end
 
 function onStateChange(player, quest, sequence)	
 	if (sequence == SEQ_ACCEPT) then
-		quest:SetENpc(ENPC_CHAUNOLLET, QFLAG_PLATE);
+		quest:SetENpc(ENPC_CHAUNOLLET, QFLAG_TALK);
 	elseif (sequence == SEQ_000) then
         quest:SetENpc(ENPC_CHAUNOLLET);
 		quest:SetENpc(BNPC_REAVER_EYES);
