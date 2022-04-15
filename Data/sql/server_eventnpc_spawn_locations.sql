@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `server_eventnpc_spawn_locations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table ffxiv_server.server_eventnpc_spawn_locations: ~1,116 rows (approximately)
+-- Dumping data for table ffxiv_server.server_eventnpc_spawn_locations: ~1,241 rows (approximately)
 /*!40000 ALTER TABLE `server_eventnpc_spawn_locations` DISABLE KEYS */;
 REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`, `zoneId`, `privateAreaName`, `privateAreaLevel`, `positionX`, `positionY`, `positionZ`, `rotation`, `motionPack`) VALUES
 	(1, 2104001, 'wharf_rat', 1, '', 0, -84.628, 54.497, -3.52, 2.491, 0),
@@ -1276,7 +1276,39 @@ REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`
 	(2199, 1080091, 'etc5l3_bomb_bane_2', 172, 'PrivateAreaMasterPast', 5, -1736.44, 56.42, -306.239, 0, 0),
 	(2200, 1080093, 'etc5l3_bomb_bane_4', 172, 'PrivateAreaMasterPast', 5, -1743.34, 56.487, -313.03, 0, 0),
 	(2201, 1002114, 'etc5l3_alret', 172, 'PrivateAreaMasterPast', 5, -1732.24, 56.015, -317.12, -1.173, 1005),
-	(2202, 1001996, 'etc5l3_nashu', 172, 'PrivateAreaMasterPast', 5, -1740.96, 56.51, -314.85, 0.8, 0);
+	(2202, 1001996, 'etc5l3_nashu', 172, 'PrivateAreaMasterPast', 5, -1740.96, 56.51, -314.85, 0.8, 0),
+	(2233, 1700001, 'man0g0_penelope', 155, 'PrivateAreaMasterPast', 1, 58.08, 3.8, -1183.33, 2.93, 0),
+	(2234, 1000435, 'man0g0_basewin', 155, 'PrivateAreaMasterPast', 1, 69.39, 4, -1196.54, 2.97, 1041),
+	(2235, 1001184, 'man0g0_gyles', 155, 'PrivateAreaMasterPast', 1, 55.39, 4, -1194.95, 1.09, 1041),
+	(2236, 1000431, 'man0g0_ltandhaa', 155, 'PrivateAreaMasterPast', 1, 66.46, 4, -1201.87, -1.26, 1026),
+	(2237, 1001183, 'man0g0_emoni', 155, 'PrivateAreaMasterPast', 1, 59.81, 4, -1221.17, 0.87, 1015),
+	(2238, 1000429, 'man0g0_honga_vunga', 155, 'PrivateAreaMasterPast', 1, 64.04, 4, -1214.38, 3.14, 1026),
+	(2239, 1000456, 'man0g0_tierney', 155, 'PrivateAreaMasterPast', 1, 56.59, 4, -1205.44, 2.4, 1015),
+	(2240, 1000430, 'man0g0_nonco_menanco', 155, 'PrivateAreaMasterPast', 1, 67.34, 4, -1208.33, -2.63, 1002),
+	(2241, 1001466, 'etc5u1_xdhilogo', 209, 'PrivateAreaMasterPast', 5, -194.39, 195.03, 154.45, 1.5, 1077),
+	(2242, 1001464, 'etc5u1_vannes', 209, 'PrivateAreaMasterPast', 5, -185.18, 195.03, 149.95, 0.07, 1076),
+	(2243, 1001468, 'etc5u1_guencen', 209, 'PrivateAreaMasterPast', 5, -183.75, 174.89, 160.38, -1.61, 0),
+	(2244, 1001995, 'etc5u1_hildibrand', 209, 'PrivateAreaMasterPast', 5, -170.55, 195, 148.501, -1.85, 1031),
+	(2245, 1290002, 'etc5u1_PrivAreaExit', 209, 'PrivateAreaMasterPast', 5, -183.582, 195.007, 147.952, 0, 0),
+	(2246, 1002071, 'etc5g1_nicoliaux', 206, 'PrivateAreaMasterPast', 5, -32.46, 8.75, -1254.38, -1.5, 1),
+	(2247, 1000411, 'etc5g1_elyn', 206, 'PrivateAreaMasterPast', 5, -46.061, 8.692, -1274.25, -0.293, 1005),
+	(2248, 1002067, 'etc5g1_hildibrand', 206, 'PrivateAreaMasterPast', 5, -27.694, 8.4, -1244.56, -2.9, 1052),
+	(2249, 1001996, 'etc5g1_nashu', 206, 'PrivateAreaMasterPast', 5, -42.156, 8.098, -1247.41, 2.1, 1093),
+	(2250, 1000410, 'etc5g1_aunillie', 206, 'PrivateAreaMasterPast', 5, -29.989, 7.961, -1244.35, 2.3, 1042),
+	(2251, 1090087, 'etc5l1_push_cave', 128, '', 0, -156.619, 25.6, -92.19, 0, 0),
+	(2252, 1001903, 'etc5l1_bertrand', 128, 'PrivateAreaMasterPast', 5, -244.619, 12.6, -97.099, 0.8, 1031),
+	(2253, 1090088, 'etc5l1_push_cutscene', 128, '', 0, -400.39, 41, -311.12, 0, 0),
+	(2254, 1080056, 'etc5l1_chest_2', 128, 'PrivateAreaMasterPast', 5, -245.056, 12.556, -99.806, -2, 1080),
+	(2255, 1080057, 'etc5l1_bottle_1', 128, 'PrivateAreaMasterPast', 5, -247.932, 12.171, -96.535, 0.336, 1080),
+	(2256, 1080057, 'etc5l1_bottle_3', 128, 'PrivateAreaMasterPast', 5, -249.13, 12, -96.809, 1.1, 1080),
+	(2257, 1080058, 'etc5l1_box_2', 128, 'PrivateAreaMasterPast', 5, -246.973, 12.442, -98.632, -1.3, 1080),
+	(2258, 1080058, 'etc5l1_box_4', 128, 'PrivateAreaMasterPast', 5, -246.104, 12.54, -100.298, -3, 1080),
+	(2259, 1290002, 'etc5l2_PrivAreaExit', 181, 'PrivateAreaMasterPast', 5, 0, 0, 0, 0, 0),
+	(2260, 1090090, 'etc5l3_push_coffin_coffer', 172, '', 0, -1732.31, 56.063, -305.919, -2.703, 0),
+	(2261, 1080090, 'etc5l3_bomb_bane_1', 172, 'PrivateAreaMasterPast', 5, -1739.28, 56.4, -309.269, 0, 0),
+	(2262, 1080092, 'etc5l3_bomb_bane_3', 172, 'PrivateAreaMasterPast', 5, -1739.94, 56.487, -315.18, 0, 0),
+	(2263, 1080094, 'etc5l3_bomb_bane_5', 172, 'PrivateAreaMasterPast', 5, -1740.43, 56.387, -305.24, 0, 0),
+	(2264, 1001995, 'etc5l3_hildibrand', 172, 'PrivateAreaMasterPast', 5, -1739.87, 56.373, -309.782, 1.916, 2071);
 /*!40000 ALTER TABLE `server_eventnpc_spawn_locations` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
