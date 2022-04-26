@@ -19,21 +19,21 @@ local defaultTalkFst = {
     [1000068] = "defaultTalkWithKain_001",                  -- Kain                 (Gridania: LTW Guild)
     [1000069] = "defaultTalkWithJolline_001",               -- Jolline              (Gridania: LNC Guild)
     [1000071] = "defaultTalkWithBertennant_001",            -- Bertennant           (Gridania: Blue Badger Gate)
-    [1000072] = "defaultTalkWithMitainie_001",              -- <<<NOT IMPLEMENTED>>> Mitainie (Gridania: White Wolf Gate)
+    [1000072] = "defaultTalkWithMitainie_001",              -- Mitainie 			(Gridania: White Wolf Gate)
     [1000074] = "defaultTalkWithOnguen_001",                -- Onguen               (Gridania: BTN Guild)
     [1000230] = "defaultTalkWithMiounne_001",               -- Miounne              (Gridania: Adv. Guild)
     [1000231] = "defaultTalkWithHereward_001",              -- Hereward             (Gridania: LTW Guild)
-    [1000234] = "defaultTalkWithSolieine_001",              -- <<<NOT IMPLEMENTED>>> Soileine [function typo] (Gridania: CNJ Guild)  Has Parley actor id: 1700030
+    [1000234] = "defaultTalkWithSolieine_001",              -- Soileine 			(Gridania: CNJ Guild) [function typo] Has Parley actor id: 1700030
     [1000236] = "defaultTalkWithOpyltyl_001",               -- Opyltyl              (Gridania: BTN Guild)
-    [1000238] = "defaultTalkWithPowle_001",                 -- <<<NOT IMPLEMENTED>>> Powle (Gridania: Acorn Orchard) - Has many actorclass IDs, this is the first one.
-    [1000239] = "defaultTalkWithSansa_001",                 -- <<<NOT IMPLEMENTED>>> Sansa (Gridania: Acorn Orchard)
+    [1000238] = "defaultTalkWithPowle_001",                 -- Powle 				(Gridania: Acorn Orchard) - Has many actorclass IDs, this is the first one.
+    [1000239] = "defaultTalkWithSansa_001",                 -- Sansa 				(Gridania: Acorn Orchard)
     [1000242] = "defaultTalkWithWillelda_001",              -- Willelda             (Gridania: LNC Guild) defaultTalkWithWillelda_002 - After signing up to the guild?
     [1000243] = "defaultTalkWithBurchard_001",              -- Burchard             (Gridania: LNC Guild)
     [1000326] = "defaultTalkWithCicely_001",                -- Cicely               (Gridania: BTN Guild)
-    [1000409] = "defaultTalkWithNicoliaux_001",             -- <<<NOT IMPLEMENTED, HAS MARKER>>> Nicoliaux (Gridania: Acorn Orchard) [has multiple map markers, one might be regular idle location?]
-    [1000410] = "defaultTalkWithAunillie_001",              -- <<<NOT IMPLEMENTED>>> Aunillie (Gridania: Acorn Orchard)
-    [1000411] = "defaultTalkWithElyn_001",                  -- <<<NOT IMPLEMENTED>>> Elyn (Gridania: Acorn Orchard)
-    [1000412] = "defaultTalkWithRyd_001",                   -- <<<NOT IMPLEMENTED>>> Ryd (Gridania: Acorn Orchard)
+    [1000409] = "defaultTalkWithNicoliaux_001",             -- Nicoliaux 			(Gridania: Acorn Orchard) [has multiple map markers, one might be regular idle location?]
+    [1000410] = "defaultTalkWithAunillie_001",              -- Aunillie 			(Gridania: Acorn Orchard)
+    [1000411] = "defaultTalkWithElyn_001",                  -- Elyn 				(Gridania: Acorn Orchard)
+    [1000412] = "defaultTalkWithRyd_001",                   -- Ryd 					(Gridania: Acorn Orchard)
     [1000427] = "defaultTalkWithAnene_001",                 -- Anene                (Gridania: Adv. Guild) defaultTalkWithAnene_002 / 003 (PGL informant)
     [1000428] = "defaultTalkWithSylbyrt_001",               -- Sylbyrt              (Gridania: Adv. Guild) defaultTalkWithSylbyrt_002 / 003 (MRD informant)
     [1000429] = "defaultTalkWithHongavunga_001",            -- Honga Vunga          (Gridania: Adv. Guild) defaultTalkWithHongavunga_002 / 003 (WVR informant)
@@ -49,13 +49,13 @@ local defaultTalkFst = {
     --[1000460] = "defaultTalkWithHetzkin_001",               -- Hetzkin            (Gridania: CNJ Guild) Guildmark NPC - Will not fire, not PplStd.
     [1000463] = "defaultTalkWithNonolato_001",              -- Nonolato             (Gridania: ARC Guild) 
     [1000465] = "defaultTalkWithAnaidjaa_001",              -- A'naidjaa            (Gridania: CRP Guild)
-    [1000504] = "defaultTalkWithTelent_001",                -- <<<NOT IMPLEMENTED>>> Telent (Gridania: CNJ Guild) - Has map marker, but whole-numbered.
-    [1000509] = "defaultTalkWithKinborow_001",              -- <<<NOT IMPLEMENTED, HAS MARKER>>> Kinborow (Gridania: CNJ Guild)
-    [1000510] = "defaultTalkWithZerig_001",                 -- <<<NOT IMPLEMENTED>>> Zerig (Gridania: CNJ Guild) - Has map marker, but whole-numbered.
-    [1000511] = "defaultTalkWithConcessa_001",              -- <<<NOT IMPLEMENTED>>> Concessa (Gridania: CNJ Guild)
-    [1000512] = "defaultTalkWithMaroile_001",               -- <<<NOT IMPLEMENTED, HAS MARKER>>> Maroile (Gridania: CNJ Guild)
-    [1000513] = "defaultTalkWithGugula_001",                -- <<<NOT IMPLEMENTED>>> Gugula (Gridania: CNJ Guild)
-    [1000556] = "defaultTalkWithWybir_001",                 -- <<<NOT IMPLEMENTED, HAS MARKER>>> Wybir (South Shroud: Quarrymill)
+    [1000504] = "defaultTalkWithTelent_001",                -- Telent 				(Gridania: CNJ Guild) - Has map marker, but whole-numbered.
+    [1000509] = "defaultTalkWithKinborow_001",              -- Kinborow 			(Gridania: CNJ Guild) - Has marker
+    [1000510] = "defaultTalkWithZerig_001",                 -- Zerig 				(Gridania: CNJ Guild) - Has map marker, but whole-numbered.
+    [1000511] = "defaultTalkWithConcessa_001",              -- Concessa 			(Gridania: CNJ Guild)
+    [1000512] = "defaultTalkWithMaroile_001",               -- Maroile 				(Gridania: CNJ Guild) - Has marker
+    [1000513] = "defaultTalkWithGugula_001",                -- Gugula 				(Gridania: CNJ Guild)
+    [1000556] = "defaultTalkWithWybir_001",                 -- <<<NOT IMPLEMENTED, HAS MARKER>>> Wybir (South Shroud: Quarrymill) - Has marker
     [1000565] = "defaultTalkWithCeinguled_001",             -- Ceinguled            (Gridania: LNC Guild)
     [1000566] = "defaultTalkWithFrancis_001",               -- Francis              (Gridania: LNC Guild) arg1=1, npc recognizes you're in the LNC guild
     [1000567] = "defaultTalkWithDhemdaeg_001",              -- Dhemdaeg             (Gridania: LNC Guild)
@@ -76,7 +76,7 @@ local defaultTalkFst = {
     [1000671] = "defaultTalkWithMiraudont_001",             -- Miraudont            (North Shroud: Camp Emerald Moss) arg1=true - Mentions Atomos
     [1000681] = "defaultTalkWithNuala_001",                 -- Nuala                (Gridania: LNC Guild)
     [1000701] = "defaultTalkWithZuzupoja_001",              -- Zuzupoja             (Gridania: CRP Guild)
-    [1000737] = "defaultTalkWithBiddy_001",                 -- <<<NOT IMPLEMENTED>>> Biddy (Gridania: CNJ Guild) - Has map marker, but whole-numbered.
+    [1000737] = "defaultTalkWithBiddy_001",                 -- Biddy 				(Gridania: CNJ Guild) - Has map marker, but whole-numbered.
     [1000821] = "defaultTalkWithNellaure_001",              -- Nellaure             (Gridania: CRP Guild)
     [1000822] = "defaultTalkWithCaplan_001",                -- Caplan               (Gridania: CRP Guild)
     [1000823] = "defaultTalkWithUlmhylt_001",               -- Ulmhylt              (Gridania: CRP Guild)
@@ -84,12 +84,12 @@ local defaultTalkFst = {
     [1000830] = "defaultTalkWithGeorjeaux_001",             -- Georjeaux            (Gridania: ARC Guild) defaultTalkWithGeorjeaux_002 - Dialog when you're part of the guild?
     [1000831] = "defaultTalkWithAlaire_001",                -- Alaire               (Gridania: ARC Guild)
     [1000832] = "defaultTalkWithMianne_001",                -- Mianne               (Gridania: ARC Guild)
-    [1000837] = "defaultTalkWithRdjongo_001",               -- <<<NOT IMPLEMENTED>>> R'djongo (Gridania: Stillglade Fane)
-    [1000839] = "defaultTalkWithKhujazhwan_001",            -- <<<NOT IMPLEMENTED>>> Khuja Zhwan (Gridania: Stillglade Fane)
+    [1000837] = "defaultTalkWithRdjongo_001",               -- R'djongo 			(Gridania: Stillglade Fane)
+    [1000839] = "defaultTalkWithKhujazhwan_001",            -- Khuja Zhwan 			(Gridania: Stillglade Fane)
     [1000951] = "defaultTalkWithLonsygg_001",               -- Lonsygg              (Gridania: Blue Badger Gate)
     [1000978] = "defaultTalkWithGylbart_001",               -- <<<NOT IMPLEMENTED, HAS MARKER>>> Gylbart (South Shroud: Quarrymill)
-    [1001071] = "defaultTalkWithTnbulea_001",               -- <<<NOT IMPLEMENTED>>> T'nbulea (Gridania: CNJ Guild)
-    [1001072] = "defaultTalkWithFoforyo_001",               -- <<<NOT IMPLEMENTED>>> Foforyo (Gridania: CNJ Guild)
+    [1001071] = "defaultTalkWithTnbulea_001",               -- T'nbulea 			(Gridania: CNJ Guild)
+    [1001072] = "defaultTalkWithFoforyo_001",               -- Foforyo 				(Gridania: CNJ Guild)
     [1001077] = "defaultTalkWithBeli_001",                  -- Beli                 (Gridania: LTW Guild)
     [1001078] = "defaultTalkWithMaddeline_001",             -- Maddeline            (Gridania: LTW Guild)
     [1001079] = "defaultTalkWithDyrstbrod_001",             -- Dyrstbrod            (Gridania: LTW Guild)
@@ -106,7 +106,7 @@ local defaultTalkFst = {
     [1001175] = "defaultTalkWithChloe_001",                 -- Chloe                (Gridania: ARC Guild)
     [1001188] = "defaultTalkWithGuildleveClientG_001",      -- Maisenta             (Gridania)
     [1001189] = "defaultTalkWithGuildleveClientG_002",      -- Pukiki               (Gridania)
-    [1001190] = "defaultTalkWithGuildleveClientG_003",      -- <<<NOT IMPLEMENTED, HAS MARKER>>> Eugenaire (Gridania: White Wolf Gate)
+    [1001190] = "defaultTalkWithGuildleveClientG_003",      -- Eugenaire 			(Gridania: White Wolf Gate) - Has marker
     [1001294] = "defaultTalkWithIolaine_001",               -- <<<NOT IMPLEMENTED>>> Iolaine - Entry Denier Guard (West Shroud) - Also guards fst_f0_dun06
     [1001338] = "defaultTalkWithLivith_001",                -- <<<NOT IMPLEMENTED>>> Livith (North Shroud: Hyrstmill)
     [1001339] = "defaultTalkWithProscen_001",               -- <<<NOT IMPLEMENTED>>> Proscen (North Shroud: Hyrstmill)
@@ -129,8 +129,8 @@ local defaultTalkFst = {
     [1001431] = "defaultTalkWithGenna_001",                 -- Genna                (Gridania: Mih Khetto's Amphitheatre)
     [1001432] = "defaultTalkWithMathye_001",                -- Mathye               (Gridania: Blue Badger Gate)
     [1001433] = "defaultTalkWithUlta_001",                  -- Ulta                 (Gridania: Blue Badger Gate)
-    [1001434] = "defaultTalkWithNicia_001",                 -- <<<NOT IMPLEMENTED>>> Nicia (Gridania: White Wolf Gate)
-    [1001435] = "defaultTalkWithBlandie_001",               -- <<<NOT IMPLEMENTED>>> Blandie (Gridania: White Wolf Gate)
+    [1001434] = "defaultTalkWithNicia_001",                 -- Nicia 				(Gridania: White Wolf Gate)
+    [1001435] = "defaultTalkWithBlandie_001",               -- Blandie 				(Gridania: White Wolf Gate)
     [1001436] = "defaultTalkWithOwyne_001",                 -- Owyne                (Gridania: Aetheryte Plaza)
     [1001437] = "defaultTalkWithSybell_001",                -- Sybell               (Gridania: Aetheryte Plaza)
     [1001459] = "defaultTalkWithFlavielle_001",             -- Flavielle            (Gridania: Adv. Guild) defaultTalkWithFlavielle_002 / 003 (ARM informant)
@@ -159,7 +159,7 @@ local defaultTalkFst = {
     [1001708] = "defaultTalkWithBeaudonet_001",             -- Beaudonet            (Gridania: Adv. Guild)
     [1001709] = "defaultTalkWithFryswyde_001",              -- Fryswyde             (Gridania: Adv. Guild)
     [1001710] = "defaultTalkWithWillielmus_001",            -- Willielmus           (Gridania: Adv. Guild)
-    [1001711] = "defaultTalkWithQZamqo_001",                -- <<<NOT IMPLEMENTED>>> Q'zamqo (Gridania: Airship Landing)
+    [1001711] = "defaultTalkWithQZamqo_001",                -- Q'zamqo 				(Gridania: Airship Landing)
     [1001806] = "defaultTalkEnie_001",                      -- Enie                 (Gridania: BTN Guild)
     [1001835] = "defaultTalkWithVorsaile_001",              -- <<<NOT IMPLEMENTED, HAS MARKER>>> Serpent Commander Heuloix (North Shroud: Emerald Moss)
     [1001836] = "defaultTalkWithPukwapika_001",             -- <<<NOT IMPLEMENTED, HAS MARKER>>> Pukwa Pika (West Shroud: Turning Leaf) - Involved in "A Feast of Fools", Thornmarch fight
@@ -178,7 +178,7 @@ local defaultTalkFst = {
     [1060039] = "defaultTalkWithJehantel_001",              -- <<<NOT IMPLEMENTED, HAS MARKER>>> Jehantel (South Shroud: Tranquil Paths) BRD Job NPC - defaultTalkWithJehantel_002 
     [1060043] = "defaultTalkWithLegendBsm_001",             -- <<<NOT IMPLEMENTED, HAS MARKER>>> Gerolt (East Shroud: Hawthorne Hut) - Arg1 controls which line of dialog he plays, otherwise nothing shows
     --[1060022] = "defaultTalkLouisoix_001",                  -- Louisoix           (Gridania: Apkallus Falls) - Will not fire, not PplStd.
-    [1200121] = "bookTalk",                                 -- <<<NOT IMPLEMENTED>>> Dusty Tomes  (Gridania: CNJ Guild) - Will not fire since it isn't PplStd.  Identical dialog regardless.
+    [1200121] = "bookTalk",                                 -- Dusty Tomes  		(Gridania: CNJ Guild) - Will not fire since it isn't PplStd.  Identical dialog regardless.
     [1500055] = "defaultTalkWithLionnellais_001",           -- Lionnellais          (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
     [1500056] = "defaultTalkWithHida_001",                  -- Hida                 (Gridania: Adv. Guild) - Will not fire, not PplStd.  Pre-airship dialog?
     [1500060] = "defaultTalkWithHonoroit_001",              -- <<<NOT IMPLEMENTED>>> Honoroit (Central Shroud) - Hangs around (-200, 5, -810), has an untargetable chocobo carriage behind
@@ -256,8 +256,6 @@ function IsQuestENPC(player, quest, npc)
     return defaultTalkFst[npc:GetActorClassId()] ~= nil;
 end
 
-
-
 function defaultTalkWithInn(player, quest, clientFunc)
     local choice = callClientFunction(player, "delegateEvent", player, quest, clientFunc);
         
@@ -272,10 +270,6 @@ function defaultTalkWithInn(player, quest, clientFunc)
         end
     end
 end
-
-
-
-
 
 function talkWithSpecial(player, npcId, clientFunc)
         local splQuest = GetStaticActor("Spl000");

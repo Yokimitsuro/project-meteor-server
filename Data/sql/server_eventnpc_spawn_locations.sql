@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `server_eventnpc_spawn_locations` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- Dumping data for table ffxiv_server.server_eventnpc_spawn_locations: ~1,241 rows (approximately)
+-- Dumping data for table ffxiv_server.server_eventnpc_spawn_locations: ~1,181 rows (approximately)
 /*!40000 ALTER TABLE `server_eventnpc_spawn_locations` DISABLE KEYS */;
 REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`, `zoneId`, `privateAreaName`, `privateAreaLevel`, `positionX`, `positionY`, `positionZ`, `rotation`, `motionPack`) VALUES
 	(1, 2104001, 'wharf_rat', 1, '', 0, -84.628, 54.497, -3.52, 2.491, 0),
@@ -1196,7 +1196,7 @@ REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`
 	(2119, 1090087, 'man2l0_seafld1_push2', 128, 'PrivateAreaMasterPast', 3, 221.01, 19.2, 1177.62, 0, 0),
 	(2120, 1000001, 'man2l0_echo2_yshtola', 128, 'PrivateAreaMasterPast', 3, 204.076, 25.286, 1181.84, 1.532, 0),
 	(2121, 1290002, 'man2l0_echo2_privarea_exit', 128, 'PrivateAreaMasterPast', 3, 225.665, 16.987, 1179.94, 0, 0),
-	(2122, 1001190, 'eugenaire', 206, '', 0, -70.77, 5.104, -1231.6, -1.2, 0),
+	(2122, 1001190, 'eugenaire', 206, '', 0, -70.88, 5.104, -1231.34, -1.2, 0),
 	(2123, 1000367, 'fongho', 128, '', 0, 288.24, 26.485, 342.12, -0.754, 0),
 	(2124, 1001764, 'baenryss', 128, '', 0, 0, 27.6, 0, 0, 0),
 	(2125, 1001765, 'chachapi', 128, '', 0, 0, 27.78, 0, 0, 0),
@@ -1212,7 +1212,7 @@ REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`
 	(2135, 1000410, 'aunillie', 206, '', 0, -34.157, 8.5, -1241.01, 3, 1069),
 	(2136, 1000411, 'elyn', 206, '', 0, -46.061, 8.692, -1274.25, -0.293, 1005),
 	(2137, 1000412, 'ryd', 206, '', 0, -42.471, 8, -1257.6, 0.6, 0),
-	(2138, 1000509, 'kinborow', 206, '', 0, -362.96, 6.82, -1693.98, 0, 0),
+	(2138, 1000509, 'kinborow', 206, '', 0, -362.96, 6.82, -1693.98, -2.8, 1047),
 	(2139, 1001352, 'ethelinda', 154, '', 0, 1313.99, -11.8, 963.94, -2.505, 0),
 	(2140, 1001358, 'patrick', 145, '', 0, 2627.58, 174.745, 1392.85, 0, 0),
 	(2141, 1001574, 'arscelin', 145, '', 0, 2625, 174.724, 1329, 0, 0),
@@ -1308,7 +1308,28 @@ REPLACE INTO `server_eventnpc_spawn_locations` (`id`, `actorClassId`, `uniqueId`
 	(2261, 1080090, 'etc5l3_bomb_bane_1', 172, 'PrivateAreaMasterPast', 5, -1739.28, 56.4, -309.269, 0, 0),
 	(2262, 1080092, 'etc5l3_bomb_bane_3', 172, 'PrivateAreaMasterPast', 5, -1739.94, 56.487, -315.18, 0, 0),
 	(2263, 1080094, 'etc5l3_bomb_bane_5', 172, 'PrivateAreaMasterPast', 5, -1740.43, 56.387, -305.24, 0, 0),
-	(2264, 1001995, 'etc5l3_hildibrand', 172, 'PrivateAreaMasterPast', 5, -1739.87, 56.373, -309.782, 1.916, 2071);
+	(2264, 1001995, 'etc5l3_hildibrand', 172, 'PrivateAreaMasterPast', 5, -1739.87, 56.373, -309.782, 1.916, 2071),
+	(2296, 1000234, 'soileine', 206, '', 0, -330.813, 8, -1682.83, 0.3, 1015),
+	(2297, 1000460, 'hetzkin', 206, '', 0, -328.943, 8, -1682.79, 0, 1016),
+	(2298, 1000073, 'cornell', 206, '', 0, -351.965, 8, -1673.36, 3.12, 0),
+	(2299, 1000737, 'biddy', 206, '', 0, -342.387, 8, -1675.51, -2, 0),
+	(2300, 1000504, 'telent', 206, '', 0, -354.234, 6.244, -1697.72, 0.76, 1040),
+	(2301, 1000510, 'zerig', 206, '', 0, -350.22, 6.82, -1705.42, -0.236, 0),
+	(2302, 1000511, 'concessa', 206, '', 0, -342.55, 6.821, -1698.93, -1.37, 0),
+	(2303, 1000512, 'maroile', 206, '', 0, -340.55, 8, -1679.17, 0.94, 1016),
+	(2304, 1000513, 'gugula', 206, '', 0, -339.898, 8, -1679.94, -2.18, 0),
+	(2305, 1000628, 'mourechaux', 206, '', 0, -352.08, 11.5, -1718.32, 0, 1002),
+	(2306, 1001071, 'tnbulea', 206, '', 0, -334.407, 8, -1669.74, 3, 0),
+	(2307, 1001072, 'foforyo', 206, '', 0, -325.68, 8, -1677.06, -1.8, 0),
+	(2308, 1200121, 'dusty_tomes_grid', 206, '', 0, -327.9, 9.3, -1681.69, 0, 0),
+	(2309, 1600079, 'juelerand', 206, '', 0, -335.244, 8, -1684.11, 0.6, 0),
+	(2310, 1000839, 'khuja_zhwan', 206, '', 0, -242.21, 19.32, -1645.61, 1.03, 0),
+	(2311, 1000837, 'rdjongo', 206, '', 0, -237.626, 19.3, -1649.29, 0.72, 1017),
+	(2312, 1000072, 'mitainie', 206, '', 0, -87.17, 4.5, -1212.46, -1.6, 2026),
+	(2314, 1001434, 'nicia', 206, '', 0, -89.66, 4.45, -1221.76, -1, 1017),
+	(2315, 1001435, 'blandie', 206, '', 0, -69.82, 8.5, -1215.72, -1.2, 0),
+	(2316, 1001711, 'qzamqo', 206, '', 0, 38.878, -10, -1185.38, 1.5, 1056),
+	(2317, 5900001, 'mihkhetto_amphitheatre_gate', 206, '', 0, -96, 15.45, -1606, 0, 0);
 /*!40000 ALTER TABLE `server_eventnpc_spawn_locations` ENABLE KEYS */;
 
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
