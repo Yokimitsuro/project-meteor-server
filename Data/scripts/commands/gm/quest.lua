@@ -16,10 +16,10 @@ function onTrigger(player, argc, quest, command, var1, var2)
 
     local messageID = MESSAGE_TYPE_SYSTEM_ERROR;
     local sender = "[quest] ";
-    local message = "Error";
-    local questId = tonumber(quest);
-    
-    if (type(questId) == "number") then
+    local message = "Error";    
+    	
+    if (type(tonumber(quest)) == "number") then
+		local questId = tonumber(quest);
         if (questId < 110001 or questId > 110001 + 2048) and player then
             player:SendMessage(messageID, sender, "Invalid questId entered");
             player:SendMessage(messageID, sender, argc);
@@ -43,6 +43,9 @@ function onTrigger(player, argc, quest, command, var1, var2)
                 message = ("Error: Command "..command.." not recognized");
             end 
         end
+	elseif (quest == "update") then
+		player:ForceQuestStateUpdate();
+		message = ("Forcing QuestState update...");
     else
         message = ("Error: Quest id must be a valid number.")
     end

@@ -140,6 +140,9 @@ namespace Meteor.Map.Actors.QuestNS
 
         public void NewNpcLsMsg(uint from)
         {
+            if (!owner.HasNpcLs(from))
+                owner.AddNpcLs(from);
+
             data.SetNpcLsFrom(from);
             owner.SetNpcLs(from, Player.NPCLS_ALERT);            
             owner.SendGameMessage(Server.GetWorldManager().GetActor(), 25119, 0x20, (object)from); // A glow emanates from the <NpcLs> linkpearl. 

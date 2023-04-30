@@ -44,9 +44,13 @@ function onEventStarted(player, aetheryte, triggerName)
 	elseif (player:HasQuest(110006) == true) then
 		require ("quests/man/man0g1");
 		local quest = player:GetQuest("Man0g1");
-		if (quest:GetSequence() == SEQ_005) then			
-			callClientFunction(player, "delegateEvent", player, quest, "processEvent013");
-			--quest:StartSequence(???);
+		if (quest:GetSequence() == SEQ_005) then
+			if (ENABLE_GL_TUTORIAL) then			
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent013");
+			else
+				callClientFunction(player, "delegateEvent", player, quest, "processEvent013_2");
+			end
+			quest:StartSequence(SEQ_010);
 		end
 	elseif (player:HasQuest(110010) == true) then
 		require ("quests/man/man0u1");

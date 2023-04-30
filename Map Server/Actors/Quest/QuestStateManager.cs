@@ -146,6 +146,11 @@ namespace Meteor.Map.Actors.QuestNS
             }
         }
 
+        public void ForceQuestStateUpdate()
+        {
+            ComputeAvailable();
+        }
+
         public Quest GetActiveQuest(uint id)
         {
             return ActiveQuests.Find(quest => quest.GetQuestId() == id);
@@ -153,10 +158,7 @@ namespace Meteor.Map.Actors.QuestNS
 
         public Quest[] GetQuestsForNpc(Npc npc, bool isPrivateArea)
         {
-            if (isPrivateArea)
-                return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc) && quest.GetSequence() != Quest.SEQ_NOT_STARTED).ToArray();
-            else
-                return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
+            return ActiveQuests.FindAll(quest => quest.IsQuestENPC(player, npc)).ToArray();
         }
 
         public byte[] GetCompletionSliceBytes(ushort from, ushort to)

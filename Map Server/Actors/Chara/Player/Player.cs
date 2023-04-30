@@ -1644,6 +1644,7 @@ namespace Meteor.Map.Actors
                     Database.RemoveQuest(this, questScenario[i].Id);
                     questScenario[i] = null;
                     playerWork.questScenario[i] = 0;
+                    questStateManager.UpdateQuestAbandoned();
                     SendQuestClientUpdate(i);
                     break;
                 }
@@ -1659,6 +1660,7 @@ namespace Meteor.Map.Actors
                     Database.RemoveQuest(this, questScenario[i].Id);
                     questScenario[i] = null;
                     playerWork.questScenario[i] = 0;
+                    questStateManager.UpdateQuestAbandoned();
                     SendQuestClientUpdate(i);
                     break;
                 }
@@ -1946,6 +1948,11 @@ namespace Meteor.Map.Actors
             return quests;
         }
 
+        public void ForceQuestStateUpdate()
+        {
+            questStateManager.ForceQuestStateUpdate();
+        }
+
         public void HandleBNpcKill(uint bnpcClassId)
         {
             foreach (Quest quest in questScenario)
@@ -1975,6 +1982,11 @@ namespace Meteor.Map.Actors
                 SetNpcLs(npcLsId, NPCLS_INACTIVE);
                 SendGameMessage(Server.GetWorldManager().GetActor(), 25118, 0x20, npcLsId); // "<NpcLs> linkpearl obtained."
             }
+        }
+
+        public bool HasNpcLs(uint npcLsId)
+        {
+            return !(playerWork.npcLinkshellChatExtra[npcLsId] == false && playerWork.npcLinkshellChatCalling[npcLsId] == false);
         }
 
         public void SetNpcLs(uint npcLsId, uint state)

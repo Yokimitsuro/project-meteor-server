@@ -10,10 +10,10 @@ function onBeginLogin(player)
 			player:AddQuest(110001);
 			player:SetHomePoint(1280001);
 		elseif (initialTown == 2 and player:HasQuest(110005) == false) then
-			--player:AddQuest(110005);
+			player:AddQuest(110005);
 			player:SetHomePoint(1280061);
 		elseif (initialTown == 3 and player:HasQuest(110009) == false) then
-			--player:AddQuest(110009);
+			player:AddQuest(110009);
 			player:SetHomePoint(1280031);
 		end		
 		
@@ -30,11 +30,11 @@ function onBeginLogin(player)
 		elseif (player:HasItem(10011252) and not player:HasQuest(110849)) then
 			dreamCode = 2;
 		-- Nael Van Darnus nightmare
-		elseif (player:???) then
-			dreamCode = 20;
+		--elseif (player:???) then
+		--	dreamCode = 20;
 		-- Random item
-		elseif (player:???) then
-			dreamCode = math.random(21, 33);
+		--elseif (player:???) then
+		--	dreamCode = math.random(21, 33);
 		end
 		
 		player:SetLoginDreamCode(dreamCode);

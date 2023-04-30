@@ -100,41 +100,23 @@ function onFinish(player, quest)
 end
 
 function onStateChange(player, quest, sequence)
+    local data = quest:GetData();
+	
     if (sequence == SEQ_000) then
-        -- Setup states incase we loaded in.
-        local data = quest:GetData();
-
-        local ydaCanPush = (not data:GetFlag(FLAG_SEQ000_MINITUT0));
-        local ydaFlag = QFLAG_TALK;
-        
-        if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) or (data:GetFlag(FLAG_SEQ000_MINITUT1)) then
-            ydaFlag = QFLAG_TALK;
-        else
-            ydaFlag = QFLAG_NONE;
-        end
-        
-        local papalymoFlag = ((not data:GetFlag(FLAG_SEQ000_MINITUT1)) and data:GetFlag(FLAG_SEQ000_MINITUT0) and QFLAG_TALK or QFLAG_NONE);
-        
-        --SetENpc(classId, byte flagType=0,isTalkEnabled, isPushEnabled, isEmoteEnabled, isSpawned)
-        quest:SetENpc(YDA, ydaFlag, true, ydaCanPush);
+        -- Setup states incase we loaded in.        
+		local ydaFlag = ((not data:GetFlag(FLAG_SEQ000_MINITUT0)) or (data:GetFlag(FLAG_SEQ000_MINITUT1))) and QFLAG_TALK or QFLAG_OFF;
+        local papalymoFlag = ((not data:GetFlag(FLAG_SEQ000_MINITUT1)) and data:GetFlag(FLAG_SEQ000_MINITUT0) and QFLAG_TALK or QFLAG_OFF);
+        		
+        quest:SetENpc(YDA, ydaFlag, true, not data:GetFlag(FLAG_SEQ000_MINITUT0));
         quest:SetENpc(PAPALYMO, papalymoFlag);
-
-
-    elseif (sequence == SEQ_010) then
-        local data = quest:GetData();
-        
-        local tkebbeTalk = (not data:GetFlag(FLAG_SEQ010_TKEBBE) and QFLAG_TALK or QFLAG_NONE);
-        
+    elseif (sequence == SEQ_010) then                      
         quest:SetENpc(FARRIMOND);
         quest:SetENpc(CECILIA);
         quest:SetENpc(SWETHYNA);
-        quest:SetENpc(TKEBBE, tkebbeTalk);
+        quest:SetENpc(TKEBBE, not data:GetFlag(FLAG_SEQ010_TKEBBE) and QFLAG_TALK or QFLAG_OFF);
         quest:SetENpc(LONSYGG);
-        quest:SetENpc(BLOCKER1, QFLAG_NONE, false, true);
-        quest:setENpc(GUILD_ENTRANCE, QFLAG_PUSH, false, true);
-        
-        
-        
+        quest:SetENpc(BLOCKER1, QFLAG_OFF, false, true);
+        quest:setENpc(PUSH_ADV_GUILD, QFLAG_PUSH, false, true);
     end
 end
 
@@ -165,7 +147,7 @@ function onPush(player, quest, npc)
             callClientFunction(player, "delegateEvent", player, quest, "processTtrBlkNml001");
             GetWorldManager():DoPlayerMoveInZone(player, 109.966, 7.559, -1206.117, -2.7916, 0x11)
             player:EndEvent();        
-        elseif (classId == GUILD_ENTRANCE) then 
+        elseif (classId == PUSH_ADV_GUILD) then 
             player:ReplaceQuest(quest, "Man0g1")
             return;
         end
@@ -185,7 +167,6 @@ end
 function seq000_onTalk(player, quest, npc, classId)
     local data = quest:GetData();
     if (classId == YDA) then
-
         if (not data:GetFlag(FLAG_SEQ000_MINITUT0)) then -- If Talk tutorial
             callClientFunction(player, "delegateEvent", player, quest, "processTtrNomal003");
             data:SetFlag(FLAG_SEQ000_MINITUT0); -- Disable Yda's PushEvent and set up Papalymo
@@ -194,7 +175,6 @@ function seq000_onTalk(player, quest, npc, classId)
         else
             callClientFunction(player, "delegateEvent", player, quest, "processEvent000_3");
         end
-
     elseif (classId == PAPALYMO) then
         if (data:GetFlag(FLAG_SEQ000_MINITUT0)) then
             callClientFunction(player, "delegateEvent", player, quest, "processEvent000_2");

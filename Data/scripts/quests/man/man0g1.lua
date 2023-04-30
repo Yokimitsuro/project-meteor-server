@@ -361,6 +361,16 @@ function onTalk(player, quest, npc)
 			return;
 		elseif (classId == BURCHARD) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent210_2");
+		elseif (classId == TKEBBE) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent200_3");
+		elseif (classId == FARRIMOND) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent200_4");
+		elseif (classId == MANSEL) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent200_5");
+		elseif (classId == JIJIMAYA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent200_6");
+		elseif (classId == CECILIA) then
+			callClientFunction(player, "delegateEvent", player, quest, "processEvent200_8");
 		end
 	elseif (sequence == SEQ_100) then
 		if (classId == NUALA) then

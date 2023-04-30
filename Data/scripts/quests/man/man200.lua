@@ -291,7 +291,7 @@ function onPush(player, quest, npc)
 		elseif (sequence == SEQ_000 and not data:GetFlag(FLAG_VISITED)) then
 		end
 		player:EndEvent();
-		GetWorldManager():DoZoneChange(player, 181, nil, 0, 15, -205.25, 0, -160, 1.55);
+		GetWorldManager():DoZoneChange(player, 181, "PrivateAreaMasterPast", 0, 15, -205.25, 0, -160, 1.55);
 		return;
 	end
 	

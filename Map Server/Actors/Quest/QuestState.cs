@@ -72,6 +72,10 @@ namespace Meteor.Map.Actors.QuestNS
                     instanceUpdated = OldENPCs[classId];
                 }
 
+                // Replace dupes
+                if (CurrentENPCs.ContainsKey(classId))
+                    CurrentENPCs.Remove(classId);
+
                 CurrentENPCs.Add(classId, OldENPCs[classId]);
                 OldENPCs.Remove(classId);
             }

@@ -148,7 +148,29 @@ function onEventStarted(player, npc, eventType, eventName)
                 GetWorldManager():DoZoneChange(player, warp[1], nil, 0, 0x02, warp[2], warp[3], warp[4], warp[5]);          
                 break;
 		elseif (choice == 2095 or choice == 3095) then -- Quest
-			quests[1]:OnPush(player, npc, eventName);
+			-- This should never happen but in dev it will:
+			-- Either let the player choose the quest or start it if it's the only one.
+			local chosenQuest = quests[1];
+			if (#quests > 1) then
+				local currentPage = 0;
+				local numPages = math.floor((#quests-1)/4) + 1;
+				
+				while (true) do
+					local page, index = callClientFunction(player, "switchEvent", quests[currentPage * 4 + 1], quests[currentPage * 4 + 2], quests[currentPage * 4 + 3], quests[currentPage * 4 + 4], currentPage + 1, numPages, 0x3F1);
+					
+					if (page == 0) then
+						chosenQuest = quests[(currentPage * 4) + index];
+						break;
+					elseif (page > 0) then
+						currentPage = page - 1;
+					else
+						player:EndEvent();
+						return;
+					end
+				end
+			end
+		
+			chosenQuest:OnPush(player, npc, eventName);
 			return;
         elseif (choice == 0 or choice == -3) then -- Menu Closed
             break;  
