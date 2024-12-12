@@ -105,21 +105,21 @@ namespace Meteor.Lobby
                         MySqlCommand cmd2 = new MySqlCommand();
                         cmd2.Connection = conn;
                         cmd2.CommandText = "UPDATE characters SET serverId = @serverId, name = @name WHERE id = @cid";
-                        cmd2.Prepare();
                         cmd2.Parameters.AddWithValue("@serverId", serverId);
                         cmd2.Parameters.AddWithValue("@name", name);
                         cmd2.Parameters.AddWithValue("@cid", cid);
+                        cmd2.Prepare();
                         cmd2.ExecuteNonQuery();
                     } else //Reserve
                     {
                         MySqlCommand cmd2 = new MySqlCommand();
                         cmd2.Connection = conn;
                         cmd2.CommandText = "INSERT INTO characters(userId, slot, serverId, name, state) VALUES(@userId, @slot, @serverId, @name, 0)";
-                        cmd2.Prepare();
                         cmd2.Parameters.AddWithValue("@userId", userId);
                         cmd2.Parameters.AddWithValue("@slot", slot);
                         cmd2.Parameters.AddWithValue("@serverId", serverId);
                         cmd2.Parameters.AddWithValue("@name", name);
+                        cmd2.Prepare();
                         cmd2.ExecuteNonQuery();
                         cid = (ushort)cmd2.LastInsertedId;
                         pid = 0xBABE;
@@ -234,13 +234,17 @@ namespace Meteor.Lobby
                 {
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.Connection = conn;
-                    cmd.CommandText = String.Format("INSERT INTO characters_class_levels(characterId, {0}) VALUES(@characterId, 1); INSERT INTO characters_class_exp(characterId) VALUES(@characterId)", CharacterCreatorUtils.GetClassNameForId((short)charaInfo.currentClass));
-                    cmd.Prepare();
-
+                    cmd.CommandText = String.Format("INSERT INTO characters_class_levels(characterId, {0}) VALUES(@characterId, 1);", CharacterCreatorUtils.GetClassNameForId((short)charaInfo.currentClass));
                     cmd.Parameters.AddWithValue("@characterId", cid);
-
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();
 
+                    MySqlCommand cmd2 = new MySqlCommand();
+                    cmd.Connection = conn;
+                    cmd.CommandText = String.Format("INSERT INTO characters_class_exp(characterId) VALUES(@characterId2)");
+                    cmd.Parameters.AddWithValue("@characterId2", cid);
+                    cmd.Prepare();
+                    cmd.ExecuteNonQuery();
                 }
                 catch (MySqlException e)
                 {
@@ -256,11 +260,9 @@ namespace Meteor.Lobby
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandText = String.Format("INSERT INTO characters_parametersave(characterId, hp, hpMax, mp, mpMax, mainSkill, mainSkillLevel) VALUES(@characterId, 1900, 1000, 115, 115, @mainSkill, 1);", CharacterCreatorUtils.GetClassNameForId((short)charaInfo.currentClass));
-                    cmd.Prepare();
-
                     cmd.Parameters.AddWithValue("@characterId", cid);
                     cmd.Parameters.AddWithValue("@mainSkill", charaInfo.currentClass);
-
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();
 
                 }
@@ -277,9 +279,8 @@ namespace Meteor.Lobby
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandText = "SELECT id FROM server_battle_commands WHERE classJob = @classjob AND lvl = 1 ORDER BY id DESC";
-                    cmd.Prepare();
-
                     cmd.Parameters.AddWithValue("@classJob", charaInfo.currentClass);
+                    cmd.Prepare();
                     List<uint> defaultActions = new List<uint>();
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -291,16 +292,16 @@ namespace Meteor.Lobby
                     MySqlCommand cmd2 = new MySqlCommand();
                     cmd2.Connection = conn;
                     cmd2.CommandText = "INSERT INTO characters_hotbar (characterId, classId, hotbarSlot, commandId, recastTime) VALUES (@characterId, @classId, @hotbarSlot, @commandId, 0)";
-                    cmd2.Prepare();
                     cmd2.Parameters.AddWithValue("@characterId", cid);
                     cmd2.Parameters.AddWithValue("@classId", charaInfo.currentClass);
                     cmd2.Parameters.Add("@hotbarSlot", MySqlDbType.Int16);
                     cmd2.Parameters.Add("@commandId", MySqlDbType.Int16);
 
-                    for(int i = 0; i < defaultActions.Count; i++)
+                    for (int i = 0; i < defaultActions.Count; i++)
                     {
                         cmd2.Parameters["@hotbarSlot"].Value = i;
                         cmd2.Parameters["@commandId"].Value = defaultActions[i];
+                        cmd2.Prepare();
                         cmd2.ExecuteNonQuery();
                     }
                 }
@@ -340,10 +341,10 @@ namespace Meteor.Lobby
                     cmd = new MySqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandText = "UPDATE characters SET name=@name, DoRename=0 WHERE id=@cid AND userId=@uid";
-                    cmd.Prepare();
                     cmd.Parameters.AddWithValue("@uid", userId);
                     cmd.Parameters.AddWithValue("@cid", characterId);
                     cmd.Parameters.AddWithValue("@name", newName);
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();
 
                 }
@@ -374,9 +375,9 @@ namespace Meteor.Lobby
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.Connection = conn;
                     cmd.CommandText = "UPDATE characters SET state=1 WHERE id=@cid AND name=@name";
-                    cmd.Prepare();
                     cmd.Parameters.AddWithValue("@cid", characterId);
                     cmd.Parameters.AddWithValue("@name", name);
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();                    
 
                 }

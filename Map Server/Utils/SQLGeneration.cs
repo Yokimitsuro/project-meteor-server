@@ -51,8 +51,6 @@ namespace Meteor.Map.utils
                     cmd.Parameters.AddWithValue("@id", 100);
                     cmd.Parameters.AddWithValue("@placename", "");
 
-                    cmd.Prepare();
-
                     Dictionary<uint, string> placenames = new Dictionary<uint, string>();
 
                     string line2;
@@ -101,6 +99,7 @@ namespace Meteor.Map.utils
                         cmd.Parameters["@placename"].Value = placenames[pId];
 
                         Program.Log.Debug("Wrote: {0}", id);
+                        cmd.Prepare();
                         cmd.ExecuteNonQuery();
 
                     }
@@ -133,9 +132,7 @@ namespace Meteor.Map.utils
                     MySqlCommand cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@id", 100);
                     cmd.Parameters.AddWithValue("@displayNameId", 100);
-                   
-                    cmd.Prepare();
-
+                  
                     string line, line2;
                     Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
                     System.IO.StreamReader file = new System.IO.StreamReader("D:\\Coding\\FFXIV Related\\FFXIV Tool\\2012.09.19.0001.decode.csv\\actorclass.csv");
@@ -159,6 +156,7 @@ namespace Meteor.Map.utils
                         cmd.Parameters["@displayNameId"].Value = nameId;
 
                         Program.Log.Debug("Wrote: {0} : {1}", id, nameId);
+                        cmd.Prepare();
                         cmd.ExecuteNonQuery();
 
                     }
@@ -198,8 +196,6 @@ namespace Meteor.Map.utils
                     for (int i = 0; i < NUMFIELDS; i++)
                         cmd.Parameters.AddWithValue("@v" + i, 100);
 
-                    cmd.Prepare();
-
                     string line;
                     Regex csvSplit = new Regex("(?:^|,)(\"(?:[^\"]+|\"\")*\"|[^,]*)", RegexOptions.Compiled);
                     //System.IO.StreamReader file = new System.IO.StreamReader("D:\\Coding\\FFXIV Related\\FFXIV Tool\\2012.09.19.0001.decode.csv\\actorclass.csv");
@@ -224,7 +220,8 @@ namespace Meteor.Map.utils
 
                         cmd.Parameters["@id"].Value = id;
 
-                        Program.Log.Debug("Wrote: {0}", id);                        
+                        Program.Log.Debug("Wrote: {0}", id);
+                        cmd.Prepare();
                         cmd.ExecuteNonQuery();
 
                     }
@@ -260,7 +257,6 @@ namespace Meteor.Map.utils
                     cmd.Parameters.AddWithValue("@name", "Battle");
                     cmd.Parameters.AddWithValue("@otherId", 0);
                     cmd.Parameters.AddWithValue("@rewardPoints", 0);
-                    cmd.Prepare();
 
                     int otherId = 1;
                     string line, line2;
@@ -314,6 +310,7 @@ namespace Meteor.Map.utils
                         cmd.Parameters["@name"].Value = name;
                         cmd.Parameters["@otherId"].Value = otherId;                        
                         cmd.Parameters["@rewardPoints"].Value = points;
+                        cmd.Prepare();
                         cmd.ExecuteNonQuery();
 
                         otherId++;
