@@ -117,6 +117,18 @@ namespace Meteor.Common
             }
         }
 
+        public void NOTOR(Bitstream other)
+        {
+            Debug.Assert(Data.Length == other.Data.Length);
+            for (int i = 0; i < Data.Length; i += 4)
+            {
+                Data[i] = (byte) ~(Data[i] | other.Data[i]);
+                Data[i + 1] = (byte)~(Data[i + 1] | other.Data[i + 1]);
+                Data[i + 2] = (byte)~(Data[i + 2] | other.Data[i + 2]);
+                Data[i + 3] = (byte)~(Data[i + 3] | other.Data[i + 3]);
+            }
+        }
+
         public void AND(Bitstream other)
         {
             Debug.Assert(Data.Length == other.Data.Length);

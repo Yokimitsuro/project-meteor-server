@@ -87,8 +87,7 @@ namespace Meteor.Map.Actors.QuestNS
         private void ComputeAvailable()
         {
             Bitstream result = new Bitstream(SCENARIO_MAX);
-            result.OR(CompletedQuestsBitfield);
-            result.NOT();
+            result.NOTOR(CompletedQuestsBitfield);
             result.AND(MinLevelBitfield);
             result.AND(PrereqBitfield);
             result.AND(GCRankBitfield);
