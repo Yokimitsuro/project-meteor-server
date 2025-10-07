@@ -397,7 +397,6 @@ namespace Meteor.Map.Actors
                             appearanceIds[L_INDEXFINGER] = reader.GetUInt32("rightIndex");
                             appearanceIds[R_RINGFINGER] = reader.GetUInt32("rightFinger");
                             appearanceIds[L_RINGFINGER] = reader.GetUInt32("leftFinger");
-                            break;
                         }
                     }
 

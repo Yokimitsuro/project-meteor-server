@@ -186,9 +186,6 @@ namespace Meteor.Map.Actors
             Name = String.Format("_pc{0:00000000}", actorID);
             className = "Player";
 
-            for (int i = 0; i < 20; i++)
-                timers[i] = 0x68FF41C1;
-
             moveSpeeds[0] = SetActorSpeedPacket.DEFAULT_STOP;
             moveSpeeds[1] = SetActorSpeedPacket.DEFAULT_WALK;
             moveSpeeds[2] = SetActorSpeedPacket.DEFAULT_RUN;
@@ -646,7 +643,6 @@ namespace Meteor.Map.Actors
 
             List<SubPacket> areaMasterSpawn = CurrentArea.GetSpawnPackets();
             List<SubPacket> debugSpawn = world.GetDebugActor().GetSpawnPackets();
-            List<SubPacket> debugSpawn2 = world.GetTestDebug();
             List<SubPacket> worldMasterSpawn = world.GetActor().GetSpawnPackets();
 
             playerSession.QueuePacket(areaMasterSpawn);
