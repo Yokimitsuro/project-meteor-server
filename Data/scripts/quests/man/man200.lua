@@ -65,6 +65,9 @@ FLAG_VISITED			= 0;
 FLAG_TALKED_TATARU		= 1;
 FLAG_DUTY_COMPLETE		= 2;
 
+-- Other
+MIN_TATARU_WAIT_TIME 	= 20;
+
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);
 end
@@ -74,6 +77,7 @@ end
 
 function onStateChange(player, quest, sequence)
 	local data = quest:GetData();
+	quest:SetTimeUpdate(false);
 	
 	-- Sequence changing ENpcs
 	if (sequence == SEQ_000) then
@@ -94,6 +98,8 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(MINFILIA);
 	elseif (sequence == SEQ_025) then
 		quest:SetENpc(TATARU);
+		quest:GetData():SetTimeNow();
+		quest:SetTimeUpdate(true);
 	elseif (sequence == SEQ_027) then
 		if (quest:GetData():GetFlag(FLAG_DUTY_COMPLETE)) then
 			quest:SetENpc(MOMODI, QFLAG_TALK);
@@ -314,6 +320,18 @@ function onPush(player, quest, npc)
 	
 	player:EndEvent();
 	quest:UpdateENPCs();
+end
+
+function onTimeUpdate(player, quest, currentTime)
+	local seqStartTime = quest:GetData():GetTime();
+	local sequence = quest:getSequence();
+	
+	if (sequence == SEQ_025) then
+		if (currentTime - seqStartTime > MIN_TATARU_WAIT_TIME) then
+			quest:SetTimeUpdate(false);
+			quest:NewNpcLsMsg(6);
+		end
+	end	
 end
 
 function onNpcLS(player, quest, from, msgStep)

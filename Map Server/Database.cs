@@ -1218,6 +1218,7 @@ namespace Meteor.Map
                         counter2,
                         counter3,
                         counter4,
+                        time,
                         npcLsFrom,
                         npcLsMsgStep
                         FROM characters_quest_scenario WHERE characterId = @charId";
@@ -1236,12 +1237,13 @@ namespace Meteor.Map
                             ushort counter2 = reader.GetUInt16("counter2");
                             ushort counter3 = reader.GetUInt16("counter3");
                             ushort counter4 = reader.GetUInt16("counter4");
+                            uint time = reader.GetUInt32("time");
                             ushort npsLsFrom = reader.GetUInt16("npcLsFrom");
                             byte npcLsMsgStep = reader.GetByte("npcLsMsgStep");
 
                             Quest baseQuest = (Quest) Server.GetStaticActors(questId);
                             player.playerWork.questScenario[index] = questId;
-                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3, counter4, npsLsFrom, npcLsMsgStep);
+                            player.questScenario[index] = new Quest(player, baseQuest, sequence, flags, counter1, counter2, counter3, counter4, time, npsLsFrom, npcLsMsgStep);
                         }
                     }
 

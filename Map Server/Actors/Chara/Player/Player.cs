@@ -186,6 +186,9 @@ namespace Meteor.Map.Actors
             Name = String.Format("_pc{0:00000000}", actorID);
             className = "Player";
 
+            for (int i = 0; i < 20; i++)
+                timers[i] = 0x68FF41C1;
+
             moveSpeeds[0] = SetActorSpeedPacket.DEFAULT_STOP;
             moveSpeeds[1] = SetActorSpeedPacket.DEFAULT_WALK;
             moveSpeeds[2] = SetActorSpeedPacket.DEFAULT_RUN;
@@ -643,6 +646,7 @@ namespace Meteor.Map.Actors
 
             List<SubPacket> areaMasterSpawn = CurrentArea.GetSpawnPackets();
             List<SubPacket> debugSpawn = world.GetDebugActor().GetSpawnPackets();
+            List<SubPacket> debugSpawn2 = world.GetTestDebug();
             List<SubPacket> worldMasterSpawn = world.GetActor().GetSpawnPackets();
 
             playerSession.QueuePacket(areaMasterSpawn);
@@ -1977,7 +1981,7 @@ namespace Meteor.Map.Actors
 
         public void AddNpcLs(uint npcLsId)
         {
-            if (playerWork.npcLinkshellChatExtra[npcLsId] == false && playerWork.npcLinkshellChatCalling[npcLsId] == false)
+            if (playerWork.npcLinkshellChatExtra[npcLsId - 1] == false && playerWork.npcLinkshellChatCalling[npcLsId - 1] == false)
             {
                 SetNpcLs(npcLsId, NPCLS_INACTIVE);
                 SendGameMessage(Server.GetWorldManager().GetActor(), 25118, 0x20, npcLsId); // "<NpcLs> linkpearl obtained."
@@ -1986,7 +1990,7 @@ namespace Meteor.Map.Actors
 
         public bool HasNpcLs(uint npcLsId)
         {
-            return !(playerWork.npcLinkshellChatExtra[npcLsId] == false && playerWork.npcLinkshellChatCalling[npcLsId] == false);
+            return !(playerWork.npcLinkshellChatExtra[npcLsId - 1] == false && playerWork.npcLinkshellChatCalling[npcLsId - 1] == false);
         }
 
         public void SetNpcLs(uint npcLsId, uint state)
@@ -2411,7 +2415,8 @@ namespace Meteor.Map.Actors
             }
 
             aiContainer.Update(tick);
-            statusEffects.Update(tick);            
+            statusEffects.Update(tick);
+            questStateManager.Update(tick);
         }
 
         public override void PostUpdate(DateTime tick, List<SubPacket> packets = null)

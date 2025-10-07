@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Meteor.Common;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,13 +17,14 @@ namespace Meteor.Map.Actors.QuestNS
         private ushort counter2;
         private ushort counter3;
         private ushort counter4;
+        private uint time;
 
         private uint npcLsFrom = 0;
         private byte npcLsMessageStep = 0;
 
         public bool Dirty { get; private set; } = false;
 
-        public QuestData(Player owner, Quest parent, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint npcLsFrom, byte npcLsMessageStep)
+        public QuestData(Player owner, Quest parent, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint time, uint npcLsFrom, byte npcLsMessageStep)
         {
             this.owner = owner;
             this.parent = parent;
@@ -31,6 +33,7 @@ namespace Meteor.Map.Actors.QuestNS
             this.counter2 = counter2;
             this.counter3 = counter3;
             this.counter4 = counter4;
+            this.time = time;
             this.npcLsFrom = npcLsFrom;
             this.npcLsMessageStep = npcLsMessageStep;
         }
@@ -39,12 +42,12 @@ namespace Meteor.Map.Actors.QuestNS
         {
             this.owner = owner;
             this.parent = parent;
-            flags = counter1 = counter2 = counter3 = counter4 = 0;
+            time = flags = counter1 = counter2 = counter3 = counter4 = 0;
         }
 
         public void ClearData()
         {
-            flags = counter1 = counter2 = counter3 = counter4 = 0;
+            time = flags = counter1 = counter2 = counter3 = counter4 = 0;
         }
 
         public void SetFlag(int index)
@@ -163,6 +166,17 @@ namespace Meteor.Map.Actors.QuestNS
             }
 
             return 0;
+        }
+
+        public void SetTimeNow()
+        {
+            time = Utils.UnixTimeStampUTC();
+            Dirty = true;
+        }
+
+        public uint GetTime()
+        {
+            return time;
         }
 
         public void SetNpcLsFrom(uint from)

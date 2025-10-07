@@ -22,6 +22,7 @@ namespace Meteor.Map.Actors.QuestNS
         private readonly Bitstream GCRankBitfield = new Bitstream(SCENARIO_MAX, true);
 
         private List<Quest> ActiveQuests = new List<Quest>();
+        private List<Quest> UpdatableQuests = new List<Quest>();
         private Dictionary<uint, QuestState> QuestStateTable = new Dictionary<uint, QuestState>();
 
         public QuestStateManager(Player player)
@@ -137,6 +138,7 @@ namespace Meteor.Map.Actors.QuestNS
                 return;
 
             ActiveQuests.Remove(staticQuest);
+            UpdatableQuests.Remove(staticQuest);
 
             if (QuestStateTable.ContainsKey(staticQuest.Id))
             {
@@ -185,6 +187,12 @@ namespace Meteor.Map.Actors.QuestNS
                     PrereqBitfield.Clear(questData.Id - SCENARIO_START);
             }
             ComputeAvailable();
+        }
+
+        public void Update(DateTime tick)
+        {
+            foreach (Quest quest in ActiveQuests)
+                quest.Update(tick);
         }
     }
 }

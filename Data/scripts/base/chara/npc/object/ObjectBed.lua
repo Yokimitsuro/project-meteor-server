@@ -45,7 +45,7 @@ function onEventStarted(player, npc, triggerName)
 			end
 			
 			-- If crystals you get x5 otherwise x1.
-			if (dreamCode > = 28 and dreamCode <= 33) then
+			if (dreamCode >= 28 and dreamCode <= 33) then
 				player:AddItem(itemCode, 5);
 			else
 				player:AddItem(itemCode, 1);

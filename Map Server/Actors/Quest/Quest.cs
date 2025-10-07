@@ -19,6 +19,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 ===========================================================================
 */
 
+using Meteor.Common;
 using Meteor.Map.lua;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace Meteor.Map.Actors.QuestNS
         private ushort currentSequence;
         private QuestState questState = null;
         private QuestData data = null;
-
+        private bool isUpdating = false;
 
         // Creates a Static Quest for the StaticActors list.
         public Quest(uint actorID, string className, string classPath)
@@ -60,11 +61,11 @@ namespace Meteor.Map.Actors.QuestNS
         }
 
         // Creates a Instance Quest that has been started with data.
-        public Quest(Player owner, Quest staticQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint npcLsFrom, byte npcLsMsgStep) : this(staticQuest)
+        public Quest(Player owner, Quest staticQuest, ushort sequence, uint flags, ushort counter1, ushort counter2, ushort counter3, ushort counter4, uint time, uint npcLsFrom, byte npcLsMsgStep) : this(staticQuest)
         {
             this.owner = owner;
             currentSequence = sequence;
-            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4, npcLsFrom, npcLsMsgStep);
+            data = new QuestData(owner, this, flags, counter1, counter2, counter3, counter4, time, npcLsFrom, npcLsMsgStep);
             questState = new QuestState(owner, this);
             questState.UpdateState();
         }
@@ -280,6 +281,17 @@ namespace Meteor.Map.Actors.QuestNS
             currentSequence = SEQ_NOT_STARTED;
             data = null;
             questState.UpdateState();
+        }
+
+        public void SetTimeUpdate(bool val)
+        {
+            isUpdating = val;
+        }
+
+        public override void Update(DateTime tick)
+        {
+            if (isUpdating)
+                LuaEngine.GetInstance().CallLuaFunctionForReturn(owner, this, "onTimeUpdate", true, Utils.UnixTimeStampUTC());
         }
     }
 }
