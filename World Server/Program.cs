@@ -25,7 +25,7 @@ using System.Diagnostics;
 
 using NLog;
 using Meteor.World.DataObjects;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Meteor.World
 {

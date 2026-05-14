@@ -22,7 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using System;
 using System.Diagnostics;
 using Meteor.Common;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using NLog;
 
 namespace Meteor.Map

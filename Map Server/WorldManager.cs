@@ -27,7 +27,7 @@ using Meteor.Map.DataObjects;
 using Meteor.Map.lua;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.actor;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Linq;

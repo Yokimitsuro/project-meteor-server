@@ -19,7 +19,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 ===========================================================================
 */
 
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 
 namespace Meteor.Map.DataObjects
@@ -53,7 +53,7 @@ namespace Meteor.Map.DataObjects
         public readonly float shieldBlocking;
         public readonly float effectDuration;
         public readonly float recastTime;
-        public readonly byte recastGroup;
+        public readonly short recastGroup;
         public readonly int repairSkill;
         public readonly int repairItem;
         public readonly int repairItemNum;
@@ -87,7 +87,7 @@ namespace Meteor.Map.DataObjects
             shieldBlocking = reader.GetFloat("shieldBlocking");
             effectDuration = reader.GetFloat("effectDuration");
             recastTime = reader.GetFloat("recastTime");
-            recastGroup = reader.GetByte("recastGroup");
+            recastGroup = reader.GetInt16("recastGroup");
             repairSkill = reader.GetInt32("repairSkill");
             repairItem = reader.GetInt32("repairItem");
             repairItemNum = reader.GetInt32("repairItemNum");

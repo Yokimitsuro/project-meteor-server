@@ -26,7 +26,7 @@ using Meteor.Map.Actors.Chara;
 using Meteor.Map.lua;
 using Meteor.Map.packets.send.actor;
 using Meteor.Map.utils;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

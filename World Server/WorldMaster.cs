@@ -29,7 +29,7 @@ using Meteor.World.Packets.Send.Subpackets;
 using Meteor.World.Packets.Send.Subpackets.Groups;
 using Meteor.World.Packets.WorldPackets.Send;
 using Meteor.World.Packets.WorldPackets.Send.Group;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Meteor.World
 {
