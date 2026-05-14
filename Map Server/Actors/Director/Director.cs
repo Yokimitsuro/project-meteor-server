@@ -67,7 +67,7 @@ namespace Meteor.Map.actors.director
         public override SubPacket CreateScriptBindPacket()
         {
             List<LuaParam> actualLParams = new List<LuaParam>();
-            actualLParams.Insert(0, new LuaParam(2, classPath));
+            actualLParams.Insert(0, new LuaParam(2, classPath ?? "/Director/Unknown"));
             actualLParams.Insert(1, new LuaParam(4, 4));
             actualLParams.Insert(2, new LuaParam(4, 4));
             actualLParams.Insert(3, new LuaParam(4, 4));
@@ -75,10 +75,13 @@ namespace Meteor.Map.actors.director
             actualLParams.Insert(5, new LuaParam(4, 4));
 
             List<LuaParam> lparams = LuaEngine.GetInstance().CallLuaFunctionForReturn(null, this, "init", false);
-            for (int i = 1; i < lparams.Count; i++)
-                actualLParams.Add(lparams[i]);
+            if (lparams != null)
+            {
+                for (int i = 1; i < lparams.Count; i++)
+                    actualLParams.Add(lparams[i]);
+            }
 
-            return ActorInstantiatePacket.BuildPacket(Id, Name, className, actualLParams);
+            return ActorInstantiatePacket.BuildPacket(Id, Name ?? "unknown", className ?? "Unknown", actualLParams);
         }
 
         public override List<SubPacket> GetSpawnPackets(ushort spawnType = 1)
@@ -323,6 +326,14 @@ namespace Meteor.Map.actors.director
 
         public void OnEventStart(Player player, object[] args)
         {
+            if (directorScript == null)
+            {
+                Program.Log.Warn("Director {0} has no script, releasing player.", directorScriptPath);
+                if (player != null)
+                    player.EndEvent();
+                return;
+            }
+
             object[] args2 = new object[args.Length + (player == null ? 1 : 2)];
             Array.Copy(args, 0, args2, (player == null ? 1 : 2), args.Length);
             if (player != null)

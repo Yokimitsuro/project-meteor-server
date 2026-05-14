@@ -91,7 +91,6 @@ function onStateChange(player, quest, sequence)
 		quest:SetENpc(GRINNING_ADVENTURER);
 		quest:SetENpc(ROSTNSTHAL, rostnsthalFlag, true, rostnsthalCanPush);
 		quest:SetENpc(EXIT_TRIGGER, exitFlag, false, exitCanPush);
-		print(tostring(exitCanPush));
 	elseif (sequence == SEQ_005) then
 	elseif (sequence == SEQ_010) then		
 		quest:SetENpc(HOB, QFLAG_TALK);

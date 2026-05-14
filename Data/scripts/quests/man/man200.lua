@@ -294,7 +294,6 @@ function onPush(player, quest, npc)
 		if (sequence == SEQ_000 and not data:GetFlag(FLAG_VISITED)) then
 			data:SetFlag(FLAG_VISITED);
 			callClientFunction(player, "delegateEvent", player, quest, "pE00", "???", 1, 1, 1, player:GetInitialTown());
-		elseif (sequence == SEQ_000 and not data:GetFlag(FLAG_VISITED)) then
 		end
 		player:EndEvent();
 		GetWorldManager():DoZoneChange(player, 181, "PrivateAreaMasterPast", 0, 15, -205.25, 0, -160, 1.55);

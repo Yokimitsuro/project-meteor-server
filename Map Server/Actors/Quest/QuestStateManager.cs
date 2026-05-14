@@ -60,6 +60,9 @@ namespace Meteor.Map.Actors.QuestNS
                     PrereqBitfield.Clear(questData.Id - SCENARIO_START);
             }
 
+            // Init GC Rank
+            UpdateGCRank();
+
             ComputeAvailable();
         }
 
@@ -83,6 +86,29 @@ namespace Meteor.Map.Actors.QuestNS
         public void UpdateQuestAbandoned()
         {
             ComputeAvailable();
+        }
+
+        public void UpdateGCRank()
+        {
+            byte playerGCRank = 0;
+            int gcAffil = 0;
+            if (player.gcCurrent == 1) { playerGCRank = player.gcRankLimsa; gcAffil = 201; }
+            else if (player.gcCurrent == 2) { playerGCRank = player.gcRankGridania; gcAffil = 202; }
+            else if (player.gcCurrent == 3) { playerGCRank = player.gcRankUldah; gcAffil = 203; }
+
+            foreach (var questData in Server.GetQuestGamedataAllGCRanked())
+            {
+                int idx = (int)(questData.Id - SCENARIO_START);
+                if (idx < 0 || idx >= SCENARIO_MAX) continue;
+
+                bool meetsRank = playerGCRank >= questData.MinGCRank;
+                bool meetsAffil = questData.GCAffiliation == 0 || questData.GCAffiliation == 204 || questData.GCAffiliation == gcAffil;
+
+                if (meetsRank && meetsAffil)
+                    GCRankBitfield.Set(idx);
+                else
+                    GCRankBitfield.Clear(idx);
+            }
         }
 
         private void ComputeAvailable()

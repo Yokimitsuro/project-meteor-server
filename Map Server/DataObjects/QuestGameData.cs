@@ -14,6 +14,7 @@ namespace Meteor.Map.DataObjects
         public uint PrerequisiteQuest { get; }
         public int MinLevel { get; }
         public int MinGCRank { get; }
+        public int GCAffiliation { get; }
         public int ExpReward { get; }
         public int GilReward { get; }
         public uint ItemReward1 { get; }
@@ -25,7 +26,7 @@ namespace Meteor.Map.DataObjects
         public uint ItemReward4 { get; }
         public int ItemReward4Qty { get; }
 
-        public QuestGameData(uint id, string className, string name, uint prereq, int minLv, int minGcRank,
+        public QuestGameData(uint id, string className, string name, uint prereq, int minLv, int minGcRank, int gcAffiliation = 0,
             int expReward = 0, int gilReward = 0,
             uint itemReward1 = 0, int itemReward1Qty = 0,
             uint itemReward2 = 0, int itemReward2Qty = 0,
@@ -38,6 +39,7 @@ namespace Meteor.Map.DataObjects
             PrerequisiteQuest = prereq;
             MinLevel = minLv;
             MinGCRank = minGcRank;
+            GCAffiliation = gcAffiliation;
             ExpReward = expReward;
             GilReward = gilReward;
             ItemReward1 = itemReward1;

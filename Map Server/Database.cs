@@ -19,7 +19,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 ===========================================================================
 */
 
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using Meteor.Common;
@@ -90,6 +90,8 @@ namespace Meteor.Map
                                 questName,
                                 prerequisite,
                                 minLevel,
+                                IFNULL(minGCRank, 0) AS minGCRank,
+                                IFNULL(gcAffiliation, 0) AS gcAffiliation,
                                 expReward,
                                 gilReward,
                                 itemReward1,
@@ -114,6 +116,8 @@ namespace Meteor.Map
                             string name = reader.GetString("questName");
                             uint prerequisite = reader.GetUInt32("prerequisite");
                             ushort minLevel = reader.GetUInt16("minLevel");
+                            int minGCRank = reader.GetInt32("minGCRank");
+                            int gcAffiliation = reader.GetInt32("gcAffiliation");
                             int expReward = reader.GetInt32("expReward");
                             int gilReward = reader.GetInt32("gilReward");
                             uint itemReward1 = reader.GetUInt32("itemReward1");
@@ -124,7 +128,7 @@ namespace Meteor.Map
                             int itemReward3Qty = reader.GetInt32("itemReward3Qty");
                             uint itemReward4 = reader.GetUInt32("itemReward4");
                             int itemReward4Qty = reader.GetInt32("itemReward4Qty");
-                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, 0,
+                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, minGCRank, gcAffiliation,
                                 expReward, gilReward, itemReward1, itemReward1Qty, itemReward2, itemReward2Qty, itemReward3, itemReward3Qty, itemReward4, itemReward4Qty));
                         }
                     }
@@ -2715,8 +2719,8 @@ namespace Meteor.Map
                             battleCommand.numHits = reader.GetByte("numHits");
                             battleCommand.positionBonus = (BattleCommandPositionBonus)reader.GetByte("positionBonus");
                             battleCommand.procRequirement = (BattleCommandProcRequirement)reader.GetByte("procRequirement");
-                            battleCommand.range = reader.GetFloat("range");
-                            battleCommand.minRange = reader.GetFloat("minRange");
+                            battleCommand.range = (float)reader.GetInt32("range");
+                            battleCommand.minRange = (float)reader.GetInt32("minRange");
                             battleCommand.rangeHeight = reader.GetInt32("rangeHeight");
                             battleCommand.rangeWidth = reader.GetInt32("rangeWidth");
                             battleCommand.statusId = reader.GetUInt32("statusId");

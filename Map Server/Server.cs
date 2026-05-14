@@ -361,12 +361,7 @@ namespace Meteor.Map
 
         public static QuestGameData[] GetQuestGamedataAllGCRanked()
         {
-            return GamedataQuests.Values.Where(quest => quest.MinGCRank != 0).ToArray();
+            return GamedataQuests.Values.Where(quest => quest.MinGCRank != 0 || quest.GCAffiliation != 0).ToArray();
         }
-
-        //public static QuestData[] GetQuestGamedataByGCRank(int gc, int rank, bool all = false)
-        //{
-        // return GamedataQuests.Values.Where(quest => all ? quest.MinLevel == lvl : quest.MinLevel <= lvl).ToArray();
-        //}
     }
 }

@@ -86,10 +86,9 @@ namespace Meteor.Map.Actors.QuestNS
                 case 3:
                     counter4++;
                     return counter4;
+                default:
+                    return 0;
             }
-
-            Dirty = false;
-            return 0;
         }
 
         public ushort DecCounter(int num)
@@ -110,10 +109,9 @@ namespace Meteor.Map.Actors.QuestNS
                 case 3:
                     counter4--;
                     return counter4;
+                default:
+                    return 0;
             }
-
-            Dirty = false;
-            return 0;
         }
 
         public void SetCounter(int num, ushort value)
