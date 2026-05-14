@@ -23,7 +23,7 @@ using Meteor.Common;
 using Meteor.Map.actors.area;
 using Meteor.Map.actors.chara.npc;
 using Meteor.Map.Actors;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 using Meteor.Map.lua;
 using Meteor.Map.packets.send;
 using Meteor.Map.packets.send.actor;
@@ -49,7 +49,6 @@ namespace Meteor.Map
         private WorldMaster worldMaster = new WorldMaster();
         private Dictionary<uint, Zone> zoneList;
         private Dictionary<uint, List<SeamlessBoundry>> seamlessBoundryList;
-        private Dictionary<uint, ZoneEntrance> zoneEntranceList;
         private Dictionary<uint, ActorClass> actorClasses = new Dictionary<uint,ActorClass>();
         private Dictionary<ulong, Party> currentPlayerParties = new Dictionary<ulong, Party>(); //GroupId, Party object
         private Dictionary<uint, StatusEffect> statusEffectList = new Dictionary<uint, StatusEffect>();
@@ -120,7 +119,7 @@ namespace Meteor.Map
                         {
                             Zone zone = new Zone(reader.GetUInt32(0), reader.GetString(1), reader.GetUInt16(2), reader.GetString(3), reader.GetUInt16(4), reader.GetUInt16(5),
                                 reader.GetUInt16(6), reader.GetBoolean(7), reader.GetBoolean(8), reader.GetBoolean(9), reader.GetBoolean(10), reader.GetBoolean(11), reader.GetBoolean(12));
-                            zoneList[zone.actorId] = zone;
+                            zoneList[zone.ZoneId] = zone;
                             count1++;
                         }
                     }
@@ -140,15 +139,13 @@ namespace Meteor.Map
                     conn.Open();
 
                     string query = @"
-                                    SELECT 
-                                    id,
+                                    SELECT
                                     parentZoneId,
                                     privateAreaName,
                                     privateAreaType,
                                     className,
-                                    dayMusic,
-                                    nightMusic,
-                                    battleMusic
+                                    canExitArea,
+                                    music
                                     FROM server_zones_privateareas
                                     WHERE privateAreaName IS NOT NULL";
 
@@ -163,7 +160,7 @@ namespace Meteor.Map
                             if (zoneList.ContainsKey(parentZoneId))
                             {
                                 Zone parent = zoneList[parentZoneId];
-                                PrivateArea privArea = new PrivateArea(parent, reader.GetUInt32("id"), reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetUInt32("privateAreaType"), reader.GetUInt16("dayMusic"), reader.GetUInt16("nightMusic"), reader.GetUInt16("battleMusic"));
+                                PrivateArea privArea = new PrivateArea(parent, reader.GetString("className"), reader.GetString("privateAreaName"), reader.GetInt32("privateAreaType"), reader.GetBoolean("canExitArea"), reader.GetUInt16("music"));
                                 parent.AddPrivateArea(privArea);
                             }
                             else
@@ -182,57 +179,6 @@ namespace Meteor.Map
             }
 
             Program.Log.Info(String.Format("Loaded {0} zones and {1} private areas.", count1, count2));
-        }
-
-        public void LoadZoneEntranceList()
-        {
-            zoneEntranceList = new Dictionary<uint, ZoneEntrance>();
-            int count = 0;
-            using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
-            {
-                try
-                {
-                    conn.Open();
-
-                    string query = @"
-                                    SELECT 
-                                    id,
-                                    zoneId,
-                                    spawnType,
-                                    spawnX,
-                                    spawnY,
-                                    spawnZ,
-                                    spawnRotation,
-                                    privateAreaName
-                                    FROM server_zones_spawnlocations";
-
-                    MySqlCommand cmd = new MySqlCommand(query, conn);
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            uint id = reader.GetUInt32(0);
-                            string privArea = null;
-
-                            if (!reader.IsDBNull(7))
-                                privArea = reader.GetString(7);
-
-                            ZoneEntrance entance = new ZoneEntrance(reader.GetUInt32(1), privArea, 1, reader.GetByte(2), reader.GetFloat(3), reader.GetFloat(4), reader.GetFloat(5), reader.GetFloat(6));
-                            zoneEntranceList[id] = entance;
-                            count++;
-                        }
-                    }
-                }
-                catch (MySqlException e)
-                { Console.WriteLine(e); }
-                finally
-                {
-                    conn.Dispose();
-                }
-            }
-
-            Program.Log.Info(String.Format("Loaded {0} zone spawn locations.", count));
         }
 
         public void LoadSeamlessBoundryList()
@@ -329,7 +275,7 @@ namespace Meteor.Map
                         {
                             uint id = reader.GetUInt32("id");
                             string classPath = reader.GetString("classPath");
-                            uint nameId = reader.GetUInt32("displayNameId");
+                            int nameId = reader.GetInt32("displayNameId");
                             string eventConditions = null;
 
                             uint propertyFlags = reader.GetUInt32("propertyFlags");
@@ -368,7 +314,7 @@ namespace Meteor.Map
             Program.Log.Info(String.Format("Loaded {0} actor classes.", count));
         }
 
-        public void LoadSpawnLocations()
+        public void LoadENPCs()
         {
             int count = 0;
             using (MySqlConnection conn = new MySqlConnection(String.Format("Server={0}; Port={1}; Database={2}; UID={3}; Password={4}", ConfigConstants.DATABASE_HOST, ConfigConstants.DATABASE_PORT, ConfigConstants.DATABASE_NAME, ConfigConstants.DATABASE_USERNAME, ConfigConstants.DATABASE_PASSWORD)))
@@ -388,10 +334,11 @@ namespace Meteor.Map
                                     positionY,
                                     positionZ,
                                     rotation,
-                                    actorState,
-                                    animationId,
-                                    customDisplayName
-                                    FROM server_spawn_locations                                    
+                                    motionPack,
+                                    layoutId,
+                                    instanceId
+                                    FROM server_eventnpc_spawn_locations
+                                    LEFT JOIN server_eventnpc_mapobj ON server_eventnpc_spawn_locations.id = server_eventnpc_mapobj.id
                                     ";
 
                     MySqlCommand cmd = new MySqlCommand(query, conn);
@@ -410,20 +357,19 @@ namespace Meteor.Map
                             if (zone == null)
                                 continue;
 
-                            string customName = null;
-                            if (!reader.IsDBNull(11))
-                                customName = reader.GetString("customDisplayName");
                             string uniqueId = reader.GetString("uniqueId");                          
                             string privAreaName = reader.GetString("privateAreaName");
-                            uint privAreaLevel = reader.GetUInt32("privateAreaLevel");
+                            int privAreaType = reader.GetInt32("privateAreaLevel");
                             float x = reader.GetFloat("positionX");
                             float y = reader.GetFloat("positionY");
                             float z = reader.GetFloat("positionZ");
                             float rot = reader.GetFloat("rotation");
-                            ushort state = reader.GetUInt16("actorState");
-                            uint animId = reader.GetUInt32("animationId");
-                            
-                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaLevel, x, y, z, rot, state, animId);
+                            uint motionPack = reader.GetUInt32("motionPack");
+
+                            uint layoutId = !reader.IsDBNull(reader.GetOrdinal("layoutId")) ? reader.GetUInt32("layoutId") : 0;
+                            uint instanceId = !reader.IsDBNull(reader.GetOrdinal("instanceId")) ? reader.GetUInt32("instanceId") : 0;
+
+                            SpawnLocation spawn = new SpawnLocation(classId, uniqueId, zoneId, privAreaName, privAreaType, x, y, z, rot, motionPack, layoutId, instanceId);
 
                             zone.AddSpawnLocation(spawn);
 
@@ -440,7 +386,7 @@ namespace Meteor.Map
                 }
             }
 
-            Program.Log.Info(String.Format("Loaded {0} spawn(s).", count));
+            Program.Log.Info(String.Format("Loaded {0} ENPC(s).", count));
         }
 
         public void LoadBattleNpcs()
@@ -545,7 +491,7 @@ namespace Meteor.Map
                             }
                         }
                     }
-                    Program.Log.Info("Loaded {0} monsters.", count);
+                    Program.Log.Info("Loaded {0} BNPC(s).", count);
                 }
                 catch (MySqlException e)
                 {
@@ -599,7 +545,7 @@ namespace Meteor.Map
                     {
                         while (reader.Read())
                         {
-                            area = area ?? Server.GetWorldManager().GetZone(reader.GetUInt16("zoneId"));
+                            area = area ?? Server.GetWorldManager().GetArea(reader.GetUInt16("zoneId"));
                             int actorId = area.GetActorCount() + 1;
                             bnpc = area.GetBattleNpcById(id);
 
@@ -764,14 +710,14 @@ namespace Meteor.Map
         {
             Area oldZone;
 
-            if (player.zone != null)
+            if (player.CurrentArea != null)
             {
-                oldZone = player.zone;
+                oldZone = player.CurrentArea;
                 oldZone.RemoveActorFromZone(player);
             }
 
             //Add player to new zone and update
-            Zone newZone = GetZone(destinationZoneId);
+            Area newZone = GetArea(destinationZoneId);
 
             //This server does not contain that zoneId
             if (newZone == null)
@@ -779,11 +725,9 @@ namespace Meteor.Map
 
             newZone.AddActorToZone(player);
 
-            player.zone = newZone;
-            player.zoneId = destinationZoneId;
+            player.CurrentArea = newZone;
 
             player.zone2 = null;
-            player.zoneId2 = 0;
 
             player.SendSeamlessZoneInPackets();
 
@@ -796,7 +740,7 @@ namespace Meteor.Map
         public void MergeZones(Player player, uint mergedZoneId)
         {
             //Add player to new zone and update
-            Zone mergedZone = GetZone(mergedZoneId);
+            Area mergedZone = GetArea(mergedZoneId);
 
             //This server does not contain that zoneId
             if (mergedZone == null)
@@ -805,7 +749,6 @@ namespace Meteor.Map
             mergedZone.AddActorToZone(player);
 
             player.zone2 = mergedZone;
-            player.zoneId2 = mergedZone.actorId;
 
             player.SendMessage(0x20, "", "Merging Zones");
 
@@ -826,26 +769,29 @@ namespace Meteor.Map
              * ->If merge box, MergeZones
              */
 
-            if (player.zone == null)
+            if (player.CurrentArea == null)
                 return;
 
-            uint regionId = player.zone.regionId;
+            uint regionId = player.CurrentArea.RegionId;
 
             if (!seamlessBoundryList.ContainsKey(regionId))
                 return;
 
             foreach (SeamlessBoundry bounds in seamlessBoundryList[regionId])
             {
+                uint zoneId = player.CurrentArea.ZoneId;
+                uint zoneId2 = player.zone2.ZoneId;
+
                 if (CheckPosInBounds(player.positionX, player.positionZ, bounds.zone1_x1, bounds.zone1_y1, bounds.zone1_x2, bounds.zone1_y2))
                 {
-                    if (player.zoneId == bounds.zoneId1 && player.zoneId2 == 0)
+                    if (zoneId == bounds.zoneId1 && zoneId2 == 0)
                         return;
 
                     DoSeamlessZoneChange(player, bounds.zoneId1);
                 }
                 else if (CheckPosInBounds(player.positionX, player.positionZ, bounds.zone2_x1, bounds.zone2_y1, bounds.zone2_x2, bounds.zone2_y2))
                 {
-                    if (player.zoneId == bounds.zoneId2 && player.zoneId2 == 0)
+                    if (zoneId == bounds.zoneId2 && zoneId2 == 0)
                         return;
 
                     DoSeamlessZoneChange(player, bounds.zoneId2);
@@ -853,13 +799,13 @@ namespace Meteor.Map
                 else if (CheckPosInBounds(player.positionX, player.positionZ, bounds.merge_x1, bounds.merge_y1, bounds.merge_x2, bounds.merge_y2))
                 {
                     uint merged;
-                    if (player.zoneId == bounds.zoneId1)
+                    if (zoneId == bounds.zoneId1)
                         merged = bounds.zoneId2;
                     else
                         merged = bounds.zoneId1;
 
                     //Already merged
-                    if (player.zoneId2 == merged)
+                    if (zoneId2 == merged)
                         return;
 
                     MergeZones(player, merged);
@@ -881,54 +827,33 @@ namespace Meteor.Map
             return xIsGood && yIsGood;
         }
 
-        //Moves actor to new zone, and sends packets to spawn at the given zone entrance
-        public void DoZoneChange(Player player, uint zoneEntrance)
-        {
-            if (!zoneEntranceList.ContainsKey(zoneEntrance))
-            {
-                Program.Log.Error("Given zone entrance was not found: " + zoneEntrance);
-                return;
-            }
-
-            ZoneEntrance ze = zoneEntranceList[zoneEntrance];
-            DoZoneChange(player, ze.zoneId, ze.privateAreaName, ze.privateAreaType, ze.spawnType, ze.spawnX, ze.spawnY, ze.spawnZ, ze.spawnRotation);
-        }
-
         //Moves actor to new zone, and sends packets to spawn at the given coords.
         public void DoZoneChange(Player player, uint destinationZoneId, string destinationPrivateArea, int destinationPrivateAreaType, byte spawnType, float spawnX, float spawnY, float spawnZ, float spawnRotation)
-        {       
+        {
             //Add player to new zone and update
-            Area newArea;
-
-            if (destinationPrivateArea == null)
-                newArea = GetZone(destinationZoneId);
-            else //Add check for -1 if it is a instance
-                newArea = GetZone(destinationZoneId).GetPrivateArea(destinationPrivateArea, (uint)destinationPrivateAreaType);
-
+            //Add check for -1 if it is a instance
+            Area newArea = GetArea(destinationZoneId, destinationPrivateArea, destinationPrivateAreaType);
+            
             //This server does not contain that zoneId
             if (newArea == null)
             {
-                Program.Log.Debug("Request to change to zone not on this server by: {0}.", player.customDisplayName);
+                Program.Log.Debug("Request to change to zone not on this server by: {0}.", player.DisplayName);
                 RequestWorldServerZoneChange(player, destinationZoneId, spawnType, spawnX, spawnY, spawnZ, spawnRotation);
                 return;
             }
 
             player.playerSession.LockUpdates(true);
 
-            Area oldZone = player.zone;
+            Area oldArea = player.CurrentArea;
             //Remove player from currentZone if transfer else it's login
-            if (player.zone != null)
+            if (player.CurrentArea != null)
             {
-                oldZone.RemoveActorFromZone(player);
+                oldArea.RemoveActorFromZone(player);
             }
             newArea.AddActorToZone(player);
 
             //Update player actor's properties
-            player.zoneId = newArea is PrivateArea ? ((PrivateArea)newArea).GetParentZone().actorId : newArea.actorId;
-
-            player.privateArea = newArea is PrivateArea ? ((PrivateArea)newArea).GetPrivateAreaName() : null;
-            player.privateAreaType = newArea is PrivateArea ? ((PrivateArea)newArea).GetPrivateAreaType() : 0;
-            player.zone = newArea;
+            player.CurrentArea = newArea;
             player.positionX = spawnX;
             player.positionY = spawnY;
             player.positionZ = spawnZ;
@@ -942,16 +867,16 @@ namespace Meteor.Map
             //Delete content if have
             if (player.currentContentGroup != null)
             {
-                player.currentContentGroup.RemoveMember(player.actorId);
+                player.currentContentGroup.RemoveMember(player.Id);
                 player.SetCurrentContentGroup(null);
 
-                if (oldZone is PrivateAreaContent)
-                    ((PrivateAreaContent)oldZone).CheckDestroy();
-            }                 
+                if (oldArea is PrivateAreaContent)
+                    ((PrivateAreaContent)oldArea).CheckDestroy();
+            }
 
             //Send packets
-            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x2));
+            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x2));
             player.SendZoneInPackets(this, spawnType);
             player.playerSession.ClearInstance();
             player.SendInstanceUpdate();
@@ -965,32 +890,15 @@ namespace Meteor.Map
             LuaEngine.GetInstance().CallLuaFunction(player, newArea, "onZoneIn", true);
         }
 
-        //Moves actor within zone to spawn position
-        public void DoPlayerMoveInZone(Player player, uint zoneEntrance)
-        {
-            if (!zoneEntranceList.ContainsKey(zoneEntrance))
-            {
-                Program.Log.Error("Given zone entrance was not found: " + zoneEntrance);
-                return;
-            }
-
-            ZoneEntrance ze = zoneEntranceList[zoneEntrance];
-
-            if (ze.zoneId != player.zoneId)
-                return;
-
-            DoPlayerMoveInZone(player, ze.spawnX, ze.spawnY, ze.spawnZ, ze.spawnRotation, ze.spawnType);
-        }
-
         //Moves actor within the zone
         public void DoPlayerMoveInZone(Player player, float spawnX, float spawnY, float spawnZ, float spawnRotation, byte spawnType = 0xF)
         {            
             //Remove player from currentZone if transfer else it's login
-            if (player.zone != null)
+            if (player.CurrentArea != null)
             {
                 player.playerSession.LockUpdates(true);
-                player.zone.RemoveActorFromZone(player);                
-                player.zone.AddActorToZone(player);
+                player.CurrentArea.RemoveActorFromZone(player);                
+                player.CurrentArea.AddActorToZone(player);
 
                 //Update player actor's properties;
                 player.positionX = spawnX;
@@ -999,12 +907,64 @@ namespace Meteor.Map
                 player.rotation = spawnRotation;
 
                 //Send packets
-                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x10));
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
                 player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(spawnType));
 
                 player.playerSession.LockUpdates(false);
                 player.SendInstanceUpdate();
             }            
+        }
+
+        // Warp the player to a private area within the zone.
+        public void WarpToPrivateArea(Player player, String name, int type)
+        {
+            WarpToPrivateArea(player, name, type, player.positionX, player.positionY, player.positionZ, player.rotation);
+        }
+
+        // Warp the player to a private area within the zone to a specific location.
+        public void WarpToPrivateArea(Player player, String name, int type, float x, float y, float z, float rotation)
+        {
+            DoZoneChange(player, player.CurrentArea.ZoneId, name, type, 15, x, y, z, rotation);
+        }
+
+        public void WarpToPublicArea(Player player)
+        {
+            WarpToPublicArea(player, player.positionX, player.positionY, player.positionZ, player.rotation);
+        }
+
+        public void WarpToPublicArea(Player player, float x, float y, float z, float rotation)
+        {
+            if (player.CurrentArea.IsPrivate())
+                DoZoneChange(player, player.CurrentArea.ZoneId, null, 0, 15, x, y, z, rotation);
+        }
+
+        public void WarpToPosition(Player player, float x, float y, float z, float rotation, bool debugInstant = false)
+        {
+            //Remove player from currentZone if transfer else it's login
+            if (player.CurrentArea != null)
+            {
+                player.playerSession.LockUpdates(true);
+                player.CurrentArea.RemoveActorFromZone(player);
+                player.CurrentArea.AddActorToZone(player);
+
+                //Update player actor's properties;
+                player.positionX = x;
+                player.positionY = y;
+                player.positionZ = z;
+                player.rotation = rotation;
+
+                //Send packets
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
+                player.playerSession.QueuePacket(player.CreateSpawnTeleportPacket(debugInstant ? (ushort) 0x0 : (ushort) 0xF));
+
+                player.playerSession.LockUpdates(false);
+                player.SendInstanceUpdate();
+            }
+        }
+
+        public void WarpToCharaPosition(Player player, Character target)
+        {
+            WarpToPosition(player, target.positionX, target.positionY, target.positionZ, target.rotation);
         }
 
         //Moves actor to new zone, and sends packets to spawn at the given coords.
@@ -1013,27 +973,23 @@ namespace Meteor.Map
             //Content area was null
             if (contentArea == null)
             {
-                Program.Log.Debug("Request to change to content area not on this server by: {0}.", player.customDisplayName);
+                Program.Log.Debug("Request to change to content area not on this server by: {0}.", player.DisplayName);
                 return;
             }
 
             player.playerSession.LockUpdates(true);
 
-            Area oldZone = player.zone;
+            Area oldArea = player.CurrentArea;
             //Remove player from currentZone if transfer else it's login
-            if (player.zone != null)
+            if (player.CurrentArea != null)
             {
-                oldZone.RemoveActorFromZone(player);
+                oldArea.RemoveActorFromZone(player);
             }
 
             contentArea.AddActorToZone(player);
 
             //Update player actor's properties
-            player.zoneId = contentArea.GetParentZone().actorId;
-
-            player.privateArea = contentArea.GetPrivateAreaName();
-            player.privateAreaType = contentArea.GetPrivateAreaType();
-            player.zone = contentArea;
+            player.CurrentArea = contentArea;
             player.positionX = spawnX;
             player.positionY = spawnY;
             player.positionZ = spawnZ;
@@ -1043,8 +999,8 @@ namespace Meteor.Map
             player.SendGameMessage(GetActor(), 34108, 0x20);
 
             //Send packets
-            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x10));
+            player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+            player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x10));
             player.SendZoneInPackets(this, spawnType);
             player.playerSession.ClearInstance();
             player.SendInstanceUpdate(true);
@@ -1058,26 +1014,22 @@ namespace Meteor.Map
         public void DoZoneIn(Player player, bool isLogin, ushort spawnType)
         {
             //Add player to new zone and update
-            Area playerArea;
-            if (player.privateArea != null)
-                playerArea = GetPrivateArea(player.zoneId, player.privateArea, player.privateAreaType);
-            else
-                playerArea = GetZone(player.zoneId);
+            Area playerArea = player.CurrentArea;
 
             //This server does not contain that zoneId
             if (playerArea == null)
                 return;
 
             //Set the current zone and add player
-            player.zone = playerArea;
+            player.CurrentArea = playerArea;
 
             playerArea.AddActorToZone(player);
             
             //Send packets            
             if (!isLogin)
             {
-                player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.actorId));
-                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.actorId, 0x2));
+                player.playerSession.QueuePacket(DeleteAllActorsPacket.BuildPacket(player.Id));
+                player.playerSession.QueuePacket(_0xE2Packet.BuildPacket(player.Id, 0x2));
             }
 
             player.SendZoneInPackets(this, spawnType);
@@ -1120,7 +1072,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Length];
                     for (int i = 0; i < actors.Length; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x3000000000000000;
@@ -1148,7 +1100,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Count];
                     for (int i = 0; i < actors.Count; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x3000000000000000;
@@ -1176,7 +1128,7 @@ namespace Meteor.Map
                 {
                     initialMembers = new uint[actors.Count];
                     for (int i = 0; i < actors.Count; i++)
-                        initialMembers[i] = actors[i].actorId;
+                        initialMembers[i] = actors[i].Id;
                 }
 
                 groupIndexId = groupIndexId | 0x2000000000000000;
@@ -1209,11 +1161,11 @@ namespace Meteor.Map
             {                
                 groupIndexId = groupIndexId | 0x0000000000000000;
 
-                RelationGroup group = new RelationGroup(groupIndexId, inviter.actorId, invitee.actorId, 0, groupType);
+                RelationGroup group = new RelationGroup(groupIndexId, inviter.Id, invitee.Id, 0, groupType);
                 mRelationGroups.Add(groupIndexId, group);
                 groupIndexId++;
 
-                group.SendGroupPacketsAll(inviter.actorId, invitee.actorId);
+                group.SendGroupPacketsAll(inviter.Id, invitee.Id);
 
                 return group;
             }
@@ -1249,12 +1201,12 @@ namespace Meteor.Map
                 inviter.SendGameMessage(GetActor(), 25043, 0x20, (object)invitee); //You cannot trade with yourself.
                 return null;
             }
-            else if (GetTradeGroup(inviter.actorId) != null)
+            else if (GetTradeGroup(inviter.Id) != null)
             {
                 inviter.SendGameMessage(GetActor(), 25045, 0x20, (object)invitee); //You may only trade with one person at a time.
                 return null;
             }
-            else if (GetTradeGroup(invitee.actorId) != null)
+            else if (GetTradeGroup(invitee.Id) != null)
             {
                 inviter.SendGameMessage(GetActor(), 25044, 0x20, (object)invitee); //Your target is unable to trade.
                 return null;
@@ -1265,11 +1217,11 @@ namespace Meteor.Map
             {
                 groupIndexId = groupIndexId | 0x0000000000000000;
 
-                TradeGroup group = new TradeGroup(groupIndexId, inviter.actorId, invitee.actorId);
+                TradeGroup group = new TradeGroup(groupIndexId, inviter.Id, invitee.Id);
                 mTradeGroups.Add(groupIndexId, group);
                 groupIndexId++;
 
-                group.SendGroupPacketsAll(inviter.actorId, invitee.actorId);
+                group.SendGroupPacketsAll(inviter.Id, invitee.Id);
 
                 inviter.SendGameMessage(GetActor(), 25101, 0x20, (object)invitee); //You request to trade with X
                 invitee.SendGameMessage(GetActor(), 25037, 0x20, (object)inviter); //X wishes to trade with you
@@ -1311,7 +1263,7 @@ namespace Meteor.Map
 
         public void AcceptTrade(Player invitee)
         {
-            TradeGroup group = GetTradeGroup(invitee.actorId);
+            TradeGroup group = GetTradeGroup(invitee.Id);
 
             if (group == null)
             {
@@ -1319,7 +1271,7 @@ namespace Meteor.Map
                 return;
             }
 
-            Player inviter = (Player)invitee.GetZone().FindActorInArea(group.GetHost());
+            Player inviter = (Player)invitee.CurrentArea.FindActorInArea(group.GetHost());
 
             //DeleteTradeGroup(group.groupIndex);
 
@@ -1332,7 +1284,7 @@ namespace Meteor.Map
 
         public void CancelTradeTooFar(Player inviter)
         {
-            TradeGroup group = GetTradeGroup(inviter.actorId);
+            TradeGroup group = GetTradeGroup(inviter.Id);
 
             if (group == null)
             {
@@ -1340,7 +1292,7 @@ namespace Meteor.Map
                 return;
             }
 
-            Player invitee = (Player)inviter.GetZone().FindActorInArea(group.GetOther());
+            Player invitee = (Player)inviter.CurrentArea.FindActorInArea(group.GetOther());
 
             inviter.SendGameMessage(GetActor(), 25042, 0x20); //You cancel the trade.
             if (invitee != null)
@@ -1351,7 +1303,7 @@ namespace Meteor.Map
 
         public void CancelTrade(Player inviter)
         {
-            TradeGroup group = GetTradeGroup(inviter.actorId);
+            TradeGroup group = GetTradeGroup(inviter.Id);
 
             if (group == null)
             {
@@ -1359,7 +1311,7 @@ namespace Meteor.Map
                 return;
             }
 
-            Player invitee = (Player)inviter.GetZone().FindActorInArea(group.GetOther());            
+            Player invitee = (Player)inviter.CurrentArea.FindActorInArea(group.GetOther());            
 
             inviter.SendGameMessage(GetActor(), 25041, 0x20); //You cancel the trade.
             if (invitee != null)
@@ -1370,7 +1322,7 @@ namespace Meteor.Map
 
         public void RefuseTrade(Player invitee)
         {
-            TradeGroup group = GetTradeGroup(invitee.actorId);
+            TradeGroup group = GetTradeGroup(invitee.Id);
 
             if (group == null)
             {
@@ -1378,7 +1330,7 @@ namespace Meteor.Map
                 return;
             }
 
-            Player inviter = (Player)invitee.GetZone().FindActorInArea(group.GetHost());
+            Player inviter = (Player)invitee.CurrentArea.FindActorInArea(group.GetHost());
 
             if (inviter != null)
                 inviter.SendGameMessage(GetActor(), 25038, 0x20); //Your trade request fails
@@ -1391,7 +1343,7 @@ namespace Meteor.Map
             if (!p1.IsTradeAccepted() || !p2.IsTradeAccepted())
                 return;
 
-            TradeGroup group = GetTradeGroup(p1.actorId);
+            TradeGroup group = GetTradeGroup(p1.Id);
 
             if (group == null)
             {
@@ -1566,9 +1518,9 @@ namespace Meteor.Map
                     }
                     
                     //TODO: Refactor so that it's not a mess like V
-                    player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                    player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                     originalPackage.SendUpdate();
-                    player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));                   
+                    player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));                   
                 }
             }
             else if (bazaarMode == InventoryItem.MODE_SELL_FSTACK)
@@ -1605,9 +1557,9 @@ namespace Meteor.Map
                         reward.ChangeQuantity(-rewardAmount);
                         finalReward = splitItem;
 
-                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                         originalRewardPackage.SendUpdate();
-                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));
                     }
                     else
                         return ItemPackage.ERROR_SYSTEM;
@@ -1630,9 +1582,9 @@ namespace Meteor.Map
                         seek.ChangeQuantity(-seekAmount);
                         finalSeek = splitItem;
 
-                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                         originalSeekPackage.SendUpdate();
-                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));
+                        player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));
                     }
                     else
                         return ItemPackage.ERROR_SYSTEM;
@@ -1644,9 +1596,9 @@ namespace Meteor.Map
                 bazaarPackage.AddItem(finalSeek);
                 finalReward.SetAsOfferTo(bazaarMode, finalSeek);
 
-                player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.actorId));
+                player.QueuePacket(InventoryBeginChangePacket.BuildPacket(player.Id));
                 bazaarPackage.SendUpdate();
-                player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.actorId));                
+                player.QueuePacket(InventoryEndChangePacket.BuildPacket(player.Id));                
             }            
 
             player.CheckBazaarFlags();
@@ -1702,7 +1654,7 @@ namespace Meteor.Map
         
         public void RequestWorldLinkshellCreate(Player player, string name, ushort crest)
         {
-            SubPacket packet = CreateLinkshellPacket.BuildPacket(player.playerSession, name, crest, player.actorId);
+            SubPacket packet = CreateLinkshellPacket.BuildPacket(player.playerSession, name, crest, player.Id);
             player.QueuePacket(packet);
         }
 
@@ -1891,25 +1843,17 @@ namespace Meteor.Map
             return null;
         }
 
-        public Zone GetZone(uint zoneId)
+        public Area GetArea(uint zoneId, string privateAreaName = "", int privateAreaType = 0)
         {
             lock (zoneList)
             {
                 if (!zoneList.ContainsKey(zoneId))
                     return null;
 
-                return zoneList[zoneId];
-            }
-        }
-
-        public PrivateArea GetPrivateArea(uint zoneId, string privateArea, uint privateAreaType)
-        {
-            lock (zoneList)
-            {
-                if (!zoneList.ContainsKey(zoneId))
-                    return null;
-
-                return zoneList[zoneId].GetPrivateArea(privateArea, privateAreaType);
+                if (privateAreaName == null || privateAreaName.Equals(""))
+                    return zoneList[zoneId];
+                else
+                    return zoneList[zoneId].GetPrivateArea(privateAreaName, privateAreaType);
             }
         }
 
@@ -1945,14 +1889,6 @@ namespace Meteor.Map
                 this.spawnZ  = z;
                 this.spawnRotation = rot;
             }
-        }
-
-        public ZoneEntrance GetZoneEntrance(uint entranceId)
-        {
-            if (zoneEntranceList.ContainsKey(entranceId))
-                return zoneEntranceList[entranceId];
-            else
-                return null;
         }
 
         public ActorClass GetActorClass(uint id)

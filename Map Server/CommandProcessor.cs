@@ -22,7 +22,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Meteor.Map.dataobjects;
+using Meteor.Map.DataObjects;
 
 using System.IO;
 using Meteor.Map.packets.send;
@@ -85,10 +85,10 @@ namespace Meteor.Map
                     }
 
                     // print out all commands
-                    foreach (var str in Directory.GetFiles("./scripts/commands/gm/"))
+                    foreach (var str in Directory.GetFiles(ConfigConstants.OPTIONS_SCRIPTPATH + "/commands/gm/"))
                     {
                         var c = str.Replace(".lua", "");
-                        c = c.Replace("./scripts/commands/gm/", "");
+                        c = c.Replace(ConfigConstants.OPTIONS_SCRIPTPATH + "/scripts/commands/gm/", "");
 
                         LuaEngine.RunGMCommand(player, c, null, true);
                     }

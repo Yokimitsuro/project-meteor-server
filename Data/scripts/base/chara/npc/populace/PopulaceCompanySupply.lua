@@ -330,11 +330,11 @@ function deliveryMenuInfo(player, city, category)
                 
                 deliveryMenuOpen
                 (
-                    player, 
-                    npc, 
-                    gcContents[supplyChoice-1].id, 
-                    gcContents[supplyChoice-1].seals, 
-                    hqPrice, 
+                    player,
+                    nil,
+                    gcContents[supplyChoice-1].id,
+                    gcContents[supplyChoice-1].seals,
+                    hqPrice,
                     category
                 );
                 
@@ -384,7 +384,7 @@ function deliveryStatus(player, city)
     local gcContents = getWeeklyItems(city, 1);
     local gcCurrent = getCurrentCount(city, 1);
 
-    callClientFunction(player, "delegateEvent", player, supplyQuest, "pENPCAskNowTalk", gcRep[npcId]);
+    callClientFunction(player, "delegateEvent", player, supplyQuest, "pENPCAskNowTalk", city);
     callClientFunction
     (
         player, 
