@@ -198,7 +198,7 @@ function onTalk(player, quest, npc, eventName)
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent030_3");
 		end
 	elseif (seq == SEQ_025) then
-		if (npcClassId == ENPC_PUSH_PGL) then
+		if (npcClassId == ENPC_TRIGGER_PGL) then
 		elseif (npcClassId == ENPC_TITININ) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent040_2");
 			data:SetCounter(COUNTER_025, 1);
@@ -224,7 +224,7 @@ function onTalk(player, quest, npc, eventName)
 	elseif (seq == SEQ_035) then
 		if (npcClassId == ENPC_TITININ) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent070");			
-            callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 2)
+            callClientFunction(player, "delegateEvent", player, quest, "sqrwa", 200, 1, 1, 9)
 			player:CompleteQuest(quest);
 		elseif (npcClassId == ENPC_GAGARUNA) then
 			callClientFunction(player, "delegateEvent", player, quest, "processEvent060_2");

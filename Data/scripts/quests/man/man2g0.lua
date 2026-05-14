@@ -361,7 +361,7 @@ function onPush(player, quest, npc)
 	local sequence = quest:getSequence();
 	local classId = npc:GetActorClassId();
 	
-	if (sequence == SEQ_15) then
+	if (sequence == SEQ_015) then
 		if (classId == CNJ_TRIGGER) then
 		end
 	elseif (sequence == SEQ_035) then

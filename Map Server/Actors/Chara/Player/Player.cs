@@ -818,7 +818,7 @@ namespace Meteor.Map.Actors
             //Save Quests
             foreach (Quest quest in questScenario)
             {
-                if (quest != null)
+                if (quest != null && quest.HasData())
                     quest.GetData().Save();
             }    
         }
@@ -1536,6 +1536,22 @@ namespace Meteor.Map.Actors
             int slot = GetQuestSlot(completed);
             if (slot >= 0)
             {
+                // Grant rewards from DB before removing the quest
+                QuestGameData gamedata = Server.GetQuestGamedata(completed.GetQuestId());
+                if (gamedata != null && gamedata.HasRewards())
+                {
+                    GiveQuestRewards(gamedata.ExpReward, gamedata.GilReward);
+
+                    if (gamedata.ItemReward1 > 0 && gamedata.ItemReward1Qty > 0)
+                        GiveQuestItem(gamedata.ItemReward1, gamedata.ItemReward1Qty);
+                    if (gamedata.ItemReward2 > 0 && gamedata.ItemReward2Qty > 0)
+                        GiveQuestItem(gamedata.ItemReward2, gamedata.ItemReward2Qty);
+                    if (gamedata.ItemReward3 > 0 && gamedata.ItemReward3Qty > 0)
+                        GiveQuestItem(gamedata.ItemReward3, gamedata.ItemReward3Qty);
+                    if (gamedata.ItemReward4 > 0 && gamedata.ItemReward4Qty > 0)
+                        GiveQuestItem(gamedata.ItemReward4, gamedata.ItemReward4Qty);
+                }
+
                 // Remove the quest from the DB and update client work values
                 playerWork.questScenarioComplete[completed.GetQuestId() - 110001] = true;
                 questScenario[slot] = null;
@@ -1552,6 +1568,29 @@ namespace Meteor.Map.Actors
                 SendGameMessage(Server.GetWorldManager().GetActor(), 25086, 0x20, (object)completed.GetQuestId()); // "<Quest> complete!"
             }
 
+        }
+
+        public void GiveQuestRewards(int expAmount, int gilAmount = 0)
+        {
+            byte classId = charaWork.parameterSave.state_mainSkill[0];
+
+            if (expAmount > 0 && classId > 0)
+            {
+                List<CommandResult> expResults = AddExp(expAmount, classId);
+                DoBattleAction(0, 0x7C000062, expResults.ToArray());
+            }
+
+            if (gilAmount > 0)
+                AddItem(1000001, gilAmount);
+        }
+
+        public void GiveQuestItem(uint catalogId, int quantity = 1)
+        {
+            if (catalogId > 0 && quantity > 0)
+            {
+                AddItem(catalogId, quantity);
+                SendGameMessage(Server.GetWorldManager().GetActor(), 25246, 0x20, (object)catalogId, (object)quantity);
+            }
         }
 
         public bool AbandonQuest(uint questId)

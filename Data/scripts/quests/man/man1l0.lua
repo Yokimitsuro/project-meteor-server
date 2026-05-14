@@ -290,10 +290,10 @@ function seq000_100_onTalk(player, quest, npc, classId)
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_8");
 	elseif (classId == COQUETTISH_PIRATE) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_9");
-	elseif (classId == 0) then  -- !!!MISSING DIALOG OWNER!!!
-		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_10");
-	elseif (classId == 0) then  -- !!!MISSING DIALOG OWNER!!!
-		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_11");
+	--elseif (classId == 0) then  -- !!!MISSING DIALOG OWNER!!!
+	--	callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_10");
+	--elseif (classId == 0) then  -- !!!MISSING DIALOG OWNER!!!
+	--	callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_11");
 	elseif (classId == IVAN) then
 		callClientFunction(player, "delegateEvent", player, quest, "processEvent2000_12");
 	end

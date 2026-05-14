@@ -10,7 +10,7 @@ end
 function onCreateContentArea(players, director, contentArea, contentGroup)
 
 	snpc = contentArea:SpawnActor(players[1]:GetSNpcSkin() + 107000, "snpc", -203.32, 0, -159.627);	
-	contentGroup:AddMember(player);
+	contentGroup:AddMember(players[1]);
 	contentGroup:AddMember(snpc);
 	contentGroup:AddMember(director);
 	

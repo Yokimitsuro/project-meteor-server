@@ -17,6 +17,7 @@ ENABLE_GL_TUTORIAL = false;
 
 -- Sequence Numbers
 SEQ_000 = 0;	-- (Private Area) Roost Echo Scene.
+SEQ_003 = 3;	-- Warp transition after Roost scene.
 SEQ_005 = 5;	-- Go attune at Camp Bentbranch
 SEQ_010 = 10;	-- Attuned, go back to Miuonne. Info: <param1> If 1, Miounne gave you a tutorial guildleve else 0.
 SEQ_012 = 12;	-- Talk to Miuonne again.
@@ -119,7 +120,9 @@ PASDEVILLET		= 1000738;
 JIJIMAYA		= 1000741;
 
 -- Quest Markers
-MRKR_MIOUNNE	= 11000601;
+MRKR_MIOUNNE		= 11000601;
+MRKR_KID_TRIGGER	= 11000602;
+MRKR_GATE_TRIGGER	= 11000603;
 
 function onStart(player, quest) 
     quest:StartSequence(SEQ_000);
@@ -694,9 +697,7 @@ function onEmote(player, quest, npc, eventName)
 end
 
 function onNotice(player, quest, target)
-    player:EndEvent();
-    player:SendMessage(0x20, "", "Test");
-    callClientFunction(player, "delegateEvent", player, quest, "processEventTu_001");  
+    callClientFunction(player, "delegateEvent", player, quest, "processEventTu_001");
     player:EndEvent();
 end
 
@@ -752,16 +753,17 @@ end
 function getJournalMapMarkerList(player, quest)
     local sequence = quest:getSequence();
     local possibleMarkers = {};
+    local data = quest:GetData();
 
     if (sequence == SEQ_000) then
-	
-    elseif (sequence == SEQ_005) then 
-	
-	elseif (sequence == SEQ_010) then 
-	
-	elseif (sequence == SEQ_012) then 
-	
-	elseif (sequence == SEQ_015) then 
+
+    elseif (sequence == SEQ_005) then
+
+	elseif (sequence == SEQ_010) then
+
+	elseif (sequence == SEQ_012) then
+
+	elseif (sequence == SEQ_015) then
 		local subseqLTW = data:GetCounter(CNTR_SEQ15_LTW);
 		local subseqCNJ = data:GetCounter(CNTR_SEQ15_CNJ);
 		

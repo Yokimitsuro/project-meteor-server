@@ -24,8 +24,12 @@ BNPC_DAPPER_CADAVER	= 2101816;
 MRKR_CADAVER_AREA	= 11067701;
 MRKR_TUTUBUKI		= 11067702;
 
+-- Counters
+COUNTER_QUESTITEM	= 0;
+
 -- Quest Details
 OBJECTIVE_ITEMID	= 11000155;
+OBJECTIVE_AMOUNT	= 1;
 
 function onStart(player, quest)	
 	quest:StartSequence(SEQ_000);

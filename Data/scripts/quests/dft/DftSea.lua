@@ -273,7 +273,7 @@ function onTalk(player, quest, npc, eventName)
 end
 
 function IsQuestENPC(player, quest, npc)
-	return defaultTalkSea[npc.GetActorClassId()] ~= nil;
+	return defaultTalkSea[npc:GetActorClassId()] ~= nil;
 end
 
 

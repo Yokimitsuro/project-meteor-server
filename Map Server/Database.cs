@@ -89,7 +89,17 @@ namespace Meteor.Map
                                 className,
                                 questName,
                                 prerequisite,
-                                minLevel
+                                minLevel,
+                                expReward,
+                                gilReward,
+                                itemReward1,
+                                itemReward1Qty,
+                                itemReward2,
+                                itemReward2Qty,
+                                itemReward3,
+                                itemReward3Qty,
+                                itemReward4,
+                                itemReward4Qty
                                 FROM gamedata_quests
                                 ";
 
@@ -104,8 +114,18 @@ namespace Meteor.Map
                             string name = reader.GetString("questName");
                             uint prerequisite = reader.GetUInt32("prerequisite");
                             ushort minLevel = reader.GetUInt16("minLevel");
-                            //ushort minRank = reader.GetUInt16("minGCRank");
-                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, 0));
+                            int expReward = reader.GetInt32("expReward");
+                            int gilReward = reader.GetInt32("gilReward");
+                            uint itemReward1 = reader.GetUInt32("itemReward1");
+                            int itemReward1Qty = reader.GetInt32("itemReward1Qty");
+                            uint itemReward2 = reader.GetUInt32("itemReward2");
+                            int itemReward2Qty = reader.GetInt32("itemReward2Qty");
+                            uint itemReward3 = reader.GetUInt32("itemReward3");
+                            int itemReward3Qty = reader.GetInt32("itemReward3Qty");
+                            uint itemReward4 = reader.GetUInt32("itemReward4");
+                            int itemReward4Qty = reader.GetInt32("itemReward4Qty");
+                            gamedataQuests.Add(questId, new QuestGameData(questId, code, name, prerequisite, minLevel, 0,
+                                expReward, gilReward, itemReward1, itemReward1Qty, itemReward2, itemReward2Qty, itemReward3, itemReward3Qty, itemReward4, itemReward4Qty));
                         }
                     }
                 }
@@ -541,12 +561,12 @@ namespace Meteor.Map
                     conn.Open();
 
                     query = @"
-                    INSERT INTO characters_quest_scenario 
-                    (characterId, slot, questId, sequence, flags, counter1, counter2, counter3)
+                    INSERT INTO characters_quest_scenario
+                    (characterId, slot, questId, sequence, flags, counter1, counter2, counter3, counter4, time, npcLsFrom, npcLsMsgStep)
                     VALUES
-                    (@charaId, @slot, @questId, @sequence, @flags, @counter1, @counter2, @counter3)
+                    (@charaId, @slot, @questId, @sequence, @flags, @counter1, @counter2, @counter3, @counter4, @time, @npcLsFrom, @npcLsMsgStep)
                     ON DUPLICATE KEY UPDATE
-                    questId = @questId, sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3
+                    questId = @questId, sequence = @sequence, flags = @flags, counter1 = @counter1, counter2 = @counter2, counter3 = @counter3, counter4 = @counter4, time = @time, npcLsFrom = @npcLsFrom, npcLsMsgStep = @npcLsMsgStep
                     ";
 
                     cmd = new MySqlCommand(query, conn);
@@ -558,9 +578,24 @@ namespace Meteor.Map
                     if (qData != null)
                     {
                         cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
-                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
-                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
-                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
+                        cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(0));
+                        cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(1));
+                        cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(2));
+                        cmd.Parameters.AddWithValue("@counter4", qData.GetCounter(3));
+                        cmd.Parameters.AddWithValue("@time", qData.GetTime());
+                        cmd.Parameters.AddWithValue("@npcLsFrom", qData.GetNpcLsFrom());
+                        cmd.Parameters.AddWithValue("@npcLsMsgStep", qData.GetMsgStep());
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@flags", 0);
+                        cmd.Parameters.AddWithValue("@counter1", 0);
+                        cmd.Parameters.AddWithValue("@counter2", 0);
+                        cmd.Parameters.AddWithValue("@counter3", 0);
+                        cmd.Parameters.AddWithValue("@counter4", 0);
+                        cmd.Parameters.AddWithValue("@time", 0);
+                        cmd.Parameters.AddWithValue("@npcLsFrom", 0);
+                        cmd.Parameters.AddWithValue("@npcLsMsgStep", 0);
                     }
 
                     cmd.ExecuteNonQuery();
@@ -601,10 +636,10 @@ namespace Meteor.Map
                     cmd.Parameters.AddWithValue("@sequence", quest.GetSequence());
 
                     cmd.Parameters.AddWithValue("@flags", qData.GetFlags());
-                    cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(1));
-                    cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(2));
-                    cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(3));
-                    cmd.Parameters.AddWithValue("@counter4", qData.GetCounter(4));
+                    cmd.Parameters.AddWithValue("@counter1", qData.GetCounter(0));
+                    cmd.Parameters.AddWithValue("@counter2", qData.GetCounter(1));
+                    cmd.Parameters.AddWithValue("@counter3", qData.GetCounter(2));
+                    cmd.Parameters.AddWithValue("@counter4", qData.GetCounter(3));
                     cmd.Parameters.AddWithValue("@npcLsFrom", qData.GetNpcLsFrom());
                     cmd.Parameters.AddWithValue("@npcLsMsgStep", qData.GetMsgStep());
                     
@@ -779,7 +814,7 @@ namespace Meteor.Map
                     (characterId, completedQuests)
                     VALUES
                     (@charaId, @completedQuests)
-                    ON DUPLICATE KEY UPDATE completedQuests=completedQuests
+                    ON DUPLICATE KEY UPDATE completedQuests=@completedQuests
                     ";
 
                     cmd = new MySqlCommand(query, conn);

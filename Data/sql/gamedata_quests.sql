@@ -23,7 +23,17 @@ CREATE TABLE IF NOT EXISTS `gamedata_quests` (
   `questName` varchar(50) NOT NULL,
   `className` varchar(10) NOT NULL,
   `prerequisite` int(11) unsigned NOT NULL,
-  `minLevel` smallint(5) unsigned NOT NULL
+  `minLevel` smallint(5) unsigned NOT NULL,
+  `expReward` int(11) unsigned NOT NULL DEFAULT 0,
+  `gilReward` int(11) unsigned NOT NULL DEFAULT 0,
+  `itemReward1` int(11) unsigned NOT NULL DEFAULT 0,
+  `itemReward1Qty` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `itemReward2` int(11) unsigned NOT NULL DEFAULT 0,
+  `itemReward2Qty` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `itemReward3` int(11) unsigned NOT NULL DEFAULT 0,
+  `itemReward3Qty` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `itemReward4` int(11) unsigned NOT NULL DEFAULT 0,
+  `itemReward4Qty` smallint(5) unsigned NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- Dumping data for table ffxiv_server.gamedata_quests: ~524 rows (approximately)

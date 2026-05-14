@@ -298,14 +298,17 @@ namespace Meteor.Map.Actors
 
                             // todo: add actual experience calculation and exp bonus values.
                             if (partyMember is Player)
+                            {
                                 BattleUtils.AddBattleBonusEXP((Player)partyMember, this, actionContainer);
+                                ((Player)partyMember).HandleBNpcKill(GetActorClassId());
+                            }
                         }
                     }
                     else
                     {
                         // onDeath(monster, player, killer)
                         lua.LuaEngine.CallLuaBattleFunction(this, "onDeath", this, lastAttacker, lastAttacker);
-                        //((Player)lastAttacker).QueuePacket(BattleActionX01Packet.BuildPacket(lastAttacker.actorId, 0, 0, new BattleAction(actorId, 30108, 0)));
+                        ((Player)lastAttacker).HandleBNpcKill(GetActorClassId());
                     }
                 }
 

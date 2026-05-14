@@ -31,13 +31,13 @@ function onTrigger(player, argc, questId, flag)
 	end
 	
 	-- Getting	
-	if (arc == 1) then
+	if (argc == 1) then
 		player:SendMessage(messageID, sender, string.format("Quest %d completion is set to: %s", questId, tostring(player:IsQuestCompleted(questId))));
 		return;
 	-- Setting
 	else
 		-- Fail if not valid flag
-		if (not flag == nil) then
+		if (flag == nil) then
 			player:SendMessage(messageID, sender, "Invalid flag entered");
 		else
 			local boolFlag = false;

@@ -388,7 +388,7 @@ function startMan20001Content(player, quest)
 		director = contentArea:GetContentDirector();		
 		player:AddDirector(director);		
 		director:StartDirector(false);		
-		GetWorldManager():DoZoneChangeContent(player, contentArea, -200, 0 -160, -1.6, 2);		
+		GetWorldManager():DoZoneChangeContent(player, contentArea, -200, 0, -160, -1.6, 2);		
 		return;
 	end
 	player:EndEvent();

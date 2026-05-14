@@ -187,7 +187,7 @@ namespace Meteor.Common
                     srcByteIndx++;
                     srcShiftIndx = 0;
                     destByteIndx++;
-                    i += 8;
+                    i += 7;
                     continue;
                 }
 

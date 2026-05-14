@@ -5,6 +5,7 @@ Special constants used by quest scripts.
 ]]
 
 -- QUEST FLAGS
+QFLAG_NONE		= 0;
 QFLAG_OFF		= 0;
 QFLAG_OFF_HIDE	= 1;
 QFLAG_TALK		= 2;
@@ -21,3 +22,7 @@ NPCLS_GONE		= 0;
 NPCLS_INACTIVE	= 1;
 NPCLS_ACTIVE	= 2;
 NPCLS_ALERT		= 3;
+
+function completeQuest(player, quest)
+	player:CompleteQuest(quest);
+end
