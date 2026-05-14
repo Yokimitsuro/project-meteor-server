@@ -2872,10 +2872,10 @@ namespace Meteor.Map
                     characterId = @characterId", CharacterUtils.GetClassNameForId(classId));
                     MySqlCommand cmd = new MySqlCommand(query, conn);
 
-                    cmd.Prepare();
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@characterId", player.Id);
                     cmd.Parameters.AddWithValue("@exp", exp);
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();
                 }
                 catch (MySqlException e)
@@ -2905,10 +2905,10 @@ namespace Meteor.Map
                     characterId = @characterId", CharacterUtils.GetClassNameForId(classId));
                     MySqlCommand cmd = new MySqlCommand(query, conn);
 
-                    cmd.Prepare();
                     cmd = new MySqlCommand(query, conn);
                     cmd.Parameters.AddWithValue("@characterId", player.Id);
                     cmd.Parameters.AddWithValue("@lvl", level);
+                    cmd.Prepare();
                     cmd.ExecuteNonQuery();
                 }
                 catch (MySqlException e)
