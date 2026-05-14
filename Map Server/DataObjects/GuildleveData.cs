@@ -19,7 +19,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 ===========================================================================
 */
 
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Meteor.Map.DataObjects
 {

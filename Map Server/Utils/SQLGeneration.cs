@@ -21,7 +21,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 
 using Meteor.Common;
 using Meteor.Map.packets.send.player;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.IO;

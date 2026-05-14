@@ -23,7 +23,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using NLog;
 
 namespace Meteor.Lobby

@@ -25,7 +25,7 @@ $g_databaseConnection = CreateDatabaseConnection($db_server, $db_username, $db_p
 
 function GenerateRandomSha224()
 {
-	mt_srand(microtime(true) * 100000 + memory_get_usage(true));
+	mt_srand((int)(microtime(true) * 100000 + memory_get_usage(true)));
 	return hash("sha224", uniqid(mt_rand(), true));
 }
 

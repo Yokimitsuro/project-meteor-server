@@ -21,7 +21,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 
 using Meteor.Map.actors.chara.player;
 using Meteor.Map.Actors;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 using System;
 using System.IO;
 
@@ -87,7 +87,7 @@ namespace Meteor.Map.DataObjects
             {                
             }
 
-            public ItemModifier(MySql.Data.MySqlClient.MySqlDataReader reader)
+            public ItemModifier(MySqlDataReader reader)
             {
                 durability = reader.GetUInt32("durability"); 
                 mainQuality = reader.GetByte("mainQuality");

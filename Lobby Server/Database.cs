@@ -23,7 +23,7 @@ using System;
 using System.Collections.Generic;
 
 using Meteor.Lobby.DataObjects;
-using MySql.Data.MySqlClient;
+using MySqlConnector;
 
 namespace Meteor.Lobby
 {
