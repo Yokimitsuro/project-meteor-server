@@ -182,6 +182,8 @@ INSERT INTO `server_battlenpc_groups` VALUES (58,41,'flan',16,20,90,950,0,0,0,0,
 INSERT INTO `server_battlenpc_groups` VALUES (59,49,'ahriman',32,37,120,2000,0,0,0,0,0,0,'',0,143);
 INSERT INTO `server_battlenpc_groups` VALUES (60,53,'grenade',35,40,120,2100,0,0,0,0,0,0,'',0,143);
 INSERT INTO `server_battlenpc_groups` VALUES (61,56,'kobold',30,35,120,1700,0,0,0,0,0,0,'',0,143);
+-- Ixali Fencer high-level Lv46-49
+INSERT INTO `server_battlenpc_groups` VALUES (62,57,'ixal',46,49,120,4500,200,0,0,0,0,0,'',0,143);
 /*!40000 ALTER TABLE `server_battlenpc_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;

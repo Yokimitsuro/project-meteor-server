@@ -99,6 +99,7 @@ INSERT INTO `server_battlenpc_pool_mods` VALUES (53,24,1,1);
 INSERT INTO `server_battlenpc_pool_mods` VALUES (54,24,1,1);
 INSERT INTO `server_battlenpc_pool_mods` VALUES (55,24,1,1);
 INSERT INTO `server_battlenpc_pool_mods` VALUES (56,24,1,1);
+INSERT INTO `server_battlenpc_pool_mods` VALUES (57,24,1,1);
 /*!40000 ALTER TABLE `server_battlenpc_pool_mods` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;

@@ -147,6 +147,8 @@ INSERT INTO `server_battlenpc_pools` VALUES (54,2101201,'vulture',41,0,1,3000,1,
 INSERT INTO `server_battlenpc_pools` VALUES (55,2106401,'ixal',24,0,1,3600,1,1,0,0,0,40);
 -- Kobold (aggressive sight)
 INSERT INTO `server_battlenpc_pools` VALUES (56,2106601,'kobold',27,0,1,3600,1,1,0,0,0,41);
+-- Ixali Fencer high-level (aggressive sight, higher damage)
+INSERT INTO `server_battlenpc_pools` VALUES (57,2106401,'ixal_fencer_hl',24,0,1,3200,1.5,1,0,0,0,40);
 /*!40000 ALTER TABLE `server_battlenpc_pools` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;

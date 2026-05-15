@@ -340,6 +340,11 @@ INSERT INTO `server_battlenpc_spawn_locations` VALUES (176,'',61,350,305,-400,0.
 INSERT INTO `server_battlenpc_spawn_locations` VALUES (177,'',61,370,303,-420,-1.0);
 INSERT INTO `server_battlenpc_spawn_locations` VALUES (178,'',61,330,307,-380,1.5);
 
+-- Ixali Fencer HL (zone 143)
+INSERT INTO `server_battlenpc_spawn_locations` VALUES (179,'',62,400,310,-450,0.5);
+INSERT INTO `server_battlenpc_spawn_locations` VALUES (180,'',62,420,308,-470,-1.0);
+INSERT INTO `server_battlenpc_spawn_locations` VALUES (181,'',62,380,312,-430,2.0);
+
 /*!40000 ALTER TABLE `server_battlenpc_spawn_locations` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
