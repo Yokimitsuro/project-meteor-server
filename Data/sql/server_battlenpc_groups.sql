@@ -184,6 +184,23 @@ INSERT INTO `server_battlenpc_groups` VALUES (60,53,'grenade',35,40,120,2100,0,0
 INSERT INTO `server_battlenpc_groups` VALUES (61,56,'kobold',30,35,120,1700,0,0,0,0,0,0,'',0,143);
 -- Ixali Fencer high-level Lv46-49
 INSERT INTO `server_battlenpc_groups` VALUES (62,57,'ixal',46,49,120,4500,200,0,0,0,0,0,'',0,143);
+-- Additional monster variants across all zones
+INSERT INTO `server_battlenpc_groups` VALUES (63,72,'stray_dodo',3,7,90,200,0,0,0,0,0,0,'',0,128);
+INSERT INTO `server_battlenpc_groups` VALUES (64,73,'painted_ladybug',2,5,60,120,0,0,0,0,0,0,'',0,128);
+INSERT INTO `server_battlenpc_groups` VALUES (65,65,'star_marmot',3,6,60,150,0,0,0,0,0,0,'',0,150);
+INSERT INTO `server_battlenpc_groups` VALUES (66,64,'dormouse',2,6,60,130,0,0,0,0,0,0,'',0,170);
+INSERT INTO `server_battlenpc_groups` VALUES (67,58,'giant_gnat',4,8,90,180,0,0,0,0,0,0,'',0,172);
+INSERT INTO `server_battlenpc_groups` VALUES (68,63,'shaggy_wolf',12,16,90,700,0,0,0,0,0,0,'',0,129);
+INSERT INTO `server_battlenpc_groups` VALUES (69,66,'roseling',10,14,90,550,0,0,0,0,0,0,'',0,129);
+INSERT INTO `server_battlenpc_groups` VALUES (70,67,'weevil',13,17,90,650,0,0,0,0,0,0,'',0,151);
+INSERT INTO `server_battlenpc_groups` VALUES (71,59,'puk',12,16,90,750,0,0,0,0,0,0,'',0,171);
+INSERT INTO `server_battlenpc_groups` VALUES (72,60,'sabotender',18,22,120,1000,0,0,0,0,0,0,'',0,130);
+INSERT INTO `server_battlenpc_groups` VALUES (73,69,'greedy_angler',16,20,120,850,0,0,0,0,0,0,'',0,130);
+INSERT INTO `server_battlenpc_groups` VALUES (74,61,'amaljaa_pugilist',24,28,120,1300,100,0,0,0,0,0,'',0,152);
+INSERT INTO `server_battlenpc_groups` VALUES (75,62,'escaped_goobbue',18,22,180,2000,0,0,0,0,0,0,'',0,154);
+INSERT INTO `server_battlenpc_groups` VALUES (76,68,'redhorn_ogre',38,43,120,3200,0,0,0,0,0,0,'',0,143);
+INSERT INTO `server_battlenpc_groups` VALUES (77,70,'cloud_hippocerf',35,40,120,2800,0,0,0,0,0,0,'',0,143);
+INSERT INTO `server_battlenpc_groups` VALUES (78,71,'acid_bomb',33,38,120,1800,0,0,0,0,0,0,'',0,143);
 /*!40000 ALTER TABLE `server_battlenpc_groups` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;

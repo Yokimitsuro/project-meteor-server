@@ -149,6 +149,23 @@ INSERT INTO `server_battlenpc_pools` VALUES (55,2106401,'ixal',24,0,1,3600,1,1,0
 INSERT INTO `server_battlenpc_pools` VALUES (56,2106601,'kobold',27,0,1,3600,1,1,0,0,0,41);
 -- Ixali Fencer high-level (aggressive sight, higher damage)
 INSERT INTO `server_battlenpc_pools` VALUES (57,2106401,'ixal_fencer_hl',24,0,1,3200,1.5,1,0,0,0,40);
+-- Additional monster variants (extracted from client displayName sheet)
+INSERT INTO `server_battlenpc_pools` VALUES (58,2100601,'giant_gnat',37,0,1,3000,0.8,0,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (59,2100103,'puk',45,0,1,3200,0.9,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (60,2100905,'sabotender',13,0,1,3400,1.2,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (61,2106502,'amaljaa_pugilist',23,2,1,3200,1.2,1,0,0,0,42);
+INSERT INTO `server_battlenpc_pools` VALUES (62,2203301,'escaped_goobbue',6,0,1,4200,2.0,5,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (63,2201402,'shaggy_wolf',3,0,1,3000,1.0,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (64,2104014,'dormouse',12,0,1,2800,0.7,0,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (65,2104010,'star_marmot',12,0,1,2800,0.7,0,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (66,2102702,'roseling',15,0,1,3000,0.8,0,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (67,2103908,'weevil',38,0,1,3000,1.0,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (68,2102502,'redhorn_ogre',60,0,1,4200,1.8,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (69,2204502,'greedy_angler',17,0,1,3200,1.0,4,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (70,2100404,'cloud_hippocerf',44,0,1,4000,1.5,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (71,2201608,'acid_bomb',64,0,1,3000,1.0,1,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (72,2202001,'stray_dodo',42,0,1,2600,0.6,0,0,0,0,0);
+INSERT INTO `server_battlenpc_pools` VALUES (73,2103906,'painted_ladybug',38,0,1,2600,0.7,0,0,0,0,0);
 /*!40000 ALTER TABLE `server_battlenpc_pools` ENABLE KEYS */;
 UNLOCK TABLES;
 commit;
