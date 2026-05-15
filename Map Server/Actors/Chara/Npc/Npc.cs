@@ -68,7 +68,7 @@ namespace Meteor.Map.Actors
             this.animationId = animationId;
 
             this.LocalizedDisplayName = actorClass.displayNameId;
-            this.DisplayName = customDisplayName;
+            this.DisplayName = string.IsNullOrEmpty(customDisplayName) ? null : customDisplayName;
 
             this.uniqueIdentifier = uniqueId;
 

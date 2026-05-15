@@ -3130,6 +3130,42 @@ namespace Meteor.Map.Actors
         public override void CalculateBaseStats()
         {
             base.CalculateBaseStats();
+
+            // Race/tribe base stats: STR, VIT, DEX, INT, MND, PIE
+            // Melee base → Attack, Magic base → AttackMagicPotency
+            int bStr = 16, bVit = 15, bDex = 14, bInt = 16, bMnd = 13, bPie = 16, bMelee = 45, bMagic = 45;
+            switch (playerWork.tribe)
+            {
+                case 1: case 2:   // Hyur Midlander
+                    bStr = 16; bVit = 15; bDex = 14; bInt = 16; bMnd = 13; bPie = 16; bMelee = 45; bMagic = 45; break;
+                case 3:           // Hyur Highlander
+                    bStr = 18; bVit = 17; bDex = 15; bInt = 13; bMnd = 15; bPie = 12; bMelee = 50; bMagic = 40; break;
+                case 4: case 5:   // Elezen Wildwood
+                    bStr = 14; bVit = 13; bDex = 18; bInt = 17; bMnd = 12; bPie = 16; bMelee = 45; bMagic = 45; break;
+                case 6: case 7:   // Elezen Duskwight
+                    bStr = 15; bVit = 14; bDex = 15; bInt = 18; bMnd = 15; bPie = 13; bMelee = 44; bMagic = 46; break;
+                case 8: case 9:   // Lalafell Plainsfolk
+                    bStr = 13; bVit = 13; bDex = 17; bInt = 16; bMnd = 15; bPie = 16; bMelee = 43; bMagic = 47; break;
+                case 10: case 11: // Lalafell Dunesfolk
+                    bStr = 12; bVit = 12; bDex = 15; bInt = 16; bMnd = 17; bPie = 18; bMelee = 39; bMagic = 51; break;
+                case 12:          // Miqo'te Seekers of the Sun
+                    bStr = 16; bVit = 15; bDex = 17; bInt = 13; bMnd = 14; bPie = 15; bMelee = 48; bMagic = 42; break;
+                case 13:          // Miqo'te Keepers of the Moon
+                    bStr = 13; bVit = 12; bDex = 16; bInt = 14; bMnd = 18; bPie = 17; bMelee = 41; bMagic = 49; break;
+                case 14:          // Roegadyn Sea Wolf
+                    bStr = 17; bVit = 18; bDex = 13; bInt = 12; bMnd = 16; bPie = 14; bMelee = 48; bMagic = 42; break;
+                case 15:          // Roegadyn Hellsguard
+                    bStr = 15; bVit = 16; bDex = 12; bInt = 15; bMnd = 17; bPie = 15; bMelee = 43; bMagic = 47; break;
+            }
+            AddMod((uint)Modifier.Strength, bStr);
+            AddMod((uint)Modifier.Vitality, bVit);
+            AddMod((uint)Modifier.Dexterity, bDex);
+            AddMod((uint)Modifier.Intelligence, bInt);
+            AddMod((uint)Modifier.Mind, bMnd);
+            AddMod((uint)Modifier.Piety, bPie);
+            AddMod((uint)Modifier.Attack, bMelee);
+            AddMod((uint)Modifier.AttackMagicPotency, bMagic);
+
             //Add weapon property mod
             var equip = GetEquipment();
             var mainHandItem = equip.GetItemAtSlot(SLOT_MAINHAND);
@@ -3143,6 +3179,11 @@ namespace Meteor.Map.Actors
                 damageAttribute = mainHandWeapon.damageAttributeType1;
                 attackDelay = (int) (mainHandWeapon.damageInterval * 1000);
                 hitCount = mainHandWeapon.frequency;
+
+                if (mainHandWeapon.IsBowWeapon() || mainHandWeapon.IsGunWeapon())
+                    SetMod((uint)Modifier.AttackRange, 20);
+                else
+                    SetMod((uint)Modifier.AttackRange, 3);
             }
 
             var hasShield = equip.GetItemAtSlot(SLOT_OFFHAND) != null ? 1 : 0;
@@ -3167,10 +3208,12 @@ namespace Meteor.Map.Actors
             AddMod((uint)Modifier.MagicEvasion, (long)((float)GetMod(Modifier.Piety) * 0.25));
             AddMod((uint)Modifier.EnfeeblingMagicPotency, (long)((float)GetMod(Modifier.Piety) * 0.25));
 
-            //VIT correlates to HP in a 1:1 fashion
-            AddMod((uint)Modifier.Hp, (long)((float)Modifier.Vitality));
+            AddMod((uint)Modifier.Hp, GetMod(Modifier.Vitality));
 
             CalculateTraitMods();
+
+            for (uint i = 0; i < 35; i++)
+                charaWork.battleTemp.generalParameter[i] = (short)GetMod(i);
         }
 
         public bool HasTrait(ushort id)

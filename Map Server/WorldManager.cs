@@ -389,6 +389,25 @@ namespace Meteor.Map
             Program.Log.Info(String.Format("Loaded {0} ENPC(s).", count));
         }
 
+        private Dictionary<uint, List<uint>> LoadBattleNpcLists(MySqlConnection conn, string table, string listIdCol, string entryIdCol)
+        {
+            var result = new Dictionary<uint, List<uint>>();
+            var query = $"SELECT `{listIdCol}`, `{entryIdCol}` FROM `{table}`";
+            using (var cmd = new MySqlCommand(query, conn))
+            using (var reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    uint listId = reader.GetUInt32(0);
+                    uint entryId = reader.GetUInt32(1);
+                    if (!result.ContainsKey(listId))
+                        result[listId] = new List<uint>();
+                    result[listId].Add(entryId);
+                }
+            }
+            return result;
+        }
+
         public void LoadBattleNpcs()
         {
             LoadBattleNpcModifiers("server_battlenpc_genus_mods", "genusId", battleNpcGenusMods);
@@ -400,8 +419,12 @@ namespace Meteor.Map
                 try
                 {
                     conn.Open();
+
+                    var spellLists = LoadBattleNpcLists(conn, "server_battlenpc_spell_list", "spellListId", "spellId");
+                    var skillLists = LoadBattleNpcLists(conn, "server_battlenpc_skill_list", "skillListId", "skillId");
+
                     var query = @"
-                    SELECT bsl.bnpcId, bsl.groupId, bsl.positionX, bsl.positionY, bsl.positionZ, bsl.rotation, 
+                    SELECT bsl.bnpcId, bsl.groupId, bsl.positionX, bsl.positionY, bsl.positionZ, bsl.rotation,
                     bgr.groupId, bgr.poolId, bgr.scriptName, bgr.minLevel, bgr.maxLevel, bgr.respawnTime, bgr.hp, bgr.mp,
                     bgr.dropListId, bgr.allegiance, bgr.spawnType, bgr.animationId, bgr.actorState, bgr.privateAreaName, bgr.privateAreaLevel, bgr.zoneId,
                     bpo.poolId, bpo.genusId, bpo.actorClassId, bpo.currentJob, bpo.combatSkill, bpo.combatDelay, bpo.combatDmgMult, bpo.aggroType,
@@ -480,9 +503,19 @@ namespace Meteor.Map
                                 battleNpc.spellListId = reader.GetUInt32("spellListId");
                                 battleNpc.skillListId = reader.GetUInt32("skillListId");
 
-                                //battleNpc.SetMod((uint)Modifier.ResistFire, )
+                                if (battleNpc.spellListId != 0 && spellLists.ContainsKey(battleNpc.spellListId))
+                                    foreach (var spellId in spellLists[battleNpc.spellListId])
+                                    {
+                                        var bcmd = GetBattleCommand(spellId);
+                                        if (bcmd != null) battleNpc.spellList[spellId] = bcmd;
+                                    }
+                                if (battleNpc.skillListId != 0 && skillLists.ContainsKey(battleNpc.skillListId))
+                                    foreach (var skillId in skillLists[battleNpc.skillListId])
+                                    {
+                                        var bcmd = GetBattleCommand(skillId);
+                                        if (bcmd != null) battleNpc.skillList[skillId] = bcmd;
+                                    }
 
-                                // todo: this is dumb
                                 if (battleNpc.npcSpawnType == NpcSpawnType.Normal)
                                 {
                                     zone.AddActorToZone(battleNpc);
@@ -520,8 +553,12 @@ namespace Meteor.Map
                 try
                 {
                     conn.Open();
+
+                    var spellLists = LoadBattleNpcLists(conn, "server_battlenpc_spell_list", "spellListId", "spellId");
+                    var skillLists = LoadBattleNpcLists(conn, "server_battlenpc_skill_list", "skillListId", "skillId");
+
                     var query = @"
-                    SELECT bsl.bnpcId, bsl.groupId, bsl.positionX, bsl.positionY, bsl.positionZ, bsl.rotation, 
+                    SELECT bsl.bnpcId, bsl.groupId, bsl.positionX, bsl.positionY, bsl.positionZ, bsl.rotation,
                     bgr.groupId, bgr.poolId, bgr.scriptName, bgr.minLevel, bgr.maxLevel, bgr.respawnTime, bgr.hp, bgr.mp,
                     bgr.dropListId, bgr.allegiance, bgr.spawnType, bgr.animationId, bgr.actorState, bgr.privateAreaName, bgr.privateAreaLevel, bgr.zoneId,
                     bpo.poolId, bpo.genusId, bpo.actorClassId, bpo.currentJob, bpo.combatSkill, bpo.combatDelay, bpo.combatDmgMult, bpo.aggroType,
@@ -648,6 +685,20 @@ namespace Meteor.Map
                             battleNpc.dropListId = reader.GetUInt32("dropListId");
                             battleNpc.spellListId = reader.GetUInt32("spellListId");
                             battleNpc.skillListId = reader.GetUInt32("skillListId");
+
+                            if (battleNpc.spellListId != 0 && spellLists.ContainsKey(battleNpc.spellListId))
+                                foreach (var sid in spellLists[battleNpc.spellListId])
+                                {
+                                    var bcmd = GetBattleCommand(sid);
+                                    if (bcmd != null) battleNpc.spellList[sid] = bcmd;
+                                }
+                            if (battleNpc.skillListId != 0 && skillLists.ContainsKey(battleNpc.skillListId))
+                                foreach (var sid in skillLists[battleNpc.skillListId])
+                                {
+                                    var bcmd = GetBattleCommand(sid);
+                                    if (bcmd != null) battleNpc.skillList[sid] = bcmd;
+                                }
+
                             battleNpc.SetBattleNpcId(reader.GetUInt32("bnpcId"));
                             battleNpc.SetRespawnTime(reader.GetUInt32("respawnTime"));
                             battleNpc.CalculateBaseStats();
@@ -730,8 +781,8 @@ namespace Meteor.Map
             player.zone2 = null;
 
             player.SendSeamlessZoneInPackets();
-
-            player.SendMessage(0x20, "", "Doing Seamless Zone Change");
+            player.playerSession.ClearInstance();
+            player.SendInstanceUpdate();
 
             LuaEngine.GetInstance().CallLuaFunction(player, newZone, "onZoneIn", true);
         }

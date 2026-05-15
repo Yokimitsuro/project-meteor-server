@@ -10,11 +10,9 @@ function onMagicStart(caster, target, spell)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    action.amount = skill.basePotency;
-
     --8071401: Gallant Gauntlets: Enhances Holy Succor
     if caster.HasItemEquippedInSlot(8071401, 13) then
-        action.amount = action.amount * 1.10;
+        skill.basePotency = skill.basePotency * 1.10;
     end
 
     --DoAction handles rates, buffs, dealing damage

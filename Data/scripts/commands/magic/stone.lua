@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("magic");
 
 function onMagicPrepare(caster, target, spell)
@@ -10,8 +10,6 @@ function onMagicStart(caster, target, spell)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    --calculate damage
-    action.amount = skill.basePotency;
     skill.statusMagnitude = 50;
 
     --DoAction handles rates, buffs, dealing damage

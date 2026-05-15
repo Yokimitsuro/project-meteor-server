@@ -49,7 +49,7 @@ namespace Meteor.Map.actors.chara.ai.state
 
         public override bool Update(DateTime tick)
         {
-            if ((target == null || owner.target != target || owner.target?.Id != owner.currentLockedTarget) && owner.isAutoAttackEnabled)
+            if (target == null || owner.target != target || owner.target?.Id != owner.currentLockedTarget)
                 owner.aiContainer.ChangeTarget(target = owner.CurrentArea.FindActorInArea<Character>(owner.currentTarget));
 
             if (target == null || target.IsDead())
@@ -61,6 +61,7 @@ namespace Meteor.Map.actors.chara.ai.state
             {
                 if (IsAttackReady())
                 {
+                    owner.LookAt(target);
                     if (CanAttack())
                     {
                         TryInterrupt();
@@ -178,7 +179,7 @@ namespace Meteor.Map.actors.chara.ai.state
 
         private bool CanAttack()
         {
-            if (!owner.isAutoAttackEnabled || target.allegiance == owner.allegiance)
+            if (target.allegiance == owner.allegiance)
             {
                 return false;
             }

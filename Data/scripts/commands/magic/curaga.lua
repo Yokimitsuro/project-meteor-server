@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("magic");
 
 function onMagicPrepare(caster, target, spell)
@@ -11,8 +11,6 @@ function onMagicStart(caster, target, spell)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    --calculate damage
-    action.amount = skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);

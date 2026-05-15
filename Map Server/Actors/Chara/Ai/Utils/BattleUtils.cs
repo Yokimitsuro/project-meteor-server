@@ -489,6 +489,15 @@ namespace Meteor.Map.actors.chara.ai.utils
         //Determine the hit type, set the hit effect, modify damage based on stoneskin and hit type, hit target
         public static void FinishActionPhysical(Character attacker, Character defender, BattleCommand skill, CommandResult action, CommandResultContainer actionContainer = null)
         {
+            if (action.amount == 0)
+            {
+                if (skill != null && skill.commandType == CommandType.AutoAttack)
+                    action.amount = AttackUtils.CalculateAutoAttackDamage(attacker);
+                else
+                    action.amount = AttackUtils.CalculateWeaponSkillDamage(attacker, skill);
+                action.enmity = action.amount;
+            }
+
             //Figure out the hit type and change damage depending on hit type
             if (!TryMiss(attacker, defender, skill, action))
             {
@@ -536,6 +545,12 @@ namespace Meteor.Map.actors.chara.ai.utils
 
         public static void FinishActionSpell(Character attacker, Character defender, BattleCommand skill, CommandResult action, CommandResultContainer actionContainer = null)
         {
+            if (action.amount == 0)
+            {
+                action.amount = AttackUtils.CalculateSpellDamage(attacker, skill);
+                action.enmity = action.amount;
+            }
+
             //I'm assuming that like physical attacks stoneskin is taken into account before mitigation
             HandleStoneskin(defender, action);
 
@@ -565,6 +580,9 @@ namespace Meteor.Map.actors.chara.ai.utils
 
         public static void FinishActionHeal(Character attacker, Character defender, BattleCommand skill, CommandResult action, CommandResultContainer actionContainer = null)
         {
+            if (action.amount == 0)
+                action.amount = AttackUtils.CalculateHealAmount(attacker, skill);
+
             //Set the hit effect
             SetHitEffectHeal(attacker, defender, skill, action);
 

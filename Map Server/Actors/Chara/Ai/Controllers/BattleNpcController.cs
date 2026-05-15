@@ -21,6 +21,7 @@ along with Project Meteor Server. If not, see <https:www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Meteor.Common;
 using Meteor.Map.Actors;
 using Meteor.Map.packets.send.actor;
@@ -182,6 +183,12 @@ namespace Meteor.Map.actors.chara.ai.controllers
             // todo:
         }
 
+        public override void WeaponSkill(Character target, uint weaponSkillId)
+        {
+            if (owner.aiContainer.CanChangeState())
+                owner.aiContainer.InternalWeaponSkill(target, weaponSkillId);
+        }
+
         public override void MonsterSkill(Character target, uint mobSkillId)
         {
             // todo:
@@ -225,7 +232,6 @@ namespace Meteor.Map.actors.chara.ai.controllers
         protected virtual void DoCombatTick(DateTime tick, List<Character> contentGroupCharas = null)
         {
             HandleHate();
-            // todo: magic/attack/ws cooldowns etc
             if (TryDeaggro())
             {
                 Disengage();
@@ -235,10 +241,42 @@ namespace Meteor.Map.actors.chara.ai.controllers
             if ((tick - lastCombatTickScript).TotalSeconds > 3)
             {
                 Move();
-                //if (owner.aiContainer.CanChangeState())
-                    //owner.aiContainer.WeaponSkill(owner.zone.FindActorInArea<Character>(owner.target.actorId), 27155);
-                //lua.LuaEngine.CallLuaBattleFunction(owner, "onCombatTick", owner, owner.target, Utils.UnixTimeStampUTC(tick), contentGroupCharas);
+                if (owner.aiContainer.CanChangeState())
+                    TryUseAbility(tick);
                 lastCombatTickScript = tick;
+            }
+        }
+
+        protected virtual void TryUseAbility(DateTime tick)
+        {
+            var target = owner.target as Character;
+            if (target == null || target.IsDead())
+                return;
+
+            float distance = Utils.Distance(owner.positionX, owner.positionY, owner.positionZ, target.positionX, target.positionY, target.positionZ);
+
+            if (owner.spellList.Count > 0 && (tick - lastSpellCastTime).TotalSeconds > 8)
+            {
+                var candidates = owner.spellList.Values.Where(s => distance <= (s.range > 0 ? s.range : 20)).ToList();
+                if (candidates.Count > 0 && Program.Random.NextDouble() < 0.35)
+                {
+                    var spell = candidates[Program.Random.Next(candidates.Count)];
+                    Cast(target, spell.id);
+                    lastSpellCastTime = tick;
+                    return;
+                }
+            }
+
+            if (owner.skillList.Count > 0 && (tick - lastSkillTime).TotalSeconds > 6)
+            {
+                var candidates = owner.skillList.Values.Where(s => distance <= (s.range > 0 ? s.range : 5)).ToList();
+                if (candidates.Count > 0 && Program.Random.NextDouble() < 0.30)
+                {
+                    var skill = candidates[Program.Random.Next(candidates.Count)];
+                    WeaponSkill(target, skill.id);
+                    lastSkillTime = tick;
+                    return;
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("ability");
 
 function onAbilityPrepare(caster, target, ability)
@@ -15,8 +15,6 @@ function onSkillFinish(caster, target, skill, action, actionContainer)
         skill.statusChance = 0.50;
     end
 
-    --calculate ws damage
-    action.amount = skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);

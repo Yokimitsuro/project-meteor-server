@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("weaponskill");
 
 function onSkillPrepare(caster, target, skill)
@@ -14,8 +14,6 @@ function onPositional(caster, target, skill)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    --calculate ws damage
-    action.amount = skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);

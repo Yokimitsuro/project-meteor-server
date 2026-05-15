@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("weaponskill");
 require("modifiers")
 
@@ -35,8 +35,6 @@ function onSkillFinish(caster, target, skill, action, actionContainer)
         skill.statusId = 223015
     end;
 
-    --calculate ws damage
-    action.amount = skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);

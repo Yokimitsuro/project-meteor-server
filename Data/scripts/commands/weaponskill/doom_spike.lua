@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("weaponskill");
 require("utils");
 
@@ -16,8 +16,6 @@ function onCombo(caster, target, skill)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    --calculate ws damage
-    action.amount = 5000;--skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);

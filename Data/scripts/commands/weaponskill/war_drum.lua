@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("weaponskill");
 
 function onSkillPrepare(caster, target, skill)
@@ -10,8 +10,6 @@ function onSkillStart(caster, target, skill)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    --calculate ws damage
-    action.amount = skill.basePotency;
 
     --might be wrong
     action.enmity = action.enmity + 400;

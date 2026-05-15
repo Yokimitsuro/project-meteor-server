@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("ability");
 
 function onAbilityPrepare(caster, target, ability)
@@ -10,7 +10,6 @@ function onAbilityStart(caster, target, ability)
 end;
 
 function onSkillFinish(caster, target, skill, action, actionContainer)
-    action.amount = skill.basePotency;
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);
 end;

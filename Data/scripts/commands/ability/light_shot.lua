@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("ability");
 
 function onAbilityPrepare(caster, target, ability)
@@ -14,7 +14,6 @@ function onSkillFinish(caster, target, skill, action, actionContainer)
     --If you set the hitnum like any other multi-hit WS it will play the animation repeatedly.
     action.hitNum = 1;
 
-    action.amount = skill.basePotency;
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);
 end;

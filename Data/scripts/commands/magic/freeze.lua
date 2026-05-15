@@ -1,4 +1,4 @@
-require("global");
+﻿require("global");
 require("magic");
 
 function onMagicPrepare(caster, target, spell)
@@ -14,8 +14,6 @@ function onSkillFinish(caster, target, skill, action, actionContainer)
     spell.enmityModifier = 0;
     target.hateContainer.UpdateHate(caster, -720);
 
-    --calculate damage
-    action.amount = skill.basePotency;
 
     --DoAction handles rates, buffs, dealing damage
     action.DoAction(caster, target, skill, actionContainer);
